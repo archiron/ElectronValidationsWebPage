@@ -1,0 +1,279 @@
+/* LXPLUS */
+body {
+  margin-top: 0px;
+  padding-top: 0px;
+  }
+div.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0px;
+  background-color: lightgreen;
+  padding: 2px;
+  font-size: 16px;
+  z-index: 301;
+}
+main {
+  position:-webkit-sticky;
+  position: sticky;
+  top: 300px;
+  left: 12px;
+  bottom: 100px;
+  width: 100%;
+}
+footer {
+  background: lightgrey;
+  left: 2px;
+  width: 100%;
+  position: fixed;
+  bottom: 0px;
+  overflow: hidden;
+}
+.parent {
+  margin: auto;
+  border: 0px solid lightgrey;
+}
+.line {
+  margin: auto;
+  padding-top: 25px;
+  /*border: 0px solid blue;*/
+}
+.cell {
+  display: inline-block;
+  padding-left: 20px;
+  padding: auto;
+  /*border: 1px solid blue;*/
+  /*scroll-margin-top: 190px;*/
+}
+.cell1 {
+  display: inline-block;
+  padding-left: 200px;
+  border: 0px pink;
+  /*scroll-margin-top: 190px;*/
+}
+.cell2 {
+  display: inline-block;
+  padding-left: 20px;
+  border: 0px solid blue;
+  /*scroll-margin-top: 190px;*/
+}
+.cellUp {
+  display: inline-block;
+  /*margin: auto;
+  vertical-align: top;*/
+  border: 0px solid green;
+}
+.cellKS {
+  display: inline-block;
+  /*margin: auto;*/
+  width: 150px;
+  border: 1px solid green;
+}
+.anchor {
+  padding-top: 205px;
+  margin-top: -206px;
+  padding-left: 20px;
+}
+.anchor0 { /* for RELEASE */
+  padding-top: 225px;
+  margin-top: -226px; 
+}
+.anchor1 { /* for DEV */
+  padding-top: 255px;
+  margin-top: -256px; 
+}
+.anchor2 {
+  padding-top: 258px;
+  margin-top: -259px; 
+}
+.anchor3 {
+  display: block;
+  position: relative;
+  top: -206px;
+  visibility: hidden;
+}
+.anchor4 {
+  padding: 50px;
+  margin-top: -51px;
+  padding-left: 20px;
+  margin-left: 20px;
+}
+.anchor5 {
+  padding-top: 155px;
+  margin-top: -156px;
+  padding-left: 140px;
+}
+.greyClass {
+  color: grey;
+}
+.lightGreyClass {
+  color: lightgrey;
+}
+.redClass {
+  color: red;
+}
+.blueClass {
+  color: blue;
+}
+.darkBlueClass {
+  color: darkblue;
+}
+.greenClass {
+  color: green;
+}
+table.tab0 {
+  padding: 5;
+  width: 100%;
+  border: 0px solid black;
+}
+table.tab1 {
+  width: 100%;
+  border: 1px solid black;
+}
+table.tab2 {
+  padding: 1px;
+  width: 60%;
+  border: 0px solid black;
+}
+table.tab3 {
+  width: 160px;
+  border: 1px solid green;
+}
+table.tab4 {
+  padding: 5px;
+  width: 40%;
+  border: 1px solid #008000;
+}
+table.tab5 {
+  padding: 5px;
+  width: 100%;
+  border: 1px solid #008000;
+  /*border-collapse: collapse;*/
+}
+.RtextAlign {
+  text-align: right;
+}
+.CtextAlign {
+  text-align: center;
+}
+.LtextAlign {
+  text-align: left;
+}
+.VtextAlign {
+  vertical-align:50%;
+}
+a.greyClass:link{
+  color: grey;
+}
+a.greenClass:link{
+  color: green;
+}
+a.blueClass:link{
+  color: blue;
+}
+a.redClass:link{
+  color: red;
+}
+img {
+  border: 1px;
+  text-align: center;
+  /*padding-top: 205px;*/
+  /*margin-top: -206px; */
+}
+img.s15 {
+  border: 0px;
+  width: 15px;
+  height: 15px;
+}
+img.s18 {
+  border: 0px;
+  width: 18px;
+  height: 18px;
+}
+img.s22 {
+  border: 0px;
+  width: 22px;
+  height: 22px;
+}
+img.selected {
+  border: 3px solid blue;
+}
+img.unselected {
+  border: 0px solid blue;
+}
+th {
+  font-size: xx-large;
+}
+tr {
+  vertical-align: top;
+}
+td.b0 {
+  border: 0px solid black;
+}
+td.b1 {
+  border: 1px solid black;
+}
+td.b2 {
+  border: 1px solid black;
+  width: 10px;
+}
+td.b3 {
+  border: 0px solid black;
+  width: 50%;
+}
+td.tab5 {
+  border: 1px solid black;
+  width: 100%;
+}/**/
+h2 {
+  color: red;
+}
+
+table.clickable.curveChoice td, table.clickable.curveChoice {
+  border-collapse: collapse;
+}
+table.clickable.curveChoice td:nth-child(2), table.clickable.curveChoice td:nth-child(4) {
+  border-left: none;
+  padding-left: 10px;
+}
+table.clickable.curveChoice td:first-child, table.clickable.curveChoice td:nth-child(3) {
+  border-right: none;
+}
+.Gras {
+  font-weight: bold;
+ }
+.noGras {
+  font-weight: normal;
+}
+
+div.ex1 {
+  width: 300px;
+  margin: auto;
+  border: 3px solid #73AD21;
+}
+div.ex2 {
+  width: 100%;
+  margin: auto;
+  border: 3px solid #73AD21;
+}
+span.ex1 {
+  display: inline-block;
+  width: 25%;
+}
+.ui-accordion-content-active {
+    padding: 0 !important;
+    border-style: none;
+    background-color: transparent;
+    background-image: none;
+}
+.ui-widget_content {
+    color: lightgreen;
+    background: lightgreen;
+}
+.ui-state_active {
+  border: 2px solid #008000;
+  background: #008000;
+}
+.ui-state_default {
+  color: lightgreen;
+  background: lightgreen;
+}
