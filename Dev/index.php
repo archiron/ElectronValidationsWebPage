@@ -187,7 +187,8 @@ for ($i = 0; $i < count($clefs); $i++) {
 
     foreach ($histoArray[$clefs[$i]] as $elem) {
         if ( $elem != "endLine" ) {
-            list ($short_histo_name, $short_histo_names, $histo_positions) = shortHistoName($elem); 
+            list ($short_histo_name, $short_histo_names, $histo_positions) = shortHistoName($elem);
+            //simPrint('long histo name', $short_histo_names[0]);
             $pict_name = $escaped_url . "/" . $pictsValue ."/" . $short_histo_names[0] . $pictsExt;
             //simPrint('pict_name', $pict_name);
             $gif_name = $escaped_url . "/gifs/" . $short_histo_names[0] . ".gif";
@@ -208,12 +209,14 @@ for ($i = 0; $i < count($clefs); $i++) {
                 echo '<div class="cellUp"><a href="#"><img class="s18" src=' . $image_up . ' alt="Top"></a></div>' . "\n";
                 echo '</td>';
             }
+            $urlOptions = 'short_histo_name=' . $short_histo_name . '&url=' . $pict_name . '&basket=view&actionFrom=' . $actionFrom . '&addLink=KO';
+            $urlOptions .= '&long_histo_name=' . $short_histo_names[0] . '"';
             if (  $histo_positions[3] == "0" ) {
                 echo '<td>';
                 echo '<div class="cell anchor1" id="' . $short_histo_name . '">';
                 //echo '<a href="' . $web_roots . '/basket.php?short_histo_name=' . $short_histo_name . '&url=' . $gif_name . '&basket=view&actionFrom=' . $actionFrom . '&addLink=KO">';
                 //echo '<img class="img " width="440" src="' . $gif_name . '" alt=""></a>';
-                echo '<a href="' . $web_roots . '/basket.php?short_histo_name=' . $short_histo_name . '&url=' . $pict_name . '&basket=view&actionFrom=' . $actionFrom . '&addLink=KO">';
+                echo '<a href="' . $web_roots . '/basket.php?' . $urlOptions . '>';
                 echo '<img class="img " width="440" src="' . $pict_name . '" alt=""></a>';
                 echo '</div>';
                 echo "\n";
@@ -270,7 +273,7 @@ for ($i = 0; $i < count($clefs); $i++) {
                 echo '<div class="cell anchor1" id="' . $short_histo_name . '">';
                 //echo '<a href="' . $web_roots . '/basket.php?short_histo_name=' . $short_histo_name . '&url=' . $gif_name . '&basket=view&actionFrom=' . $actionFrom . '&addLink=KO">';
                 //echo '<img class="img" width="440" src="' . $gif_name . '" alt=""></a>' ;
-                echo '<a href="' . $web_roots . '/basket.php?short_histo_name=' . $short_histo_name . '&url=' . $pict_name . '&basket=view&actionFrom=' . $actionFrom . '&addLink=KO">';
+                echo '<a href="' . $web_roots . '/basket.php?' . $urlOptions . '>';
                 echo '<img class="img" width="440" src="' . $pict_name . '" alt=""></a>' ;
 
                 if ($DBoxflag) {

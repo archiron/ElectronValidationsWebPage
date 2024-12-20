@@ -460,6 +460,7 @@ echo '<br><br><br><br><br><br>';
     var origin = <?php echo json_encode($origin); ?>;
     var tableau = <?php echo json_encode($tableau); ?>;
     var pictsValue = <?php echo json_encode($pictsValue); ?>;
+    var newUrl = <?php echo json_encode($newUrl); ?>;
 </script>
 
 <script>
@@ -618,6 +619,9 @@ $(document).ready(function(){
     }
     function checkReleases() {
         if ($(this).parents('table.clickable').hasClass('Releases')) {
+            var cc2 = $(this).attr('id');
+            console.log('cc2 : ' + cc2)
+            if ( cc2 == 'Histos' ) {
             var tild = $("#Histos").text();
             if (tild.indexOf("remove") >= 0) {
                 $("#Histos").html('<span class="blueClass"><b>Press here to display Releases array</b></span>');
@@ -627,6 +631,10 @@ $(document).ready(function(){
             }
             //console.log('tild : ' + tild);
             $("#ListeReleases").toggle();
+        }
+        else if ( cc2 == 'displayHistosLink' ) {
+                $(location).attr('href',newUrl);
+            }
         }
     }
 

@@ -159,7 +159,6 @@ if ($basket == "view") {
     echo "Fin du calcul" . $dateString . $_fDL;
 
     echo '<div id="ListeReleases" style="display: none;">';
-
     echo '<table border=1>';
     echo '<tr><td class="CtextAlign"><b>Release</b></td><td class="CtextAlign"><b>Reference</b></td></tr>';
     foreach ($tableau as $key3 => $value3)
@@ -461,6 +460,7 @@ echo '<br><br><br><br><br><br>';
     var origin = <?php echo json_encode($origin); ?>;
     var tableau = <?php echo json_encode($tableau); ?>;
     var pictsValue = <?php echo json_encode($pictsValue); ?>;
+    var newUrl = <?php echo json_encode($newUrl); ?>;
 </script>
 
 <script>
@@ -619,15 +619,22 @@ $(document).ready(function(){
     }
     function checkReleases() {
         if ($(this).parents('table.clickable').hasClass('Releases')) {
-            var tild = $("#Histos").text();
-            if (tild.indexOf("remove") >= 0) {
-                $("#Histos").html('<span class="blueClass"><b>Press here to display Releases array</b></span>');
+            var cc2 = $(this).attr('id');
+            console.log('cc2 : ' + cc2)
+            if ( cc2 == 'Histos' ) {
+                var tild = $("#Histos").text();
+                if (tild.indexOf("remove") >= 0) {
+                    $("#Histos").html('<span class="blueClass"><b>Press here to display Releases array</b></span>');
+                }
+                else if (tild.indexOf("display") >= 0) {
+                    $("#Histos").html('<span class="blueClass"><b>Press here to remove Releases array</b></span>');
+                }
+                //console.log('tild : ' + tild);
+                $("#ListeReleases").toggle();
             }
-            else if (tild.indexOf("display") >= 0) {
-                $("#Histos").html('<span class="blueClass"><b>Press here to remove Releases array</b></span>');
+            else if ( cc2 == 'displayHistosLink' ) {
+                $(location).attr('href',newUrl);
             }
-            //console.log('tild : ' + tild);
-            $("#ListeReleases").toggle();
         }
     }
 

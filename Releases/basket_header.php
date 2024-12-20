@@ -43,6 +43,7 @@
     $basket = (isset($_REQUEST['basket']) ? $_REQUEST['basket'] : '');
     $createF = (isset($_REQUEST['createF']) ? $_REQUEST['createF'] : '');
     $short_histo_name  = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
+    $long_histo_name  = (isset($_REQUEST['long_histo_name']) ? $_REQUEST['long_histo_name'] : '');
     if (!empty($createF)) {
         echo $web_roots . "/" . getSharedFileName(session_id());
         $fSharedName = $web_roots . "/" . getSharedFileName(session_id());
@@ -184,9 +185,22 @@
 
     if ($basket == "view") {
         echo '<td class="CtextAlign">';
-        echo '<table class="clickable Releases" width="270px" border="1">';
+        echo '<table class="clickable Releases" width="500px" border="1">';
         echo '<tr>';
         echo '<td align="center" id="Histos"><span class="blueClass"><b>Press here to display Releases array</b></span></td>';
+        //echo "</tr>";
+        //echo '<tr>';
+        echo '<td>&nbsp;</td>';
+        $tag1 = explode('/', $actionFrom)[3];
+        $tag2 = explode('_', $tag1, 2)[0];
+        $tag3 = explode('_', $tag1, 2)[1];
+        $newUrl = 'https://cms-egamma.web.cern.ch/validation/Electrons/Comparisons/main_display_comparison.php?';
+        $newUrl .= '&tag=' . $tag2;
+        $newUrl .= '&file4histos=ElectronMcSignalHistos.txt&release=&dataset=' . $tag3;
+        $newUrl .= '&reference=&long_histo_name='.$long_histo_name.'&compFullFast=';
+        //echo '<td align="center" id="displayHistos"><span class="blueClass"><b>Display histos comparison (dev)</b></span></td>';
+        echo '<td align="center" id="displayHistosLink"><span class="blueClass">';
+        echo '<b>Display histos comparison (dev)</b></span></td>';
         echo "</tr>";
         echo "</table>";/**/
         /*echo '<table width="250px" border="1">';
