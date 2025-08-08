@@ -20,6 +20,7 @@ $web_rootsT=$racine_html . "validation/Electrons/Test";
 $web_rootsR=$racine_html . "validation/Electrons/Releases";
 $web_roots=$racine_html . "validation/Electrons";
 $web_roots_comparison = $racine_html . "validation/Electrons/Comparisons";
+$web_roots_KS = $racine_html . "validation/Electrons/KS_Evaluation";
 
 $racine_eos="/eos/project/c/cmsweb/www/egamma/";
 $racine_KS = '/eos/project/c/cmsweb/www/egamma/validation/Electrons/Store/KS_Curves';
@@ -30,9 +31,18 @@ $image_point=$web_roots . "/img/point.gif";
 $image_add=$web_roots . "/img/buy.png";
 $image_remove=$web_roots . "/img/remove.png";
 $image_loupe=$web_roots . "/img/loupe.png";
+$image_emptyFile=$web_roots . "/img/emptyFile.webp";
+$image_missingFile=$web_roots . "/img/missingFile.webp";
 
 $url_0 = $web_roots . "/php_inc/addRemove.php";
 $url_1 = $web_roots . "/php_inc/pictFormat.php"; // picture format (gif/png)
+$url_2 = $web_roots . "/php_inc/goBasket.php";
+$url_3 = $web_roots . "/php_inc/regenerate.php"; // tableListe
+$url_4 = $web_roots . "/php_inc/goKS_Evaluation.php"; // KS Evaluation
+$url_5 = $web_roots . "/php_inc/emptyBasketFile.php"; // empty basket file
+$url_6 = $web_roots . "/php_inc/createSharedFile.php"; // shared file
+$url_7 = $web_roots . "/php_inc/chooseSharedFile.php"; // choosed file
+$url_8 = $web_roots . "/php_inc/reloadIndex.php"; // for tablo1[2]
 
 ?>
 

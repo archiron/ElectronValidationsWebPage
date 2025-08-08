@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<title>releases list webpage</title>
+<title>Releases list webpage</title>
 <link rel="stylesheet" href="../php_inc/styles.css">
 <script src="../js/jQuery-3.6.3/jquery-3.6.3.min.js"></script>
 <script src="../js/jquery-ui.min.js"></script>
@@ -35,14 +35,12 @@ if ($basket == "view") {
     $tags = $parts[3];
     $origin = $new . DIRECTORY_SEPARATOR . $ref;
     //simPrint('origin', $origin);
-    //if (strpos($url_http, "gif") !== false) {
     if (strpos($url_http, $_SESSION['pictFormat']) !== false) {
         $tmp = explode('_', $ref, 2);//prePrint("ref", $tmp);
         $ref = $tmp[1];
         echo '<b><span>' . $tags . '</span></b>' . '<br>';
         echo '<b><span class="redClass">' . $ref . '</span></b>' . ' - ';
         echo '<b><span class="blueClass">' . $new . '</span></b>' . '<br>' . $_fDL;
-        //simPrint('rr', $parts[3]); // get the comp (i.e. RECO vs RECO) & dataset (i.e. ZEE)
         echo '<a id="' . $short_histo_name  . '" name="' . $short_histo_name  . '"';
         echo ' href="' . $url_http . '"><img border="0" class="image" width="480" src="' . $url_http . '" id="displayHisto"></a>' . "\n";
     }
@@ -54,7 +52,6 @@ if ($basket == "view") {
     $testExistUrl = false;
     foreach ($lineHisto as $key => $value) {
         if ( $value == $url_http ) {
-            //echo "exist<br>";
             $testExistUrl = true;
         }
     }
@@ -62,11 +59,9 @@ if ($basket == "view") {
     echo '<table border="1" width = "100" class="clickable addLink">';//
     echo '<tr>';// valign=\"top\"
     if ( $testExistUrl) {
-        //echo '<td align="center" addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" width="60"><font color="red"><b>Remove</b></font></td>';
         echo '<td align="center" addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" width="60"><img width="32" height="32" src="' . $image_remove . '" alt="Rem"/></td>';
     }
     else {
-        //echo '<td align="center" addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" width="60"><font color="blue"><b>Add</b></font></td>';
         echo '<td align="center" addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" width="60"><img width="32" height="32" src="' . $image_add . '" alt="Add"/></td>';
     }
     echo "</tr>";
@@ -74,20 +69,13 @@ if ($basket == "view") {
     echo "<br><br><br>";
 
     echo "<br><div>";
-    echo "<a href=\"$web_roots/basket.php?short_histo_name=" . $short_histo_name   . "&basket=work&actionFrom=" . $actionFrom . "\">Manage the links</a>" . "\n";
-    echo "<br></div>";
-
-    echo "<br><div>";
-    echo "<a href=\"$web_roots/basket.php?short_histo_name=" . $short_histo_name   . "&basket=share&actionFrom=" . $actionFrom . "\">Create - Use a shared file</a>" . "\n";
-    echo "&nbsp;- &nbsp;";
-    echo "<a href=\"$web_roots/basket.php?short_histo_name=" . $short_histo_name   . "&basket=view&actionFrom=" . $actionFrom . "&local=true" . "\">Use local file</a>" . "\n";
+    echo "&nbsp;<a href=\"$web_roots/basket.php?basket=work&actionFrom=" . $actionFrom . "\">Manage the links</a>&nbsp;" . "\n";
     echo "<br></div>";
 
     echo "</td>";
 
     echo '<td class="CtextAlign">';
     echo '<span class="darkBlueClass" style="font-size:150%; " id="Liste"><b>List of releases for comparison</b></span>' . $_fDL;
-    //filter($url, $image_loupe);
     $listDir0 = array();
     $listDir1 = array();
     $listDir2 = array();
@@ -100,7 +88,6 @@ if ($basket == "view") {
         {
             $first = $value[0];
             if (is_numeric($first)) {
-                //echo $key . ' : ' . $path0 . $_fDL;
                 $listDir0[] = $value;
             }
         }
@@ -118,7 +105,6 @@ if ($basket == "view") {
         $path0 = $chemin_eos_base . DIRECTORY_SEPARATOR . $value1;
         $listDir1 = [];
         $files1 = array_slice(scandir($path0), 2);
-        //echo '<tr><td>' . $value1 . '</td><td>';
         $temp = [];
         foreach ($files1 as $key2 => $value2)
         {
@@ -126,17 +112,13 @@ if ($basket == "view") {
             if (is_dir($path1))
             {
                 foreach(array('gifs', 'pngs') as $value6) {
-                    //echo '==' . $key2 . ' : ' . $value2 . $_fDL;
-                    //$path2 = $path1 . DIRECTORY_SEPARATOR . $tags . DIRECTORY_SEPARATOR . 'gifs';
                     $histoName1 = explode('.', $histoName)[0];
                     $pictsExt = substr($value6, 0, 3);//simPrint('ext', $pictsExt);
                     $path2 = $path1 . DIRECTORY_SEPARATOR . $tags . DIRECTORY_SEPARATOR . $value6;
-                    //simPrint('path2', $path2);
                     if (is_dir($path2)) {
                         $listDir2[] = $path2;
                         if (file_exists($path2 . DIRECTORY_SEPARATOR . $histoName1 . "." . $pictsExt)) {
                             $listPict[] = $path2 . DIRECTORY_SEPARATOR . $histoName1 . "." . $pictsExt;
-                                //$temp[] = $value2;
                                 $temp[] = $value2 . "." . $pictsExt;
                             }
                     }
@@ -147,16 +129,9 @@ if ($basket == "view") {
             $tableau[$value1] = $temp;
         }
     }
-    //prePrint('listdirs2', $listDir2);
-    //prePrint('list pict', $listPict);
-    //prePrint('tableau', $tableau);
-    //simPrint('ref', $ref);echo strlen($ref) . $_fDL;
-    //simPrint('new', $new);echo strlen($ref) . $_fDL;
-    //$name = $new . DIRECTORY_SEPARATOR . $ref;
-    //simPrint('name', $name);
     $timestamp = time();
     $dateString = date($format, $timestamp);
-    echo "Fin du calcul" . $dateString . $_fDL;
+    echo "Fin du calcul : " . $dateString . $_fDL;
 
     echo '<div id="ListeReleases" style="display: none;">';
     echo '<table border=1>';
@@ -192,64 +167,19 @@ if ($basket == "view") {
     echo '<br><br><br><br><br><br>';
 } 
 elseif ($basket == "work") {
-    $workLink = "basket.php?short_histo_name=" . $short_histo_name  . "&basket=work&actionFrom=" . $actionFrom ;
+    $workLink = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name  . "&basket=work&actionFrom=" . $actionFrom ;
     $aFrom = explode("/", $actionFrom);
-    $refLink = $web_roots . '/index.php?actionFrom=/' . $aFrom[1] . '/' . $aFrom[2];
+    $refLink = $web_roots . '/index.php?actionFrom=' . $actionFrom;
     $displayAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name  . "&basket=display&actionFrom=" . $actionFrom;
     $sharedAddress = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=work&actionFrom=" . $actionFrom . "&sharedF=" . getReducedName($_SESSION['fileForHistos_eos']);
+
     if ($url == '') {
         $url = $sharedAddress;
     }
 
-    echo '<form method="POST" action="'.$workLink.'">';
     error_reporting(E_ALL);
     $lineHisto = array_filter($lineHisto);
     $text_0 = "[0] " . $refLink . "\n\n";
-    $text = ''; //$text_0;
-
-    if (!empty($_POST['rmva'])){
-        $lineHisto2 = [];
-        file_put_contents($_SESSION['fileForHistos_eos'], implode(PHP_EOL, $lineHisto2));
-        header( "Location: " . $workLink );
-    }
-    
-    if( !empty($_POST['cpal']) ) {
-        //$allSelected = true; // not used
-        $checked = array_fill(0, $Nlinks, 1);
-    }
-
-    if( !empty($_POST['choix']) )
-    {
-       $checked = array_fill(0, $Nlinks, 0);
-        if( !empty($_POST['copy']) ) {
-            foreach($_POST['choix'] as $val)
-            {
-                //$text = $text . sprintf('[%d]', $val + 1) . " https:" . $lineHisto[$val] . "\n";
-                $text = $text . sprintf('[%d]', $val + 1) . " " . $lineHisto[$val] . "\n";
-                $checked[$val] = 1;
-            }
-        }
-        if( !empty($_POST['rmvs']) ) {
-            $checked2 = array_fill(0, $Nlinks, 1);
-            echo "rmvs : " . $_POST['rmvs'] . "<br>\n";
-            foreach($_POST['choix'] as $val) {
-                $checked2[$val] = 0;
-            }
-            $ii = 0;
-            foreach($lineHisto as $key => $value) {
-                if ($checked2[$ii] == 1) {
-                    $lineHisto2[] = $value;
-                    $ii += 1;
-                }
-                else {
-                    $ii += 1;
-                }
-            }
-            file_put_contents($_SESSION['fileForHistos_eos'], implode(PHP_EOL, $lineHisto2));
-            header( "Location: " . $workLink );
-        }
-    }
-    echo '<br />';
     
     echo "<table border=\"1\" cellpadding=\"5\" width=\"100%\">";
     echo "\n<tr valign=\"top\">";
@@ -262,39 +192,27 @@ elseif ($basket == "work") {
     foreach($lineHisto as $key => $value)
     {
         echo "\n<tr valign=\"top\">";
-        //$value2 = substr($value, 46); // classique
-        //$value2 = substr($value, 52); // new version
-        //simPrint('chemin html : ', $racine_html);
         $value2 = str_replace($racine_html . 'validation/Electrons/', '', $value);
-        //simPrint("value1 : " , $value);
-        //simPrint("value2 : " , $value2);
         $parts = explode("/", $value2); # so, there is 6 parts
-        //prePrint('parts', $parts);
-        //simPrint('parts[5] : ', $parts[5]);
-        //simPrint('parts[3] : ', $parts[3]);
         $histoName = substr($parts[5], 0, -4);
         $compAnddataset = explode("_", $parts[3], 2);
-        //prePrint('compAnddataset', $compAnddataset);
-        //simPrint('compAnddataset[0] ', $compAnddataset[0]);
-        //simPrint('compAnddataset[1] ', $compAnddataset[1]);
-        echo "<td align=\"center\">" . sprintf('%02d', $key + 1) . ' <input type="checkbox" name="choix[]" value="' . $key ;
+        echo '<td align="center">' . sprintf('%02d', $key + 1) . ' <input type="checkbox" onchange="checkFunction2()" name="choix[]" id="' . sprintf('%02d', $key + 1);
+        echo '" value="' . $key ;
         if (count($checked) >= 1) {
             if ($checked[$key] == '1') {
-                echo "\" checked=\"checked\"" ;
+                echo '" checked="checked"';
             }
         }/**/
-        echo "\">" . "</td>\n";
+        echo '" />' . "</td>\n";
         echo "<td align=\"center\">" . $compAnddataset[0] . "</td>\n"; // comparison (RECO vs RECO, PU vs PU, ..)
         echo "<td align=\"center\">" . $compAnddataset[1] . "</td>\n"; // dataset (ZEE, TTbar, ..)
         echo "<td align=\"center\">" . $histoName . "</td>\n";
         
         if (strpos($url, $parts[1]) !== false)
         {
-            //echo "<td align=\"center\"><font color=\"blue\">" . "https:" . $value . "</font>";
             echo "<td align=\"center\"><font color=\"blue\">" . $value . "</font>";
         }
         else {
-            //echo "<td align=\"center\"><font color=\"darkgrey\">" . "https:" . $value . "</font>";
             echo "<td align=\"center\"><font color=\"darkgrey\">" . $value . "</font>";
         }
         echo "</td>\n";
@@ -304,25 +222,33 @@ elseif ($basket == "work") {
 
     echo '<br>';
     echo '<table border="1" cellpadding="5" class="clickable buttonChoice">';
-    echo '<tr><td class="CtextAlign" button-choice="line0" title="Click on text to add it on textArea">';
+    echo '<tr><td class="CtextAlign" button-choice="line0" title="Click on text to add it on textArea" id="line0">';
     echo 'Release link : ' . $text_0 ;
     echo "</td></tr>";
     echo  "</table>\n";
 
-    echo "<br>";
-    echo '    <input type="submit" name="cpal" value="Select/UnSelect all links" >' . "\n"; 
-    echo '&nbsp;&nbsp;';
-    echo '    <input type="submit" name="rmva" value="Remove all links" ">' . "\n"; 
-    echo '&nbsp;&nbsp;';
-    echo '    <input type="submit" name="rmvs" value="Remove selected links" >' . "\n"; 
-    echo '&nbsp;&nbsp;';
-    echo '    <input type="submit" name="copy" value="Copy selected links">' . "\n";
+    echo '<br>';
+    echo '<table style="border:1px solid black;" cellpadding="5" class="clickable actionChoice">';
+    echo '<tr>';
+    echo '<td id="selectAll" style="border:1px solid black;width:180px" class="CtextAlign">Select/UnSelect all links</td>' . "\n"; 
+    echo '<td id="removeAll" style="border:1px solid black;width:130px" class="CtextAlign">Remove all links</td>' . "\n"; 
+    echo '<td id="removeSelected" style="border:1px solid black;width:160px" class="CtextAlign">Remove selected links</td>' . "\n"; 
+    echo '<td id="copySelected" style="border:1px solid black;width:130px" class="CtextAlign">Copy selected links</td>' . "\n";
+    echo '<td style="border:1px solid black;width:130px" class="CtextAlign">&nbsp;</td>' . "\n";
+    echo '<td id="shareFile" style="border:1px solid black;width:130px" class="CtextAlign"><font color="grey">Select histos for sharing</font></td>' . "\n";
+    echo '<td style="border:1px solid black;width:130px" class="CtextAlign">&nbsp;</td>' . "\n";
+    echo '<td style="border:1px solid black;width:130px" class="CtextAlign">' . '<a href="' . $displayAddr . '">Display histos</a>' . '</td>' . "\n";
+    echo "</tr>";
+    echo  "</table>";
 
-    echo "<br>&nbsp;&nbsp;<font color=\"blue\">Please, note that the <b>remove</b> function act on the file and not only on this webpage ! </font><br>" ;
+    echo "&nbsp;&nbsp;<font color=\"blue\">Please, note that the <b>remove</b> function act on the file</font> <b><font color=\"red\">AND NOT ONLY</font></b> <font color=\"blue\">on this webpage ! </font><br>" ;
+    echo '<br>';
     
-    echo '</form>';
-    
-    echo "<textarea name=\"message_content\" cols=\"100\" rows=\"10\" class=\"contentfont\" id=\"textArea\">".$text."</textarea>" . "<br>\n"; # 
+    echo '<textarea name="message_content" cols="100" rows="10" class="contentfont" id="textArea">' . $text . '</textarea>' . "<br>\n"; #
+
+    echo '<br>';
+        echo '<label style="border:2px solid red;display:none" id="sharedAddress">Shared address : </label>';
+    echo '<br>';
 
     $returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=view&actionFrom=" . $actionFrom;
     $pos = strpos($url, 'index.php');
@@ -333,81 +259,56 @@ elseif ($basket == "work") {
     else {
         $returnAddr = $url;
     }
-    echo "<br><div>\n";
-    if(isset($_POST['button1'])) {
-        header( "Location: " . $workLink ); 
-    }
-    echo "<form method=\"post\">";
-    echo "<input type=\"submit\" name=\"button1\" class=\"button\" value=\"Refresh\" >";
-    echo " &nbsp;&nbsp;&nbsp; ";
-    //echo "<a href=\"" . $returnAddr . "\">BACK</a>" . "\n"; 
-    //echo "$nbsp - $nbsp\n";
-    echo "<a href=\"" . $displayAddr . "\">Display histos</a>" . "\n"; 
-    echo "<br></div>\n";
 
-    if (strpos(getReducedName($_SESSION['fileForHistos_eos']), "shared") !== false) {
-        echo "<table border=\"1\" cellpadding=\"5\" width=\"100%\">";
-        echo "\n<tr valign=\"top\">";
-        echo "<td align=\"center\"><font color=\"blue\"><b>link to share</b></font></td>\n";
-        echo "</tr>\n";
-        echo "\n<tr valign=\"top\">";
-        echo "<td align=\"center\">" . $sharedAddress . "</td>\n";
-        echo "</tr>\n";
-        echo  "</table>\n";
+    echo '<table style="margin:0 auto;border:1px solid black;" cellpadding="5" width="30%">';
+    echo '<tr valign="top">';
+    echo '<td align="center" style="margin:0 auto;border:1px solid black;"><font color="black"><b>shared files to use</b></font></td>';
+    echo '</tr>';
+
+    //prePrint('sharedFilesList', $sharedFilesList);
+    foreach ($sharedFilesList as $key => $value) {
+        $name = $chemin_eos_base . '/' . $value;
+        if (file_exists($name) && (filesize($name) !== 0)) {
+            echo '<tr valign="top"><td align="center" style="margin:0 auto;border:1px solid black;">';
+            //echo '[' . $key . '] := ' . $name . ' (' . filesize($name) . ')' . $_fDL;
+            $reducedValue = str_replace('sharedList.', '', $value);
+            $reducedValue = str_replace('.txt', '', $reducedValue);
+            // recompute actionFrom
+            $handleBasket = fopen($name, "r");
+            $tmp_aF0 = fgets($handleBasket);
+            $tmp_aF0 = str_replace(array("\r", "\n"), '', $tmp_aF0);
+            fclose($handleBasket);
+
+            $tmp_aF1 = str_replace($web_roots, '', $tmp_aF0);
+            $tmp_aF2 = explode('/',$tmp_aF1);
+            $tmp_aF3 = '/' . $tmp_aF2[1] . '/' . $tmp_aF2[2] . '/' . $tmp_aF2[3];
+            //simPrint('aF1', $tmp_aF3);
+
+            $address = $web_roots . "/basket.php?actionFrom=" . $tmp_aF3 . "&sharedF=" . $reducedValue . '&basket=work';
+            //echo '[' . $key . '] := ' . $address . $_fDL;
+            //echo '<a href="' . $address . '">sharedList.' . $reducedValue . '.txt</a>';
+            $tmp_aF4 = explode('.', $reducedValue)[1];
+            $tmp_AF5 = substr($tmp_aF4, 0, 8);//simPrint('$tmp_AF5', $tmp_AF5);
+            $tmp_AF6 = substr($tmp_aF4, 8);//simPrint('$tmp_AF5', $tmp_AF6);
+            echo '<a href="' . $address . '">' . $tmp_AF5 . ' - ' . $tmp_AF6 . '</a>';
+            echo '</td></tr>';
+        }
     }
+        echo  '</table>' . "\n";
     echo $_fDL . $_fDL;
 }
-elseif ($basket == "share") {
-    $returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name  . "&basket=view&actionFrom=" . $actionFrom;
-    #echo "share session : " . $_SESSION['url'] . "<br>\n";
-    
-    echo "<table border=\"1\" cellpadding=\"5\" width=\"100%\">";
-    echo "\n<tr valign=\"top\">";
-    echo "<td align=\"center\" width=\"30%\"><font color=\"blue\"><b>Create a shared file</b></font></td>\n";
-    echo "<td align=\"center\" width=\"50%\"><font color=\"blue\"><b>Use a shared file</b></font></td>";
-    echo "<td align=\"center\" width=\"20%\"><font color=\"blue\"><b>Stay using a local file</b></font></td>";
-    echo "</tr>\n";
-    echo "\n<tr valign=\"top\">";
-    echo "<td align=\"center\" width=\"30%\">";
-    echo "<br>";
-    echo "<a href=\"$web_roots/basket.php?short_histo_name=" . $short_histo_name   . "&basket=share&actionFrom=" . $actionFrom . "&createF=OK" . "\">Create a shared file</a>" . "\n";
-    echo "<br><br>";
-    echo "</td>";
-    echo "<td align=\"center\" width=\"50%\">";
-
-    foreach($sharedFilesList as $key => $value)
-    {
-        $sLink = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=view&actionFrom=" . $actionFrom . "&sharedF=" . $value;
-        echo " <a href=\"" . $sLink . "\">".$value."</a><br>\n";
-    }
-    
-    echo "</td>";
-    echo "<td width=\"20%\" align=\"center\">";
-    echo "<br>";
-    echo "<a href=\"" . $returnAddr . "\">BACK</a>" . "\n"; 
-    echo "<br><br>";
-    echo "</td>";
-    echo "\n<tr valign=\"top\">";
-    echo  "</table>\n";
-    
-}
 elseif ($basket == "display") {
-    //$returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name . "&basket=view&actionFrom=" . $actionFrom;
-    $returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name . "&basket=work&actionFrom=" . $actionFrom . "&url=" . $url;
-    $returnAddr2 = $web_roots . "/index.php?actionFrom=" . $actionFrom . "#";// #vertexX
+    $returnAddr = $web_roots . "/basket.php?basket=work&actionFrom=" . $actionFrom;
+    $returnAddr2 = $web_roots . "/index.php?actionFrom=" . $actionFrom . "#";
     
     $lineHisto = array_filter($lineHisto);
-    #$clefs = array_keys($histoArray);
     echo "<h2><center><b><font color=red>shared histos display</font></b></center></h2><br>";
 
     $i=0;
     echo "<table border=\"1\" cellpadding=\"5\" width=\"100%\">";
     foreach ($lineHisto as $key => $value) {
-        //echo "value1 : " . $value . "<br>\n";
         $value2 = substr($value, 52);
-        //echo "value2 : " . $value2 . "<br>\n";
         $parts = explode("/", $value2); # so, there is 6 parts
-        //prePrint('parts', $parts);
 
         if ( $i % 3  == 0 ) {
             echo "\n<tr valign=\"top\">";
@@ -420,7 +321,6 @@ elseif ($basket == "display") {
         else {
             echo "<font color=\"darkgrey\">" . "https:" . $parts[1] . "</font>";
         }
-        //echo "<a href=\"" . "http:" . $value . "\"><img border=\"0\" class=\"image\" width=\"" . "440" . "\" src=\"" . "http:" . $value . "\"></a>" . "\n";
         echo "<a href=\"" . $value . "\"><img border=\"0\" class=\"image\" width=\"" . "440" . "\" src=\"" . $value . "\"></a>" . "\n";
 
         echo "</td>";
@@ -441,29 +341,29 @@ else { # manage the basket
     echo "HOUSTON WE HAVE A BIG PBM !!!"; 
 }
 
-echo '<br><br><br><br><br><br>';
 ?>
 
 <script>
-    var text_values = <?php echo json_encode($textValues); ?>;
-    var text = <?php echo json_encode($text); ?>;
     var text_0 = <?php echo json_encode($text_0); ?>;
+    var text_values = <?php echo json_encode($textValues); ?>;
     var lineHisto1 = <?php echo json_encode($lineHisto); ?>;
     var url0 = <?php echo json_encode($url_0); ?>;
-    var img_add = <?php echo json_encode($image_add); ?>;
-    var img_remove = <?php echo json_encode($image_remove); ?>;
-    var listPict = <?php echo json_encode($listPict); ?>;
+    var url5 = <?php echo json_encode($url_5); ?>;
+    var url6 = <?php echo json_encode($url_6); ?>;
+    var url7 = <?php echo json_encode($url_7); ?>;
     var tags = <?php echo json_encode($tags); ?>;
-    var webRoots = <?php echo json_encode($web_roots); ?>;
-    var urlhttp = <?php echo json_encode($url_http); ?>;
     var histoName1 = <?php echo json_encode($histoName1); ?>;
     var origin = <?php echo json_encode($origin); ?>;
-    var tableau = <?php echo json_encode($tableau); ?>;
-    var pictsValue = <?php echo json_encode($pictsValue); ?>;
+    var webRoots = <?php echo json_encode($web_roots); ?>;
+    var urlhttp = <?php echo json_encode($url_http); ?>;
     var newUrl = <?php echo json_encode($newUrl); ?>;
+    var actionFrom = <?php echo json_encode($actionFrom); ?>;
+    var shareFileName = <?php echo json_encode(getSharedFileName(session_id())); ?>;
+    var img_add = <?php echo json_encode($image_add); ?>;
+    var img_remove = <?php echo json_encode($image_remove); ?>;
 </script>
 
-<script>
+<script> // t12
 $(document).ready(function(){
   $("p").click(function(){
     if ( $('[valInfo="t12"]').html() != '' ) {
@@ -476,13 +376,14 @@ $(document).ready(function(){
 });
 </script>
 
-<script>
+<script> // check buttons, size, releases, ..
     $(document).ready(function(){
         // la class clickable est appliquée à tous les table qui auront des "boutons"
         $('table.clickable td').on('click', checkButtonChoice );
         $('table.clickable td').on('click', checkSizeChoice );
         $('table.clickable td').on('click', checkAddLink );
         $('table.clickable td').on('click', checkReleases );
+        $('table.clickable td').on('click', checkActionChoice );
     });
 
     function checkAddLink() {
@@ -500,9 +401,6 @@ $(document).ready(function(){
         var id = obj.attr('addlink-id');
         var imageName = obj.attr('addlink-url');
         var aff = 'id : ' + id + ' _ link : ' + imageName;
-        //console.log(aff);
-        //console.log('url0 : ' + url0);
-        //console.log('imageName : ' + imageName);
         if (typeof cc !== "undefined") {
             if (cc.indexOf("add") >= 0) {
                 obj.attr('addlink-choice', "remove from basket");
@@ -510,12 +408,6 @@ $(document).ready(function(){
                 obj.html('<img width="32" height="32" src="' + img_remove + '" alt="Rem"/>');
                 lineHisto1.push(imageName);
                 var nb = lineHisto1.length;
-                /*var someText = nb + '<br>';
-                for (let j=0; j<nb; j++) {
-                    someText += ' - ' + lineHisto1[j] + '<br>';
-                }*/
-                //lineHisto1 = lineHisto2;
-                //$('[soDiv="Arghhhhh"]').html(someText);
                 TableData = JSON.stringify(lineHisto1);
                 //console.log(TableData);
                 $.post(
@@ -524,7 +416,6 @@ $(document).ready(function(){
                     ).done(function(returnResult){
             		//console.log('OK from url0 !');
                     console.log(returnResult);
-                    //location.reload(true);
                 	}
                   	).fail(function(){
                     	console.log('ERROR from basket::cc::add !');
@@ -532,24 +423,19 @@ $(document).ready(function(){
             }
             else {
                 //console.log("remove");
-                //$('[addlink-choice="remove from basket"]').attr('addlink-choice', "add to basket");
                 obj.attr('addlink-choice', "add to basket");
-                //obj.html('<font color="blue"><b>Add</b></font>');
                 obj.html('<img width="32" height="32" src="' + img_add + '" alt="Add"/>');
                 lineHisto1 = $.grep(lineHisto1, function(value) {
                     return value != imageName;
                 });
                 var lineHisto2 = [];
                 var nb = lineHisto1.length;
-                //var someText = nb + '<br>';
                 for (let j=0; j<nb; j++) {
                     if (lineHisto1[j] != imageName) {
                         lineHisto2.push(lineHisto1[j]);
-                        //someText += ' - ' + lineHisto1[j] + '<br>';
                     }
                 }
                 lineHisto1 = lineHisto2;
-                //$('[soDiv="Arghhhhh"]').html(someText);
                 TableData = JSON.stringify(lineHisto1);
                 //console.log(TableData);
                 $.post(
@@ -583,13 +469,166 @@ $(document).ready(function(){
             console.log("line0");
             $('[button-choice="line0"]').addClass('Gras');
             $('[button-choice="line0"]').attr('button-choice', "line1");
+            text = $("textarea#textArea").val()
             $("textarea#textArea").val(text_0 + text);
         }
         else {
             $('[button-choice="line1"]').attr('button-choice', "line0");
+            var selected = [];
+            $("input:checkbox:checked").each(function() {
+                selected.push($(this).attr('id'));
+                $(this).prop( "checked", true )
+            });
+            var text = ''
+            if ($('#line0').hasClass('Gras')) {
+                text = $('#line0').text().split(" : ")[1]
+                //textA = textA.replace('[0]', '[00]')
+            }
+            var i_c = 1
+            selected.forEach(element => {
+                text += '[' + i_c + '] ' + lineHisto1[element-1] + "\n"
+                i_c += 1
+            });
             $("textarea#textArea").val(text);
         }/**/
 
+    }
+    function checkActionChoice() {
+        // si le td a une class ou une autre, on peut le traiter différemment
+        if ($(this).parents('table.clickable').hasClass('actionChoice')) {
+            actionChoice($(this));
+        }
+    }
+    function actionChoice(obj){
+        var bc = obj.attr('id');
+        var affiche = 'bc : ' + bc;
+        console.log(affiche);
+        var i_c = 0
+        if (typeof bc !== "undefined") {
+            if (bc == 'selectAll') {
+                console.log('select All')
+                if ($('#selectAll').hasClass('Gras')) {
+                    $('#selectAll').removeClass('Gras');
+                    $("input[type='checkbox']").each(function() {
+                        $(this).prop( "checked", false )
+                    });
+                    var textA = ''
+                    if ($('#line0').hasClass('Gras')) {
+                        textA = $('#line0').text().split(" : ")[1]
+                        textA = textA.replace('[0]', '[00]')
+                    }
+                    $('textarea#textArea').val(textA)
+                    $('#shareFile').html('<font color="grey">Select histos for sharing</font>')
+                }
+                else {
+                    $('#selectAll').addClass('Gras');
+                    $("input[type='checkbox']").each(function() {
+                        $(this).prop( "checked", true )
+                    });
+                    $('#shareFile').html('Share selected links')
+                }
+            }
+            else if (bc == 'removeAll') {
+                console.log('remove All')
+                stayingAddresses = JSON.stringify([]);
+                var destination = webRoots + '/basket.php?actionFrom=' + actionFrom + '&basket=work'
+                $.post(
+                    url5, 
+                    {basketFile: stayingAddresses},
+                    ).done(function(returnResult){
+                    //console.log('OK from url5 !');
+                    console.log(returnResult);
+                    $(location).attr('href',destination);
+                    }
+                    ).fail(function(){
+                        console.log('ERROR from basket::bc::removeAll !');
+                    });/**/
+            }
+            else if (bc == 'removeSelected') {
+                console.log('remove Selected')
+                var unselected = [];
+                //var i_compte = 0
+                $("input:checkbox:not(:checked)").each(function() { // get unchecked checkboxes
+                    unselected.push(lineHisto1[$(this).attr('id')-1]);
+                });
+                if (unselected.length !== lineHisto1.length) {
+                    stayingAddresses = JSON.stringify(unselected);
+                    var destination = webRoots + '/basket.php?actionFrom=' + actionFrom + '&basket=work'
+                    $.post(
+                        url5, 
+                        {basketFile: stayingAddresses},
+                        ).done(function(returnResult){
+                        //console.log('OK from url5 !');
+                        console.log(returnResult);
+                        $(location).attr('href',destination);
+                        }
+                        ).fail(function(){
+                            console.log('ERROR from basket::bc::removeSelected !');
+                        });/**/
+                }
+                else {
+                    console.log('meme valeur : ' + unselected.length + ', rien a retirer')
+                }
+            }
+            else if (bc == 'copySelected') {
+                var selected = [];
+                $("input:checkbox:checked").each(function() {
+                    selected.push($(this).attr('id'));
+                    $(this).prop( "checked", true )
+                });
+                var textA = ''
+                if ($('#line0').hasClass('Gras')) {
+                    textA = $('#line0').text().split(" : ")[1]
+                    //textA = textA.replace('[0]', '[00]')
+                }
+                var i_c = 1
+                selected.forEach(element => {
+                    textA += '[' + i_c + '] ' + lineHisto1[element-1] + "\n"
+                    i_c += 1
+                });
+                $('textarea#textArea').val(textA)
+            }
+            else if (bc == 'shareFile') {
+                var selected = [];
+                $("input:checkbox:checked").each(function() {
+                    selected.push($(this).attr('id'));
+                    $(this).prop( "checked", true )
+                });
+                if (selected.length >= 1) {
+                    var ListA = []
+                    selected.forEach(element => {
+                        ListA.push(lineHisto1[element-1])
+                    });
+                    var destination = webRoots + '/basket.php?actionFrom=' + actionFrom + '&basket=work'
+                    console.log(destination)
+                    sharedText = JSON.stringify([webRoots, shareFileName, ListA]);
+                    console.log('sharedText = ' + sharedText)
+                    $.post(
+                        url6, 
+                        {sharedFile: sharedText},
+                        ).done(function(returnResult){
+                        //console.log('OK from url6 !');
+                        console.log(returnResult);
+                        //$(location).attr('href',destination);
+                        }
+                        ).fail(function(){
+                            console.log('ERROR from basket::zc::sharedFile !');
+                        });
+                    var tmp1 = shareFileName.replace('sharedList.', '').replace('.txt', '')
+                    //'<a href="' . $address . '">sharedList.' . $redValue . '.txt</a>';
+                    var addr = 'https://cms-egamma.web.cern.ch/validation/Electrons/Releases/basket.php?actionFrom=' + actionFrom
+                    addr += '&sharedF=' + tmp1 + '&basket=work'                
+                    //var tmp2 = '<font color="blue">https://cms-egamma.web.cern.ch/validation/Electrons/Releases/basket.php?actionFrom=' + actionFrom
+                    //tmp2 += '&sharedF=' + tmp1 + '&basket=work' + '</font>'
+                    var tmp2 = '<a href="' + addr + '">' + addr + '</a>'
+                    $('#sharedAddress').html('Shared address : ' + tmp2)
+                    $('#sharedAddress').show()
+                }
+                else {
+                    ;
+                }
+            }
+        }
     }
 
     function checkSizeChoice() {
@@ -597,7 +636,7 @@ $(document).ready(function(){
         if ($(this).parents('table.clickable').hasClass('sizeChoice')) {
             $('table.sizeChoice td').removeClass('Gras');//
             sizeChoice($(this));
-            //console.log("curveChoice");
+            console.log("sizeChoice");
         }
     }
     function sizeChoice(obj){
@@ -607,12 +646,12 @@ $(document).ready(function(){
         //alert(cc);
         
         if (typeof cc !== "undefined") {
+            $('[size-choice="' + cc + '"]').removeClass('Gras');
             if (cc == '') {
                 cc = 480;
             }
             $('[size-choice="' + cc + '"]').addClass('Gras');
             $('#displayHisto').attr('width', cc);
-            //var affiche = '[size-choice="' + cc + '"]';
             //console.log(affiche)
         }/**/
         
@@ -633,7 +672,7 @@ $(document).ready(function(){
             $("#ListeReleases").toggle();
         }
         else if ( cc2 == 'displayHistosLink' ) {
-                $(location).attr('href',newUrl);
+                $('#displayHistos').toggle();
             }
         }
     }
@@ -648,7 +687,7 @@ $(document).ready(function(){
 
 </script>
 
-<script>
+<script> // checked
     function checkFunction() {
         var select1 = [];
         console.log(tags);
@@ -671,11 +710,7 @@ $(document).ready(function(){
             //affiche += '<td>' + origin + '<img border="0" class="image" width="480" src="' + urlhttp + '"></td>';
             $.each(select1, function(key, value) {
                 tmp1 = value.split(".");
-                //console.log(key + ' - ' + tmp1[0]);
-                //var name = webRoots + '/' + tmp1[0] + '/' + tags + '/gifs/' + histoName1;
                 var name = webRoots + '/' + tmp1[0] + '/' + tags + '/' + tmp1[1] + 's/' + histoName1 + '.' + tmp1[1];
-                //console.log("name : " + name)
-                //console.log("value : " + tmp1[0])
                  affiche += '<td>' + tmp1[0] + '<img border="0" class="image" width="480" src="' + name + '"></td>';
             });
             affiche += '</tr></table><br>';
@@ -692,7 +727,24 @@ $(document).ready(function(){
     }
 </script>
 
-<script>
+<script> // checked2
+    function checkFunction2() {
+        //var select2 = [];
+        var nb = 0
+        $('input:checked').each(function() {
+            //select2.push($(this).attr('id'));
+            nb += 1
+        });
+        if (nb >= 1) {
+            $('#shareFile').html('Share selected links')
+        }
+        else { // 
+            $('#shareFile').html('<font color="grey">Select histos for sharing</font>')
+        }
+    }
+</script>
+
+<script> // display/remove Releases array
 $(document).ready(function(){
   $("#Liste").click(function(){
     var tild = $("#Histos").html();//console.log('histos : '+tild)

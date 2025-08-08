@@ -78,8 +78,8 @@ footer {
   margin-top: -226px; 
 }
 .anchor1 { /* for DEV */
-  padding-top: 255px;
-  margin-top: -256px; 
+  padding-top: 235px;
+  margin-top: -236px; 
 }
 .anchor2 {
   padding-top: 258px;
@@ -102,6 +102,10 @@ footer {
   margin-top: -156px;
   padding-left: 140px;
 }
+.anchor6 { /* for DEV */
+  padding-top: 285px;
+  margin-top: -286px;
+}
 .greyClass {
   color: grey;
 }
@@ -119,6 +123,23 @@ footer {
 }
 .greenClass {
   color: green;
+}
+.blackClass {
+  color: black;
+}
+.whiteClass {
+  color: white;
+}
+.button {
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  color: blue;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  background-color: #b1e9fa;
 }
 table.tab0 {
   padding: 5;
@@ -148,6 +169,10 @@ table.tab5 {
   width: 100%;
   border: 1px solid #008000;
   /*border-collapse: collapse;*/
+}
+table.tab6 {
+  width: 100%;
+  border: 2px solid rgb(168, 156, 235);
 }
 .RtextAlign {
   text-align: right;
@@ -213,7 +238,7 @@ td.b1 {
   border: 1px solid black;
 }
 td.b2 {
-  border: 1px solid black;
+  border: 2px solid rgb(54, 149, 7);
   width: 10px;
 }
 td.b3 {
@@ -259,6 +284,7 @@ span.ex1 {
   display: inline-block;
   width: 25%;
 }
+
 .ui-accordion-content-active {
     padding: 0 !important;
     border-style: none;
@@ -269,6 +295,7 @@ span.ex1 {
     color: lightgreen;
     background: lightgreen;
 }
+
 .ui-state_active {
   border: 2px solid #008000;
   background: #008000;
@@ -277,3 +304,62 @@ span.ex1 {
   color: lightgreen;
   background: lightgreen;
 }
+
+.navbar {
+  overflow: hidden;
+  background-color: lightgreen; 
+}
+
+.navbar a {
+  float: left;
+  font-size: 16px;
+  color: black;
+  text-align: center;
+  padding: 8px 12px; /*top left*/
+  text-decoration: none;
+}
+
+.subnav {
+  float: left;
+  overflow: hidden;
+}
+
+.subnav .subnavbtn {
+  font-size: 16px;  
+  border: none;
+  outline: none;
+  color: black;
+  padding: 8px 12px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+.navbar a:hover, .subnav:hover .subnavbtn {
+  background-color: green;
+}
+
+.subnav-content {
+  display: none;
+  position: absolute;
+  left: 0;
+  background-color: green;
+  width: 100%;
+  z-index: 1;
+}
+
+.subnav-content a {
+  float: left;
+  color: white;
+  text-decoration: none;
+}
+
+.subnav-content a:hover {
+  background-color: #eee;
+  color: black;
+}
+
+.subnav:hover .subnav-content {
+  display: block;
+}
+
