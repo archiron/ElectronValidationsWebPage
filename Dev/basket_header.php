@@ -5,7 +5,8 @@
     //echo "session id : " . session_id() . "<br><br>\n";
 
     $base_dir = __DIR__;
-    include '../php_inc/defaults.inc.php';    
+    include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
 
@@ -14,15 +15,25 @@
     if (isset($_SESSION['pictFormat'])) {
         $pictsValue=$_SESSION['pictFormat'] . "s"; // gifs/pngs
         $pictsExt="." . $_SESSION['pictFormat']; // .gif/.png
-        //simPrint('pictsValue', $pictsValue);
-        //simPrint('pictsExt', $pictsExt);
+        //simPrintC('pictsValue', $pictsValue);
+        //simPrintC('pictsExt', $pictsExt);
     }
 
     $chemin = $web_roots;
-    //simPrint('$web_roots',$web_roots);
     
-    $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; # url of the folder in order to use without index.php
+    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; # url of the folder in order to use without index.php
     //simPrintC('url', $url);
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
     $fileName_0 = getFileName(session_id());
     $fileName = $web_roots . "/" . $fileName_0;
     $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);
@@ -32,19 +43,22 @@
     }
     
     //$corresp = 0;
-    $url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
+    //$url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
 
-    $actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
-    $basket = (isset($_REQUEST['basket']) ? $_REQUEST['basket'] : '');
-    //$basket = $_SESSION['basket']; // pbms avec work au retour. il faut passer $_SESSION['basket'] = 'work' au moment de cliquer sur manage links
-    $site  = (isset($_REQUEST['site']) ? $_REQUEST['site'] : ''); simPrint('site', $site);
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');simPrintC('actionFrom ', $actionFrom);
+    //$basket = (isset($_REQUEST['basket']) ? $_REQUEST['basket'] : '');
+    //$site  = (isset($_REQUEST['site']) ? $_REQUEST['site'] : '');
+    $issetArray = ['url' => $url, 'actionFrom' => $actionFrom, 'basket' => $basket, 'site' => $site];
+    displayIsset($issetArray);
+    
     $i2_flag = false;
     if ($site == 'Dev2') {
         $site = 'Dev';
         $i2_flag = true;
     }
-    simPrint('site', $site);
+    //simPrintC('site', $site);
     //$short_histo_name  = $_SESSION[$site . '-' . 'short_histo_name'];
+    simPrintC('short histo name', $short_histo_name);
     if ($short_histo_name == '') {
         $tt = $_SESSION[$site . '-url']; //echo $tt . $_fDL;
         $short_histo_name = explode('.', end(explode('/', $tt)))[0];
@@ -69,7 +83,7 @@
     }
     
     if (($_SESSION['url'] !== '') && ($actionFrom == '')) {
-        #simPrintC('racine html', $racine_html);simPrintC('racine html', $_SESSION['url']);
+        //simPrintC('racine html', $racine_html);simPrintC('racine html', $_SESSION['url']);
         $tmp = str_replace($racine_html, '', $_SESSION[$site . '-url']);
         $tmp = str_replace('validation/Electrons/Dev/', '', $tmp);
         $tmp = str_replace('index.php?actionFrom=', '', $tmp);
@@ -92,7 +106,7 @@
         }
     }
     $actionFrom = str_replace('//', '/', $actionFrom);
-    simPrint('actionFrom after ', $actionFrom);
+    simPrintC('actionFrom after ', $actionFrom);
     if (empty($url)) {
         $url = $_SESSION[$site . '-' . 'url'];
     }
@@ -105,7 +119,7 @@
     
     $chemin = $chemin . '/' . $actionFrom;
     $chemin_eos=str_replace($racine_html, $racine_eos, $chemin);
-    $chemin_eos_base = str_replace($racine_html, $racine_eos, $web_roots);//simPrint("chemin_eos_base", $chemin_eos_base);
+    $chemin_eos_base = str_replace($racine_html, $racine_eos, $web_roots);//simPrintC("chemin_eos_base", $chemin_eos_base);
     
     $filesList = array();
     $sharedFilesList = array();
@@ -153,7 +167,7 @@
         $tmp_aF1 = str_replace($web_roots, '', $lineHisto[0]);
         $tmp_aF2 = explode('/',$tmp_aF1);
         $actionFrom = '/' . $tmp_aF2[1] . '/' . $tmp_aF2[2] . '/' . $tmp_aF2[3];
-        //simPrint('aF1', $actionFrom);
+        //simPrintC('aF1', $actionFrom);
     }
     
     if ($short_histo_name != '') {
@@ -164,7 +178,7 @@
     }
 
     echo '<table class="tab0" border="0" cellpadding="1">';
-    echo '<tr>';
+    echo '<tr class="ValidationsMenu">';
     echo '<td width=" 25%" class="b0">';
     writeHeaderMenu();
     echo '</td>';
@@ -178,7 +192,7 @@
         echo "<b>" . $short_histo_name  . "</b>";
         echo "</span></th>";
     }
-    echo "<td class=\"RtextAlign\">";
+    echo "<td style=\"vertical-align:middle\" class=\"RtextAlign\">";
     if ($basket == 'display') {
         echo "<a href=\"" . $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=work&actionFrom=" . $actionFrom . "#000\">BACK</a>";
         echo "&nbsp; - &nbsp;\n";
@@ -245,7 +259,6 @@
             $pict_name2 = $web_roots . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_2.png';
             $pict_name3 = $web_roots . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_3.png';
             $chemin_KS_eos = str_replace($racine_html, $racine_eos, $web_roots);
-            //echo $chemin_KS_eos . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_3.png' . $_fDL;
             if (file_exists($chemin_KS_eos . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_3.png')) {
                 echo '<a href="' . $pict_name3 . '">';
                 echo '<img class="image img" width="200" src="' . $pict_name3 . '" alt="" style="border: 2px solid blue;" ></a>';
@@ -262,15 +275,22 @@
             }
             echo '</td>';
         echo "<td>";
-        simPrint('site', $site);
+        simPrintC('site', $site);
         $code = $_SESSION[$site . '-code'];
         $code = substr_replace($code, "0", -1, 1);
-        simPrint('code', $code);
+        simPrintC('code', $code);
         $returnAddr = $web_roots .  "/index.php?actionFrom=" . $actionFrom . "#" . $code ;
         if ($i2_flag) {
             $returnAddr = $web_roots .  "/index2.php?actionFrom=" . $actionFrom . "#" . $code ;
         }
-        //simPrintC('return addr', $returnAddr);
+        simPrintC('return address view', $returnAddr); 
+        simPrintC('addr', $chemin_KS_eos . $actionFrom);
+        if (file_exists($chemin_KS_eos . $actionFrom)) {
+            echo 'OK' . $_fDL;
+        }
+        else {
+            echo 'KO' . $_fDL;
+        }
         imageSize($returnAddr);
         echo "<script type='text/javascript'>\n";
         echo '$(\'[size-choice="480"]\').addClass("Gras")';
@@ -295,7 +315,7 @@
 
     //echo "session id : " . session_id() . $_fDL;
     echo "file for histos name : " . $_SESSION['fileForHistos_eos'] . $_fDL;
-    //simPrint('test uuid : ', guidv4());
+    //simPrintC('test uuid : ', guidv4());
 
 ?>
 </header>

@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html lang="en">
+
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <title>Dev list webpage</title>
@@ -12,6 +13,31 @@
 </head>
 
 <body>
+<?php
+// --- SECURITY (Haut de page) ---
+    include '../php_inc/security.inc.php';
+
+    // 1. Sanitization de l'URL avant toute utilisation
+    $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
+    $url = cleanInput_V2($_REQUEST['url'] ?? '', true);    // false bloque les slashes
+    $site = cleanInput_V2($_REQUEST['site'] ?? '', false);    // false bloque les slashes
+    $basket = cleanInput_V2($_REQUEST['basket'] ?? '', false);    // false bloque les slashes
+
+    $url_safe = cleanInput($_GET['redirect'] ?? '', 'url');
+    if (!empty($url_safe) && !preg_match('#^https?://#i', $url_safe)) {
+        $url_safe = ''; // Fallback si jamais le protocole a été altéré
+    }
+
+    // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
+    $_REQUEST['actionFrom'] = $actionFrom;
+    $_REQUEST['url'] = $url;
+    $_REQUEST['basket'] = $basket;
+    $_REQUEST['site'] = $site;
+    $_REQUEST['redirect'] = $url_safe;
+
+// --- END SECURITY ---
+
+?>
 <div class="sticky">    
     <?php include('basket_header.php'); ?>
 </div>
@@ -39,7 +65,7 @@ if ($basket == "view") {
     $ref = $parts[2];
     $tags = $parts[3];
     $origin = $new . DIRECTORY_SEPARATOR . $ref;
-    //simPrint('origin', $origin);
+    //simPrintC('origin', $origin);
     if (strpos($url_http, $_SESSION['pictFormat']) !== false) {
         $tmp = explode('_', $ref, 2);//prePrint("ref", $tmp);
         $ref = $tmp[1];
@@ -118,7 +144,7 @@ if ($basket == "view") {
             {
                 foreach(array('gifs', 'pngs') as $value6) {
                     $histoName1 = explode('.', $histoName)[0];
-                    $pictsExt = substr($value6, 0, 3);//simPrint('ext', $pictsExt);
+                    $pictsExt = substr($value6, 0, 3);//simPrintC('ext', $pictsExt);
                     $path2 = $path1 . DIRECTORY_SEPARATOR . $tags . DIRECTORY_SEPARATOR . $value6;
                     if (is_dir($path2)) {
                         $listDir2[] = $path2;
@@ -287,14 +313,14 @@ elseif ($basket == "work") {
             $tmp_aF1 = str_replace($web_roots, '', $tmp_aF0);
             $tmp_aF2 = explode('/',$tmp_aF1);
             $tmp_aF3 = '/' . $tmp_aF2[1] . '/' . $tmp_aF2[2] . '/' . $tmp_aF2[3];
-            //simPrint('aF1', $tmp_aF3);
+            //simPrintC('aF1', $tmp_aF3);
 
             $address = $web_roots . "/basket.php?actionFrom=" . $tmp_aF3 . "&sharedF=" . $reducedValue . '&basket=work';
             //echo '[' . $key . '] := ' . $address . $_fDL;
             //echo '<a href="' . $address . '">sharedList.' . $reducedValue . '.txt</a>';
             $tmp_aF4 = explode('.', $reducedValue)[1];
-            $tmp_AF5 = substr($tmp_aF4, 0, 8);//simPrint('$tmp_AF5', $tmp_AF5);
-            $tmp_AF6 = substr($tmp_aF4, 8);//simPrint('$tmp_AF5', $tmp_AF6);
+            $tmp_AF5 = substr($tmp_aF4, 0, 8);//simPrintC('$tmp_AF5', $tmp_AF5);
+            $tmp_AF6 = substr($tmp_aF4, 8);//simPrintC('$tmp_AF5', $tmp_AF6);
             echo '<a href="' . $address . '">' . $tmp_AF5 . ' - ' . $tmp_AF6 . '</a>';
             echo '</td></tr>';
         }

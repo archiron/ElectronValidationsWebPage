@@ -1,0 +1,177 @@
+#### index.php
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Dev list webpage</title>
+<link rel="stylesheet" href="../php_inc/styles.css">
+<link rel="stylesheet" href="../php_inc/all.min.css">
+<link rel="stylesheet" href="../js/jquery-ui.min.css">
+<script src="../js/jQuery-3.6.3/jquery-3.6.3.min.js"></script>
+<script src="../js/jquery-ui.min.js"></script>
+<!-- the modification of img style (img.anchor) is a precious help of M. Mellin ! -->
+</head>
+
+<body>
+<?php
+    include '../php_inc/security.inc.php';
+
+    // 1. Sanitization de l'URL avant toute utilisation
+    $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
+    $cchoice    = cleanInput_V2($_REQUEST['cchoice'] ?? '', true);    // false bloque les slashes
+    echo "<-- DEBUG: Original = " . htmlspecialchars($_REQUEST['cchoice'] ?? 'vide') . " -->" . '<br>' . "\n";
+    echo "<-- DEBUG: Cleaned = " . htmlspecialchars($cchoice) . " -->" . '<br>' . "\n";
+    $short_histo_name    = cleanInput_V2($_REQUEST['short_histo_name'] ?? '', false);    // false bloque les slashes
+
+    $url_safe = cleanInput($_GET['redirect'] ?? '', 'url');
+    if (!empty($url_safe) && !preg_match('#^https?://#i', $url_safe)) {
+        $url_safe = ''; // Fallback si jamais le protocole a été altéré
+    }
+
+    // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
+    $_REQUEST['actionFrom'] = $actionFrom;
+    $_REQUEST['cchoice'] = $cchoice;
+    $_REQUEST['short_histo_name'] = $short_histo_name;
+    $_REQUEST['redirect'] = $url_safe;
+    echo "url safe : " . $url_safe . '<br>' . "\n";
+
+// --- END SECURITY ---
+
+?>
+<div class="sticky">    
+    <?php include('header.php'); ?>
+</div>
+<main>
+<?php
+
+echo '====<br>' . "\n";
+prePrint('SESSION', $_SESSION);
+echo '====<br>' . "\n";
+
+?>
+
+<script>
+    some javascript;
+</script>
+
+</main>
+
+<?php include('footer.php'); ?>
+
+
+</body>
+</html>
+
+#### header.php
+
+<header>
+    <script>
+        // introduced to correct the "old" access with action instead of actionFrom.
+        var url = window.location.href;
+        if (url.includes('/index.php?action=/')) {
+            var url = url.replace('/index.php?action=/', '/index.php?actionFrom=/');
+            window.location.href = url;
+        }
+    </script>
+
+    <?php
+    session_start();
+    //echo "session id : " . session_id() . " <br>\n";
+    //phpinfo();
+
+    $base_dir = __DIR__;
+    include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
+    include '../php_inc/fonctions.inc.php';
+
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
+    // 2. Préparez la version échappée pour le HTML si nécessaire
+    $url_html = htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+    // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
+    $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
+
+    // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
+    $url_from_safe = cleanInput($clean_referer, 'url');
+
+    // 3. Vérification CRITIQUE du domaine (Whitelist)
+    // Empêche la redirection vers google.com, evil.com, etc.
+    $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhost'];
+    $host = parse_url($url_from_safe, PHP_URL_HOST);
+
+    if ($url_from_safe && !in_array($host, $allowed_hosts)) {
+        // Si le domaine n'est pas le vôtre, on ignore le referer
+        $url_from_safe = ''; 
+        // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/index.php';
+    }
+    simPrintC('url from', $url_from_safe);
+
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
+    //$cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
+    //$short_histo_name = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
+
+
+    /*echo '====<br>' . "\n";
+    prePrint('SESSION', $_SESSION);
+    echo '====<br>' . "\n"*/
+
+?>
+</header>
+
+#### security.inc.php
+
+<?php
+
+function cleanInput($data, $allowSlash = true) {
+    if ($allowSlash) {
+        // Pour les chemins comme actionFrom
+        return preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $data);
+    } else {
+        // Pour les IDs, noms, choix simples (comme cchoice)
+        return preg_replace('/[^a-zA-Z0-9_\-]/', '', $data);
+    }
+}
+
+function cleanInput_V2($data, $allowSlash = false) {
+    // Cas spécial pour les URL : validation stricte du protocole avant nettoyage
+    if ($allowSlash === 'url') {
+        $data = trim($data);
+        
+        // 1. Validation structurelle
+        if (!filter_var($data, FILTER_VALIDATE_URL)) {
+            return ''; // Rejet si structure invalide
+        }
+
+        // 2. Vérification du protocole (Liste blanche)
+        $scheme = strtolower(parse_url($data, PHP_URL_SCHEME));
+        if (!in_array($scheme, ['http', 'https'])) {
+            return ''; // Rejet si javascript:, data:, file:, etc.
+        }
+
+        // 3. Nettoyage final des caractères superflus (optionnel mais recommandé)
+        // On garde une URL propre
+        return filter_var($data, FILTER_SANITIZE_URL); 
+    }
+
+    // Comportement existant pour les autres données
+    if ($allowSlash) {
+        return preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $data);
+    } else {
+        return preg_replace('/[^a-zA-Z0-9_\-]/', '', $data);
+    }
+}
+
+?>
