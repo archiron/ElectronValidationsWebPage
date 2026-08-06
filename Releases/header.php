@@ -3,36 +3,78 @@
         // introduced to correct the "old" access with action instead of actionFrom.
         var url = window.location.href;
         if (url.includes('/index.php?action=/')) {
-            //alert(url);
             var url = url.replace('/index.php?action=/', '/index.php?actionFrom=/');
-            //alert(url);
             window.location.href = url;
         }
     </script>
 
     <?php
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => true,      // Nécessite HTTPS
+        'httponly' => true,    // Bloque l'accès JS
+        'samesite' => 'Strict' // Protection CSRF
+    ]);
     session_start();
     //echo "session id : " . session_id() . " <br>\n";
     //phpinfo();
 
     $base_dir = __DIR__;
     include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
     
     $chemin = $web_roots;
-    //echo 'chemin : ' . $chemin . '<br>';
-    
-    $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
-    //simPrint('url', $url);
+    simPrintC('chemin', $chemin);
+
+    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
+    //simPrintC('url avant ', $url);
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
+    // 2. Préparez la version échappée pour le HTML si nécessaire
+    $url_html = htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
+    //simPrintC('url ', $url);
 
     $url_graph = explode('&', $url)[0];
     $url_graph = str_replace('/index.php?actionFrom=/', '/', $url_graph);
     
     //prePrint('url', parse_url($url));
-    $url_from = $_SERVER['HTTP_REFERER'];
-    //simPrint('url from', $url_from);
-    $url_tmp = explode('?', $url_from)[0];
+    //$url_from = $_SERVER['HTTP_REFERER'];
+    //simPrintC('url from', $url_from);
+    // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
+    $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
+
+    // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
+    $url_from_safe = cleanInput($clean_referer, 'url');
+
+    // 3. Vérification CRITIQUE du domaine (Whitelist)
+    // Empêche la redirection vers google.com, evil.com, etc.
+    $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhost'];
+    $host = parse_url($url_from_safe, PHP_URL_HOST);
+
+    if ($url_from_safe && !in_array($host, $allowed_hosts)) {
+        // Si le domaine n'est pas le vôtre, on ignore le referer
+        $url_from_safe = ''; 
+        // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/index.php';
+    }
+    simPrintC('url from', $url_from_safe);
+
+    $url_tmp = explode('?', $url_from_safe)[0];
     $url_tmp = end(explode('/', $url_tmp));
     $url_flag = false;
     if ($url_tmp == 'basket.php') {
@@ -41,7 +83,7 @@
  
     $histoSize = 440; // 200 440
     //simPrint('histo size', $histoSize);
-    if ($url == '//cms-egamma.web.cern.ch/validation/Electrons/Dev/index.php') {
+    if ($url == '//cms-egamma.web.cern.ch/validation/Electrons/Releases/index.php') {
         session_unset(); // back to beginning & free $_SESSION
     }
     $fileName_0 = getFileName(session_id());
@@ -196,17 +238,17 @@ if (isset($_SESSION['pictFormat'])) {
     }
     
     echo "<table class=\"tab0\" border=\"0\">";
-    echo '<tr>';
+    echo '<tr class="ValidationsMenu">';
     echo '<td width=" 25%">';
     writeHeaderMenu();
     echo '</td>';
     echo '<th class="redClass">';
     echo "<b>electron validation: signal</b>";
     echo "</th>";
-    echo '<td width="25%" class="CtextAlign" valign="middle">';
+    echo '<td style="width:25%;vertical-align:middle" class="CtextAlign" >';
     writeHeaderLinks($base_dir, $url);
     echo "</td>";
-    echo "<td class=\"RtextAlign\">";
+    echo "<td style=\"vertical-align:middle\" class=\"RtextAlign\">";
     if ( $actionFrom !== '' ) // histos web page construction
     {    
         echo "<a href=\"$web_roots/index.php\">Back to roots</a>";
@@ -317,14 +359,17 @@ if (isset($_SESSION['pictFormat'])) {
     
             $lineRead10_1 = fgets($handle_0); // line 10 part 1
             $lineRead10_2 = fgets($handle_0); // line 10 part 2
+            //echo $lineRead8_1 . " - " . $lineRead8_2 . $_fDL;
+            //echo $lineRead9_1 . " - " . $lineRead9_2 . $_fDL;
+            //echo $lineRead10_1 . " - " . $lineRead10_2 . $_fDL;
             $newLine10 = "<p>In all plots below, ";
-            if ($lineRead10_1 == $lineRead10_2) {
+            if ( ($lineRead10_1 == $lineRead10_2) && ($lineRead8_1 == $lineRead9_1) ) {
                 $newLine10 .= "there was no reference histograms to compare with";
                 $newLine10 .= ", and the " . $lineRead10_1 . " histograms are in red.";
             }
             else {
-                $newLine10 .= 'the <b><span class="redClass"> ' . $lineRead10_1 . " </span></b> histograms are in red";
-                $newLine10 .= ", and the <b><span class=\"blueClass\"> " . $lineRead10_2 . " </span></b> histograms are in blue.";
+                $newLine10 .= 'the <b><span class="redClass"> ' . $lineRead10_1 . " " . $lineRead8_1 . " </span></b> histograms are in red";
+                $newLine10 .= ", and the <b><span class=\"blueClass\"> " . $lineRead10_2 . " " . $lineRead9_1 . " </span></b> histograms are in blue.";
             }
             $newLine10 .= "<br>Some more details";
             $lineRead10_3 = fgets($handle_0); // line 10 part 3
@@ -440,6 +485,17 @@ if (isset($_SESSION['pictFormat'])) {
         }
     }
     echo "</td>";
+    if ($l_actionFrom >= 4) {
+        if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_3.png')) {
+            echo '<td>';//
+            echo '<table class="clickable curveChoice" style="border:1px solid blue ;"><tr>'; // padding:5px
+            echo '<td style="border : 1px solid blue;padding:5px" class="CtextAlign Gras" curve-choice="histos" title="Click on text to change the pictures">Histos</td>';
+            //echo '</tr><tr>';
+            echo '<td style="border : 1px solid blue;padding:5px" class="CtextAlign" curve-choice="diffMax" title="Click on text to change the pictures">Differences</td>';
+            echo "</tr></table>";
+            echo '</td>';
+        }
+    }
     if ($l_actionFrom >= 4) {
         echo '<td align="center" valign="middle" onclick="KS_Evclick()">';
     $runText = '';
