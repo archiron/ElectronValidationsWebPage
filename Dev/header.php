@@ -3,9 +3,7 @@
         // introduced to correct the "old" access with action instead of actionFrom.
         var url = window.location.href;
         if (url.includes('/index.php?action=/')) {
-            //alert(url);
             var url = url.replace('/index.php?action=/', '/index.php?actionFrom=/');
-            //alert(url);
             window.location.href = url;
         }
     </script>
@@ -17,21 +15,24 @@
 
     $base_dir = __DIR__;
     include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
+    prePrint('SESSION', $_SESSION);
 
     $chemin = $web_roots;
-    //echo 'chemin : ' . $chemin . '<br>';
+    simPrintC('chemin', $chemin);
+    $displayPaths = '';
     
     $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
-    //simPrintC('url', $url);
+    simPrintC('url', $url);
 
     $url_graph = explode('&', $url)[0];
     $url_graph = str_replace('/index.php?actionFrom=/', '/', $url_graph);
     
     //prePrint('url', parse_url($url));
     $url_from = $_SERVER['HTTP_REFERER'];
-    //simPrintC('url from', $url_from);
+    simPrintC('url from', $url_from);
     $url_tmp = explode('?', $url_from)[0];
     $url_tmp = end(explode('/', $url_tmp));
     $url_flag = false;
@@ -39,24 +40,24 @@
         $url_flag = true;//simPrintC('url flag', $url_flag);
     }
     else {
-        echo "no basket.php";
+        echo "no basket.php" . $_fDL;
     }
  
     $histoSize = 340; // 200 440
     //simPrint('histo size', $histoSize);
+    
     if ($url == '//cms-egamma.web.cern.ch/validation/Electrons/Dev/index.php') {
         session_unset(); // back to beginning & free $_SESSION
     }
     $fileName_0 = getFileName(session_id());
     $fileName = $web_roots . "/" . $fileName_0;
-    $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);
+    $fileName_eos = str_replace($racine_html, $racine_eos, $fileName);
     $_SESSION['localFileForHistos_eos'] = $fileName_eos;
     $_SESSION['fileForHistos_eos'] = $_SESSION['localFileForHistos_eos'];
-    $classical_roots = htmlspecialchars( $web_roots, ENT_QUOTES, 'UTF-8' );
-    $classical_roots = str_replace("/index.php?actionFrom=/", "/", $classical_roots);
     $classical_path = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
     $classical_path = str_replace("/index.php?actionFrom=/", "/", $classical_path);
     $previous_url = dirname($url);
+    $displayPaths .= '<span class="blueClass" style="font-weight: bold">classical_path = </span><span>' . $classical_path . '</span><br>';
     
     if ( !file_exists($fileName_eos) ) {
         //echo $file . " does not exist. Create it<br>\n";
@@ -66,7 +67,6 @@
     $dirsList = array();
     $dirsList_date = array(); // AC
     $filesList = array();
-    //$lineHisto = array();
     $lineHisto1 = array();
     $pictsDir=False;
     $pictsValue="gifs"; // default
@@ -80,11 +80,13 @@
     $sharedF='';
     $short_histo_name='';
     
-    $actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
-    $cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
-    $short_histo_name = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
+    //$cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
+    //$short_histo_name = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
     $code = $_SESSION['Dev-code'];
     //simPrintC('code from', $code);
+    $issetArray = ['actionFrom' => $actionFrom, 'cchoice' => $cchoice, 'short_histo_name' => $short_histo_name];
+    displayIsset($issetArray);
     if ($cchoice == '') {
         $cchoice = "diff";
     }
@@ -97,11 +99,14 @@
     $escaped_url = str_replace("&amp;cchoice=pValue", "", $escaped_url);
     $escaped_url = explode('&', $escaped_url)[0];
     //simPrintC('escaped_url', $escaped_url);
+    $displayPaths .= '<span class="blueClass" style="font-weight: bold">escaped_url = </span><span>' . $escaped_url . '</span><br>';
 
     $_SESSION['url'] = $url_http;
 
     $chemin = $chemin . '/' . $actionFrom;
     $chemin_eos=str_replace($racine_html, $racine_eos, $chemin);
+    $displayPaths .= '<span class="blueClass" style="font-weight: bold">chemin = </span><span>' . $chemin . '</span><br>';
+    $displayPaths .= '<span class="blueClass" style="font-weight: bold">chemin_eos = </span><span>' . $chemin_eos . '</span><br>';
     
     $files = array_slice(scandir($chemin_eos), 2);
     
@@ -124,7 +129,6 @@
             echo "unknown type : $value<br>";
         }
     }
-    
     //prePrint('actionFrom', explode('/', $actionFrom));
     $l_actionFrom = count(explode('/', $actionFrom));
     //simPrint('l actionFrom', $l_actionFrom);
@@ -199,7 +203,7 @@
     }
 
     echo "<table class=\"tab0\" >";
-    echo '<tr>';
+    echo '<tr class="ValidationsMenu">';
     echo '<td style="width:25%">';
     writeHeaderMenu();
     echo '</td>';
@@ -209,7 +213,7 @@
     echo '<td style="width:25%;vertical-align:middle" class="CtextAlign" >';
     writeHeaderLinks($base_dir, $url);
     echo "</td>";
-    echo "<td class=\"RtextAlign\">";
+    echo "<td style=\"vertical-align:middle\" class=\"RtextAlign\">";
     if ( $actionFrom !== '' ) // histos web page construction
     {    
         echo "<a href=\"$web_roots/index.php\">Back to roots</a>";
@@ -301,13 +305,13 @@
             $lineRead10_1 = fgets($handle_0); // line 10 part 1
             $lineRead10_2 = fgets($handle_0); // line 10 part 2
             $newLine10 = "<p>In all plots below, ";
-            if ($lineRead10_1 == $lineRead10_2) {
+            if ( ($lineRead10_1 == $lineRead10_2) && ($lineRead8_1 == $lineRead9_1) ) {
                 $newLine10 .= "there was no reference histograms to compare with";
                 $newLine10 .= ", and the " . $lineRead10_1 . " histograms are in red.";
             }
             else {
-                $newLine10 .= 'the <b><span class="redClass"> ' . $lineRead10_1 . " </span></b> histograms are in red";
-                $newLine10 .= ", and the <b><span class=\"blueClass\"> " . $lineRead10_2 . " </span></b> histograms are in blue.";
+                $newLine10 .= 'the <b><span class="redClass"> ' . $lineRead10_1 . " " . $lineRead8_1 . " </span></b> histograms are in red";
+                $newLine10 .= ", and the <b><span class=\"blueClass\"> " . $lineRead10_2 . " " . $lineRead9_1 . " </span></b> histograms are in blue.";
             }
             $newLine10 .= "<br>Some more details";
             $lineRead10_3 = fgets($handle_0); // line 10 part 3
@@ -426,7 +430,7 @@
     }
     echo "</td>";
     if ($l_actionFrom >= 4) {
-        echo '<td style="text-align:center;vertical-align:middle" onclick="KS_Evclick()">';
+        echo '<td style="text-align:center;vertical-align:middle;" onclick="KS_Evclick()">';
         $runText = '';
         $dataSetText = substr($tmp_01[1], 6);
         if (strpos($tmp_02[1], 'Run3') !== false)
@@ -513,13 +517,30 @@
     // displayVariablesValues($url, $actionFrom, $cchoice, $basket, $fileForHistos, $curveChoice, $sharedF, $short_histo_name);
     $textValues = displayVariablesValues2($url, $actionFrom, $cchoice, $basket, $fileForHistos, $curveChoice, $sharedF, $short_histo_name);
     echo '<table style="border:0px solid #008000;width:100%;padding:5px" >';
-    echo '<tr><td>';
+    echo '<tr><td style="width:55%">';
     echo '<p>+ Variables values</p>';
     echo '<span valInfo="t12"></span>';
     echo '</td>';
-    echo '<td style="text-align:right">';
-    echo '<br><a href="https:'.str_replace("index.php", "index2.php", $url).'">New form</a>';
+    if ($l_actionFrom >= 4) {
+        if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_3.png')) {
+            echo '<td>';//
+            echo '<table class="clickable curveChoice" style="border:1px solid blue ;"><tr>'; // padding:5px
+            echo '<td style="border : 1px solid blue;padding:5px" class="CtextAlign Gras" curve-choice="histos" title="Click on text to change the pictures">Histos</td>';
+            //echo '</tr><tr>';
+            echo '<td style="border : 1px solid blue;padding:5px" class="CtextAlign" curve-choice="diffMax" title="Click on text to change the pictures">Differences</td>';
+            echo "</tr></table>";
+            echo '</td>';
+        }
+    }
+    
+    echo '<td style="text-align:left;vertical-align: middle;border:0px solid #008000;">';
+    echo '<span valInfo="t13"></span>';
+    echo '</td>';
+    echo '<td style="text-align:right;vertical-align: middle;">';
+    //echo '<br><a href="https:'.str_replace("index.php", "index2.php", $url).'">New form</a>';
+    echo '<a href="https:'.str_replace("index.php", "index2.php", $url).'">New form</a>';
     echo '</td></tr>';
+
     echo '</table>';
 
     $tab_2 = [];

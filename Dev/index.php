@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <title>Dev list webpage</title>
@@ -12,14 +14,46 @@
 </head>
 
 <body>
+<?php
+// --- SECURITY (Haut de page) ---
+    include '../php_inc/security.inc.php';
+
+    // 1. Sanitization de l'URL avant toute utilisation
+    /*$actionFrom = isset($_REQUEST['actionFrom']) 
+        ? preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $_REQUEST['actionFrom']) 
+        : '';*/
+    $actionFrom = cleanInput($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
+
+    /*$cchoice = isset($_REQUEST['cchoice']) 
+        ? preg_replace('/[^a-zA-Z0-9_\-]/', '', $_REQUEST['cchoice']) 
+        : '';*/
+    $cchoice    = cleanInput($_REQUEST['cchoice'] ?? '', true);    // false bloque les slashes
+    echo "<-- DEBUG: Original = " . htmlspecialchars($_REQUEST['cchoice'] ?? 'vide') . " -->" . '<br>' . "\n";
+    echo "<-- DEBUG: Cleaned = " . htmlspecialchars($cchoice) . " -->";
+
+    /*$short_histo_name = isset($_REQUEST['short_histo_name']) 
+        ? preg_replace('/[^a-zA-Z0-9_\-]/', '', $_REQUEST['short_histo_name']) 
+        : '';*/
+    $short_histo_name    = cleanInput($_REQUEST['short_histo_name'] ?? '', false);    // false bloque les slashes
+
+    // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
+    $_REQUEST['actionFrom'] = $actionFrom;
+    $_REQUEST['cchoice'] = $cchoice;
+    $_REQUEST['short_histo_name'] = $short_histo_name;
+
+// --- END SECURITY ---
+
+?>
 <div class="sticky">    
     <?php include('header.php'); ?>
 </div>
 <main>
 <?php
-/*echo '====<br>' . "\n";
+$url = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL);
+
+echo '====<br>' . "\n";
 prePrint('SESSION', $_SESSION);
-echo '====<br>' . "\n";*/
+echo '====<br>' . "\n";/**/
 
 if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 {
@@ -35,6 +69,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 
     $histoArray_0 = createHistoArray($lineHisto);
     $clefs_0 = array_keys($histoArray_0);
+    $displayPaths .= '<span class="blueClass" style="font-weight: bold">ImageName = </span><span>' . 'https:' . $escaped_url . "/" . $pictsValue . '</span><br>';
 
     ##### test with Title/Histo name choice
         $histoArray = $histoArray_0;
@@ -101,6 +136,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 }/**/
             fclose($filehistoName);
             }
+            
             $ImageName = 'https:' . $escaped_url . "/" . $pictsValue ."/" . $short_histo_names[0] . $pictsExt;
             $ImageName = str_replace($racine_html, $racine_eos, $ImageName);//simPrint('image', $ImageName);
             if (file_exists($ImageName)) {
@@ -109,7 +145,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 $classColor = "lightGreyClass";
                 //echo $ImageName."<br>";
             }/**/
-
             if ( $elem == "endLine" ) {
                 $otherTextToWrite .= " <br>";
                 $jc += 1;
@@ -117,16 +152,16 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             }
             elseif ( $histo_positions[3] == "0" ) {
                 if ($numLine == 0) {
-                    $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $short_histo_name . '</a>' . " &nbsp;";//.$ic.$jc.$kc
+                    $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $short_histo_name . '</a>' . " &nbsp;";
                     $common = $short_histo_name;
                     $numLine += 1;
                 }
                 else { // $numLine > 0
                     if ( $after == "" ) {
-                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $before . '</a>' . " &nbsp;";//.$ic.$jc.$kc
+                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $before . '</a>' . " &nbsp;";
                     }
                     else{ // $after != ""
-                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $after . '</a>' . " &nbsp;";//.$ic.$jc.$kc
+                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $after . '</a>' . " &nbsp;";
                     }
                     $common = $before;
                 }
@@ -134,15 +169,15 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             }
             else { //$histo_positions[3] == "1"
                 if ($numLine == 0) {
-                    $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $short_histo_name . '</a>' . " &nbsp;";//.$ic.$jc.$kc
+                    $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $short_histo_name . '</a>' . " &nbsp;";
                     $common = $short_histo_name;
                 }
                 else { // $numLine > 0
                     if ( $after == "" ) {
-                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $before . '</a>' . " &nbsp;";//.$ic.$jc.$kc
+                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $before . '</a>' . " &nbsp;";
                     }
                     else { // $after != ''
-                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $after . '</a>' . " &nbsp;";//.$ic.$jc.$kc
+                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic.$jc . '0" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $after . '</a>' . " &nbsp;";
                     }
                 }
                 $numLine = 0;
@@ -189,49 +224,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 else { // construction of folders list web page
     echo '<div id="part1" class="parent" style="border:0px solid blue;float:left;text-align: center;width: 45%;">';
     $temp = substr($web_roots,6) . "/index.php";
-    /*if ( $url == $temp ) { // test for root url
-        echo "<p>List of the 5 last releases candidates ";
-        usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-        echo '( here <b><span class="redClass">' . $dirsList_date[0] .'</span> and <span class="blueClass">' . $dirsList_date[1] .'</span></b> folders).</p>';//
-
-        echo '<table class="tab5 clickable folders">';
-        echo "<tr><td width=\"50%\">";
-        echo "<b>Last release candidates";
-        echo "</td><td width=\"50%\">";
-        echo "<b>Last Modified On ";
-        echo "</td></tr><tr>\n";
-    
-        $i = 0;
-        echo '<td>' . "\n";
-        foreach($dirsList_date as $filename)
-        {
-            if ( $i < 5 ) {
-                $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
-                if ( $i == 0 ) {
-                    echo "<li>" . '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b>' . '</li>';//
-                    }
-                elseif ( $i ==1 ) {
-                    echo "<li>" . '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b>' . '</li>';//
-                }
-                else {
-                    echo "<li>" . '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b>' . '</li>';//
-                }
-            }
-            $i++;
-        }
-        echo '</td><td>';
-        $i = 0;
-        foreach($dirsList_date as $filename)
-        {
-            if ( $i < 5 ) {
-                echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
-            }
-            $i++;
-        }
-        echo '</td></tr></table>';
-        echo ' <br>';
-        echo ' <br>';
-    }*/
 
     if ( $actionFrom != '') {
         echo '<br>';
@@ -240,7 +232,7 @@ else { // construction of folders list web page
         echo '<br><br>';
         
         echo '<table class="tab0">';
-        echo '<tr><td style="width=:20%">';
+        echo '<tr><td style="width:50%">';
         echo '<b>Release references</b>';
         echo '</td><td>';
         echo '<b>Last Modified On </b>';
@@ -252,7 +244,7 @@ else { // construction of folders list web page
             if ( $choiceValue != '' ) {
                 if ( stristr($filename, $choiceValue) != FALSE ) {
                     $new_path = $filename;
-                    echo '<tr><td style="width=:20%">';
+                    echo '<tr><td style="width:50%">';
                     echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
                     echo '</td><td>';
                     echo @date('F d, Y, H:i:s', filemtime($new_path));
@@ -261,7 +253,7 @@ else { // construction of folders list web page
             }
             else {
                 $new_path = $filename;
-                echo '<tr><td style="width=:20%">';
+                echo '<tr><td style="width:20%">';
                 echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
                 echo '</td><td>';
                 echo @date('F d, Y, H:i:s', filemtime($new_path));
@@ -279,9 +271,9 @@ else { // construction of folders list web page
             echo '( here <b><span class="redClass">' . $dirsList_date[0] .'</span> and <span class="blueClass">' . $dirsList_date[1] .'</span></b> folders).</p>';//
 
             echo '<table class="tab5 clickable folders">';
-            echo "<tr><td width=\"50%\">";
+            echo '<tr><td width="50%">';
             echo "<b>Last release candidates";
-            echo "</td><td width=\"50%\">";
+            echo '</td><td width="50%">';
             echo "<b>Last Modified On ";
             echo "</td></tr><tr>\n";
         
@@ -292,13 +284,13 @@ else { // construction of folders list web page
                 if ( $i < 5 ) {
                     $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
                     if ( $i == 0 ) {
-                        echo "<li>" . '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b>' . '</li>';//
+                        echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
                         }
                     elseif ( $i ==1 ) {
-                        echo "<li>" . '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b>' . '</li>';//
+                        echo '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b><br>';//
                     }
                     else {
-                        echo "<li>" . '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b>' . '</li>';//
+                        echo '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b><br>';//
                     }
                 }
                 $i++;
@@ -322,14 +314,17 @@ else { // construction of folders list web page
     $action_tmp = substr($actionFrom,1);
     $action_list = explode("/", $action_tmp);
     if ( count($action_list) == 2) {
+        //echo 'count(action_list) == 2';
         echo '<h2><center><b>' . $action_list[1] . '</b></center></h2><br>';
-
     }
     if (!(strpos($url, 'index') !== false)) {
+        //echo 'strpos(url, index) !== false';
         echo ' <br><b><a href="'.$web_roots.'/index.php">Roots</a></b>';
         echo ' <br><br>';
     }
     if ( count($action_list) == 2) {
+        //echo 'count(action_list) == 2';
+        echo '<b>Up to release folder : </b>' . $_fDL;
         echo '<b> ' . '<a href="' . $web_roots.'/index.php?actionFrom=/' . $action_list[0] . '&cchoice=diff">' . $action_list[0] . '</a></b>' . '<br>';
     }
 
@@ -339,44 +334,6 @@ else { // construction of folders list web page
         echo "<p>List of all releases " . "<br>";
         echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';//
     }
-    /*if ( $actionFrom != '') {
-        echo '<br>';
-        echo '<b>Release candidate : </b>';
-        echo '<span class="blueClass"><b>' . $action_list[0] . '</b></span>';
-        echo '<br><br>';
-        
-        echo '<table class="tab0">';
-        echo '<tr><td style="width=:20%">';
-        echo '<b>Release references</b>';
-        echo '</td><td>';
-        echo '<b>Last Modified On </b>';
-        echo '</td></tr>';
-
-        usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-        foreach($dirsList_date as $filename)
-        {
-            if ( $choiceValue != '' ) {
-                if ( stristr($filename, $choiceValue) != FALSE ) {
-                    $new_path = $filename;
-                    echo '<tr><td style="width=:20%">';
-                    echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
-                    echo '</td><td>';
-                    echo @date('F d, Y, H:i:s', filemtime($new_path));
-                    echo '</td></tr>';
-                }
-            }
-            else {
-                $new_path = $filename;
-                echo '<tr><td style="width=:20%">';
-                echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
-                echo '</td><td>';
-                echo @date('F d, Y, H:i:s', filemtime($new_path));
-                echo '</td></tr>';
-            }
-        }
-        echo  '</table>';
-    }
-    else {*/
     if ( $actionFrom == '') {
         $tab_Others = array();
         $tab_CMSSW = array();
@@ -479,6 +436,8 @@ else { // construction of folders list web page
     }
     echo '</div>'; // part2
 
+    //echo 'blow';
+
 } // end of folders list web page construction
 
 /*echo '====<br>' . "\n";
@@ -501,6 +460,7 @@ echo '====<br>' . "\n"*/
     var img_remove = <?php echo json_encode($image_remove); ?>;
     var web_path = <?php echo json_encode($web_roots . '/basket.php?'); ?>;
     var Transf = <?php echo json_encode($Transf); ?>;
+    var displayPaths= <?php echo json_encode($displayPaths); ?>;
 </script>
 
 <script> // t12
@@ -511,6 +471,12 @@ $(document).ready(function(){ // p=t12
     }
     else {
         $('[valInfo="t12"]').html(text_values);
+    }
+    if ( $('[valInfo="t13"]').html() != '' ) {
+        $('[valInfo="t13"]').html('');
+    }
+    else {
+        $('[valInfo="t13"]').html(displayPaths);
     }
   });
 });
@@ -540,6 +506,7 @@ $(document).ready(function(){ // p=t12
         // la class clickable est appliquée à tous les table qui auront des "boutons"
         $('table.clickable td').on('click', checkAddLink );
         $('table.clickable td').on('click', checkTable ); // TEMP
+        $('table.clickable td').on('click', checkCurveChoice );
         console.log('general nous voilà !');
         var nb = lineHisto1.length;
         //console.log('nb : ' + nb);
@@ -590,7 +557,7 @@ $(document).ready(function(){ // p=t12
         var affiche3 = 'ff : ' + ff;
         console.log(affiche3);
         var gg = obj.attr('img_id')
-        console.log('=== img_id= ' + gg)
+        //console.log('=== img_id= ' + gg)
 
         if (typeof gg !== "undefined") {
             //console.log('=== img_id= ' + gg)
@@ -795,6 +762,58 @@ $(document).ready(function(){ // p=t12
             console.log('cc2 : ' + cc2)
             $("#tableHistos").toggle();
         }
+    }
+    function checkCurveChoice() {
+        // si le td a une class ou une autre, on peut le traiter différemment
+        if ($(this).parents('table.clickable').hasClass('curveChoice')) {
+            $('table.curveChoice td').removeClass('Gras');//
+            curveChoice($(this));
+            //console.log("curveChoice");
+        }
+    }
+    function curveChoice(obj){
+        var cc = obj.attr('curve-choice');
+        var affiche = 'cc : ' + cc ;
+        console.log(affiche)
+        if (typeof cc !== "undefined") {
+            if (cc == '') {
+                cc = 'histos';
+                $('[curve-choice="histos"]').addClass('Gras');
+            }
+            else if (cc == 'histos') {
+                $('[curve-choice="histos"]').addClass('Gras');
+            }
+            else if (cc == 'diffMax') {
+                $('[curve-choice="diffMax"]').addClass('Gras');
+            }
+            $('div.cell img.image.img').each(function(index, elt) {
+                var dd = $(this).attr('src').split("/");
+                var lastItem = dd.pop();
+                var beforeLastItem = dd.join("/");
+                var ext = lastItem.split(".")[1];
+                lastItem = lastItem.split(".")[0];
+                //console.log(lastItem);
+                //console.log(beforeLastItem + '//' + lastItem)
+                var firstChars = lastItem.substring(0,2);
+                //console.log(firstChars + ' - ' + cc);
+                if ((firstChars == 'h_') && (cc == 'diffMax')) {
+                    p_name = beforeLastItem + '/maxDiff_comparison_' + lastItem + '_3.' + ext
+                    //console.log(p_name + firstChars)
+                    $(this).data('src', p_name)
+                    $(this).attr('src', p_name)
+                }
+                else if ((firstChars == 'ma') && (cc == 'histos')) {
+                    //console.log('==' + lastItem.replace('maxDiff_comparison_', ''))
+                    //console.log('==' + lastItem.replace('maxDiff_comparison_', '').replace('_3', ''))
+                    p_name = beforeLastItem + '/' + lastItem.replace('maxDiff_comparison_', '').replace('_3', '') + '.' + ext
+                    //console.log(p_name)
+                    $(this).data('src', p_name)
+                    $(this).attr('src', p_name)
+                }
+            })
+        }
+    // https://cms-egamma.web.cern.ch/validation/Electrons/Releases/15_1_0_pre6_2025_DQM_std/FullvsFull_CMSSW_15_1_0_pre5/RECO-RECO_ZpToEE_m6000_14TeV/pngs/h_ele_charge.png
+    // https://cms-egamma.web.cern.ch/validation/Electrons/Releases/15_1_0_pre6_2025_DQM_std/FullvsFull_CMSSW_15_1_0_pre5/RECO-RECO_ZpToEE_m6000_14TeV/pngs/maxDiff_comparison_h_ele_charge_3.png
     }
 </script>
 
