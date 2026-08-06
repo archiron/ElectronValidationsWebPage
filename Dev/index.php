@@ -19,27 +19,23 @@
     include '../php_inc/security.inc.php';
 
     // 1. Sanitization de l'URL avant toute utilisation
-    /*$actionFrom = isset($_REQUEST['actionFrom']) 
-        ? preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $_REQUEST['actionFrom']) 
-        : '';*/
-    $actionFrom = cleanInput($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
-
-    /*$cchoice = isset($_REQUEST['cchoice']) 
-        ? preg_replace('/[^a-zA-Z0-9_\-]/', '', $_REQUEST['cchoice']) 
-        : '';*/
-    $cchoice    = cleanInput($_REQUEST['cchoice'] ?? '', true);    // false bloque les slashes
+    $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
+    $cchoice    = cleanInput_V2($_REQUEST['cchoice'] ?? '', true);    // false bloque les slashes
     echo "<-- DEBUG: Original = " . htmlspecialchars($_REQUEST['cchoice'] ?? 'vide') . " -->" . '<br>' . "\n";
-    echo "<-- DEBUG: Cleaned = " . htmlspecialchars($cchoice) . " -->";
+    echo "<-- DEBUG: Cleaned = " . htmlspecialchars($cchoice) . " -->" . '<br>' . "\n";
+    $short_histo_name    = cleanInput_V2($_REQUEST['short_histo_name'] ?? '', false);    // false bloque les slashes
 
-    /*$short_histo_name = isset($_REQUEST['short_histo_name']) 
-        ? preg_replace('/[^a-zA-Z0-9_\-]/', '', $_REQUEST['short_histo_name']) 
-        : '';*/
-    $short_histo_name    = cleanInput($_REQUEST['short_histo_name'] ?? '', false);    // false bloque les slashes
+    $url_safe = cleanInput($_GET['redirect'] ?? '', 'url');
+    if (!empty($url_safe) && !preg_match('#^https?://#i', $url_safe)) {
+        $url_safe = ''; // Fallback si jamais le protocole a été altéré
+    }
 
     // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
     $_REQUEST['actionFrom'] = $actionFrom;
     $_REQUEST['cchoice'] = $cchoice;
     $_REQUEST['short_histo_name'] = $short_histo_name;
+    $_REQUEST['redirect'] = $url_safe;
+    echo "url safe : " . $url_safe . '<br>' . "\n";
 
 // --- END SECURITY ---
 
@@ -49,7 +45,7 @@
 </div>
 <main>
 <?php
-$url = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL);
+//$url = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL);
 
 echo '====<br>' . "\n";
 prePrint('SESSION', $_SESSION);

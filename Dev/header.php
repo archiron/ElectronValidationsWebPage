@@ -24,16 +24,52 @@
     simPrintC('chemin', $chemin);
     $displayPaths = '';
     
-    $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
-    simPrintC('url', $url);
+    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
+    //simPrintC('url avant ', $url);
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
+    // 2. Préparez la version échappée pour le HTML si nécessaire
+    $url_html = htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
+    simPrintC('url ', $url);
 
     $url_graph = explode('&', $url)[0];
     $url_graph = str_replace('/index.php?actionFrom=/', '/', $url_graph);
+    //simPrintC('url graph', $url_graph);
     
     //prePrint('url', parse_url($url));
-    $url_from = $_SERVER['HTTP_REFERER'];
-    simPrintC('url from', $url_from);
-    $url_tmp = explode('?', $url_from)[0];
+    //$url_from = $_SERVER['HTTP_REFERER'];
+    //simPrintC('url from', $url_from);
+    // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
+    $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
+
+    // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
+    $url_from_safe = cleanInput($clean_referer, 'url');
+
+    // 3. Vérification CRITIQUE du domaine (Whitelist)
+    // Empêche la redirection vers google.com, evil.com, etc.
+    $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhost'];
+    $host = parse_url($url_from_safe, PHP_URL_HOST);
+
+    if ($url_from_safe && !in_array($host, $allowed_hosts)) {
+        // Si le domaine n'est pas le vôtre, on ignore le referer
+        $url_from_safe = ''; 
+        // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/index.php';
+    }
+    simPrintC('url from', $url_from_safe);
+
+    $url_tmp = explode('?', $url_from_safe)[0];
     $url_tmp = end(explode('/', $url_tmp));
     $url_flag = false;
     if ($url_tmp == 'basket.php') {
