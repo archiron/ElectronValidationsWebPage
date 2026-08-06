@@ -88,7 +88,7 @@
     }
     $fileName_0 = getFileName(session_id());
     $fileName = $web_roots . "/" . $fileName_0;
-    $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);
+    $fileName_eos = str_replace($racine_html, $racine_eos, $fileName);
     $_SESSION['localFileForHistos_eos'] = $fileName_eos;
     $_SESSION['fileForHistos_eos'] = $_SESSION['localFileForHistos_eos'];
     $classical_roots = htmlspecialchars( $web_roots, ENT_QUOTES, 'UTF-8' );
@@ -105,7 +105,6 @@
     $dirsList = array();
     $dirsList_date = array(); // AC
     $filesList = array();
-    //$lineHisto = array();
     $lineHisto1 = array();
     $pictsDir=False;
     $pictsValue="gifs"; // default
@@ -120,8 +119,8 @@
     $sharedF='';
     $short_histo_name='';
     
-    $actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
-    $cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
+    //$cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
     if ($cchoice == '') {
         $cchoice = "diff";
     }

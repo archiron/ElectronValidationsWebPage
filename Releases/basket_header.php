@@ -1,6 +1,14 @@
 <header>
     
     <?php
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => true,      // Nécessite HTTPS
+        'httponly' => true,    // Bloque l'accès JS
+        'samesite' => 'Strict' // Protection CSRF
+    ]);
     session_start();
     //echo "session id : " . session_id() . "<br><br>\n";
     if (isset($_POST['pTableData'])) {
@@ -10,6 +18,7 @@
 
     $base_dir = __DIR__;
     include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
 
@@ -18,13 +27,25 @@
     if (isset($_SESSION['pictFormat'])) {
         $pictsValue=$_SESSION['pictFormat'] . "s"; // gifs/pngs
         $pictsExt="." . $_SESSION['pictFormat']; // .gif/.png
-        //simPrint('pictsValue', $pictsValue);
-        //simPrint('pictsExt', $pictsExt);
+        //simPrintC('pictsValue', $pictsValue);
+        //simPrintC('pictsExt', $pictsExt);
     }
 
     $chemin = $web_roots;
     
-    $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; # url of the folder in order to use without index.php
+    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; # url of the folder in order to use without index.php
+    //simPrintC('url', $url);
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
     $fileName_0 = getFileName(session_id());
     $fileName = $web_roots . "/" . $fileName_0;
     $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);
@@ -34,17 +55,21 @@
     }
     
     //$corresp = 0;
-    $url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
+    //$url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
 
-    $actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');simPrintC('actionFrom ', $actionFrom);
-    $basket = (isset($_REQUEST['basket']) ? $_REQUEST['basket'] : '');
-    $site  = (isset($_REQUEST['site']) ? $_REQUEST['site'] : '');
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');//simPrintC('actionFrom ', $actionFrom);
+    //$basket = (isset($_REQUEST['basket']) ? $_REQUEST['basket'] : '');
+    //$site  = (isset($_REQUEST['site']) ? $_REQUEST['site'] : '');
     //$short_histo_name = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');simPrintC('short histo name', $short_histo_name);
     //$long_histo_name = (isset($_REQUEST['long_histo_name']) ? $_REQUEST['long_histo_name'] : '');simPrintC('long histo name', $long_histo_name);
     if (!empty($url)) {
         $tmp_lhn = end(explode('/', $url));
         $long_histo_name = explode('.', $tmp_lhn)[0]; //simPrintC('long histo name', $long_histo_name);
         $short_histo_name = shorterHistoName($long_histo_name); //simPrintC('short histo name', $short_histo_name);
+        if ( substr($short_histo_name, 0, 2) != 'h_' ) {
+            $short_histo_name = '';
+        }
+        //simPrintC('short histo name', $short_histo_name);
     }
     $fileForHistos = (isset($_REQUEST['sharedF']) ? $_REQUEST['sharedF'] : '');
     if (!empty($fileForHistos)) {
@@ -52,7 +77,6 @@
         $fileForHistos = "sharedList." . $fileForHistos . ".txt";
         $fileForHistos_eos=str_replace($racine_html, $racine_eos, $fileForHistos);
         $_SESSION['fileForHistos_eos'] = $fileForHistos_eos;
-        //echo "You are using a <font color=\"red\"><b>shared</b></font> file : " . getReducedName($fileForHistos_eos) . "<br>\n";
     }
 
     if (($_SESSION['url'] !== '') && ($actionFrom == '')) {
@@ -77,7 +101,7 @@
             }
     }
     $actionFrom = str_replace('//', '/', $actionFrom);
-    simPrintC('actionFrom after ', $actionFrom);
+    //simPrintC('actionFrom after ', $actionFrom);
     if (empty($url)) {
         $url = $_SESSION['url'];
     }
@@ -90,7 +114,7 @@
     
     $chemin = $chemin . '/' . $actionFrom;
     $chemin_eos=str_replace($racine_html, $racine_eos, $chemin);
-    $chemin_eos_base = str_replace($racine_html, $racine_eos, $web_roots);//simPrint("chemin_eos_base", $chemin_eos_base);
+    $chemin_eos_base = str_replace($racine_html, $racine_eos, $web_roots);//simPrintC("chemin_eos_base", $chemin_eos_base);
     
     $filesList = array();
     $sharedFilesList = array();
@@ -138,7 +162,7 @@
         $tmp_aF1 = str_replace($web_roots, '', $lineHisto[0]);
         $tmp_aF2 = explode('/',$tmp_aF1);
         $actionFrom = '/' . $tmp_aF2[1] . '/' . $tmp_aF2[2] . '/' . $tmp_aF2[3];
-        simPrint('aF1', $actionFrom);
+        simPrintC('aF1', $actionFrom);
     }
     
     if ($short_histo_name != '') {
@@ -149,7 +173,7 @@
     }
 
     echo '<table class="tab0" border="0" cellpadding="1">';
-    echo '<tr>';
+    echo '<tr class="ValidationsMenu">';
     echo '<td width=" 25%" class="b0">';
     writeHeaderMenu();
     echo '</td>';
@@ -163,7 +187,7 @@
         echo "<b>" . $short_histo_name  . "</b>";
         echo "</span></th>";
     }
-    echo "<td class=\"RtextAlign\">";
+    echo "<td style=\"vertical-align:middle\" class=\"RtextAlign\">";
     if ($basket == 'display') {
         echo "<a href=\"" . $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=work&actionFrom=" . $actionFrom . "#000\">BACK</a>";
         echo "&nbsp; - &nbsp;\n";
@@ -181,7 +205,6 @@
         }
         else {
             $returnAddr = $web_roots .  "/index.php?actionFrom=" . $actionFrom . "&cchoice=diff#000" ;
-            simPrint('return Adress work', $returnAddr);
             echo '<a href="' . $returnAddr . '">BACK to histos</a>';
             //echo "&nbsp; - &nbsp;\n";
         }
