@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,12 +29,16 @@
         $url_safe = ''; // Fallback si jamais le protocole a été altéré
     }
 
+    // Vérification CRITIQUE anti-traversal
+    if (strpos($actionFrom, '..') !== false) {
+        die("Chemin invalide : tentative de traversal détectée");
+    }
+
     // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
     $_REQUEST['actionFrom'] = $actionFrom;
     $_REQUEST['cchoice'] = $cchoice;
     $_REQUEST['short_histo_name'] = $short_histo_name;
     $_REQUEST['redirect'] = $url_safe;
-    echo "url safe : " . $url_safe . '<br>' . "\n";
 
 // --- END SECURITY ---
 

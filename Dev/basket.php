@@ -28,6 +28,11 @@
         $url_safe = ''; // Fallback si jamais le protocole a été altéré
     }
 
+    // Vérification CRITIQUE anti-traversal
+    if (strpos($actionFrom, '..') !== false) {
+        die("Chemin invalide : tentative de traversal détectée");
+    }
+
     // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
     $_REQUEST['actionFrom'] = $actionFrom;
     $_REQUEST['url'] = $url;

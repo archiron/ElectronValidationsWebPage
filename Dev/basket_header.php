@@ -1,6 +1,14 @@
 <header>
     
     <?php
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => true,      // Nécessite HTTPS
+        'httponly' => true,    // Bloque l'accès JS
+        'samesite' => 'Strict' // Protection CSRF
+    ]);
     session_start();
     //echo "session id : " . session_id() . "<br><br>\n";
 
