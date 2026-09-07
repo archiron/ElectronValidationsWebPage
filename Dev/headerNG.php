@@ -52,7 +52,6 @@
     $pictsExt=".gif"; // default
     $indexHtml=False;
     $histosFile=False;
-    $DBoxflag=False;
     $choiceValue='';
     $basket='';
     $fileForHistos='';
@@ -116,10 +115,6 @@
                 $pictsValue="pngs";
                 $pictsExt=".png";
                 $allFormat+=1;
-            }
-            elseif ( $value == "DBox" ) // pbm : si le dernier repertoire est un png, ça zappe les gifs
-            {
-                $DBoxflag = True;
             }
         }
     }
@@ -271,24 +266,6 @@
             $newLine9 = "<b><span class='blueClass'> " . $lineRead9_1 . " " . $lineRead9_2 . " </span></b>" . " : " . $lineRead9_4 . " \n";//<br>
             echo $newLine9;
             echo '</td>';
-            if ($DBoxflag) {
-            echo '<td class="CtextAlign MtextAlign" >';
-            if ($cchoice == "diff"){
-                echo '<a href="$web_roots/indexNG.php?actionFrom=' . $actionFrom . '&cchoice=diff"><b><span class="blueClass">Diff</span></b></a>';//
-            }
-            else {
-                echo '<a href="$web_roots/indexNG.php?actionFrom=' . $actionFrom . '&cchoice=diff"><span class="blueClass">Diff</span></a>';//
-            }
-            echo ' &nbsp;: &nbsp;<span class="blueClass">0&le;diff&le;5 %</span> - <span class="greyClass">5&lt;diff&le;10 %</span> - <span class="redClass"> diff&gt;10 %</span><br>';//
-            if ($cchoice == "pValue"){
-                echo '<a href="$web_roots/indexNG.php?actionFrom=' . $actionFrom . '&cchoice=pValue"><b><span class="blueClass">p-Value</span></b></a>';//
-            }
-            else {
-                echo '<a href="$web_roots/indexNG.php?actionFrom=' . $actionFrom . '&cchoice=pValue"><span class="blueClass">p-Value</span></a>';//
-            }
-            echo ' : <span class="blueClass">0.95&lt;pV&le;1.</span> - <span class="greyClass">0.90&lt;pV&le;0.95</span> - <span class="redClass"> pV&lt;0.90</span><br>';
-            echo '</td>';
-            }
             echo '</tr>';
             echo '</table>';
     

@@ -123,11 +123,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         $histoArray = cleanHistoArray($histoArray, $clefs, $choiceValue);
         echo ' <br>';
     }
-    ##### end test with Title/Histo name choice
-    if ($DBoxflag) {
-        $fileDiffpValueName = $chemin_eos . "/" . 'DBox/pValuesDiffHistosNames.txt';
-        $handle_4 = fopen($fileDiffpValueName, "w");
-    }
 
     /* Write the table with all histos */
     if ( $url_flag ) {
@@ -159,33 +154,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 
             list ($after, $before, $common) = testExtension($short_histo_name, $histoPrevious);
             $classColor = "blueClass";
-            if ($DBoxflag) {
-                $filehistoName = $chemin_eos . "/" . 'DBox/' . $short_histo_name . '.txt';
-                $handle_3 = fopen($filehistoName, "r");
-                if ($handle_3) {
-                    for ($ij = 0; $ij <= 13; $ij++) {
-                        $tmp = fgets($handle_3);
-                    }
-                    $lRead1 = fgets($handle_3); // line 14
-                    $lRead1 = str_replace(" <p>diff. max. : ","",$lRead1);
-                    $lRead1 = str_replace("</p>","",$lRead1);
-                    $lRead2 = fgets($handle_3); // line 15
-                    $lRead2 = str_replace("</p>","",$lRead2);
-                    $lRead2 = substr($lRead2, -7);
-                    $tempDiff = $short_histo_name . ' ' . $lRead1 . $lRead2 . "\n"; // . ' '
-                    $tempDiff = str_replace(array("\r", "\n"), '', $tempDiff);
-                    $tempDiff .= "\n";
-                    if ($handle_4) {
-                        fwrite($handle_4, $tempDiff);
-                    }
-                    $classColor = getClassColor_cchoice($cchoice, $lRead1, $lRead2);
-                    
-                }
-                else {
-                    simPrint("could not open ", $filehistoName);
-                }
-            fclose($filehistoName);
-            }
 
             if ( $elem == "endLine" ) {
                 $otherTextToWrite .= " <br>";
@@ -255,9 +223,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     echo '</table>';
     echo '</div>';
     
-    if ($DBoxflag && $handle_4) {
-        fclose($handle_4);
-    }
 
     $lineFlag = True;
         /* Write the HISTOS pictures */
@@ -306,36 +271,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                     echo '</div>';
                     echo "\n";
 
-                    if ($DBoxflag) {
-                        $filehistoName = 'DBox/' . $short_histo_name . '.txt';
-                        $handle_3 = fopen($chemin_eos . "/" . $filehistoName, "r");
-                        if ($handle_3)
-                        {
-                            $lineRead = fgets($handle_3);
-                            $lineRead = fgets($handle_3);
-                            if (strlen($lineRead) > 1){
-                                echo '<div class="cellKS" border="1">';
-                                for ($ij = 2; $ij <= 12; $ij++) {
-                                $lineRead = fgets($handle_3);
-                            }
-
-                                echo '<a href="' . $web_roots . '/globos.php?short_histo_name=' . $short_histo_name . '&url=' . $escaped_url . '&actionFrom=' . $actionFrom . '">Decision Box</a>';
-                            $lineRead = fgets($handle_3); // line 14
-                            $lineRead = str_replace("<td>", "", $lineRead);
-                            echo $lineRead ;
-                            $lineRead = fgets($handle_3); // line 15
-                            echo $lineRead ;
-                            $lineRead = fgets($handle_3); // line 16
-                            $lineRead = str_replace("</td>", "", $lineRead);
-                            echo $lineRead . "\n";
-                            $lineRead = fgets($handle_3); // line 17
-                            $lineRead = str_replace("</td>", "", $lineRead);
-                            echo $lineRead . "\n";
-                            echo '</div>';
-                        }
-                        fclose($handle_3);
-                        }
-                    }
                     echo '</td>';
                     if ( $testExistUrl) {
                         echo '<td align="center" addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" width="60"><img width="32" height="32" src="' . $image_remove . '" alt="Add"/>'; // </td>
@@ -351,36 +286,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                     echo '<div class="cell anchor0" id="' . $short_histo_name . '">';
                     echo '<img class="image img blueBorder2" width="440" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">' ;//</a>
 
-                    if ($DBoxflag) {
-                        echo '</div>';
-                        $filehistoName = 'DBox/' . $short_histo_name . '.txt';
-                        $handle_3 = fopen($chemin_eos . "/" . $filehistoName, "r");
-                        if ($handle_3)
-                        {
-                            $lineRead = fgets($handle_3);
-                            $lineRead = fgets($handle_3);
-                            if (strlen($lineRead) > 1) {
-                                echo '<div class="cellKS" border="1">';
-                                for ($ij = 2; $ij <= 12; $ij++) {
-                                $lineRead = fgets($handle_3);
-                            }
-                                echo '<a href="' . $web_roots . '/globos.php?short_histo_name=' . $short_histo_name . '&url=' . $escaped_url . '&actionFrom=' . $actionFrom . '">Decision Box</a>';
-                            $lineRead = fgets($handle_3); // line 8
-                            $lineRead = str_replace("<td>", "", $lineRead);
-                            echo $lineRead ;
-                            $lineRead = fgets($handle_3); // line 9
-                            echo $lineRead ;
-                            $lineRead = fgets($handle_3); // line 10
-                            $lineRead = str_replace("</td>", "", $lineRead);
-                            echo $lineRead . "\n";
-                            $lineRead = fgets($handle_3); // line 17
-                            $lineRead = str_replace("</td>", "", $lineRead);
-                            echo $lineRead . "\n";
-                            echo '</div>';
-                        }
-                        fclose($handle_3);
-                        }
-                    }
                     echo '</div>';
                     echo '</td>';
                     if ( $testExistUrl) {

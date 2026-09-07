@@ -119,33 +119,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 
             list ($after, $before, $common) = testExtension($short_histo_name, $histoPrevious);
             $classColor = "blueClass";
-            if ($DBoxflag) {
-                $filehistoName = $chemin_eos . "/" . 'DBox/' . $short_histo_name . '.txt';
-                $handle_3 = fopen($filehistoName, "r");
-                if ($handle_3) {
-                    for ($ij = 0; $ij <= 13; $ij++) {
-                        $tmp = fgets($handle_3);
-                    }
-                    $lRead1 = fgets($handle_3); // line 14
-                    $lRead1 = str_replace(" <p>diff. max. : ","",$lRead1);
-                    $lRead1 = str_replace("</p>","",$lRead1);
-                    $lRead2 = fgets($handle_3); // line 15
-                    $lRead2 = str_replace("</p>","",$lRead2);
-                    $lRead2 = substr($lRead2, -7);
-                    $tempDiff = $short_histo_name . ' ' . $lRead1 . $lRead2 . "\n"; // . ' '
-                    $tempDiff = str_replace(array("\r", "\n"), '', $tempDiff);
-                    $tempDiff .= "\n";
-                    if ($handle_4) {
-                        fwrite($handle_4, $tempDiff);
-                    }
-                    $classColor = getClassColor_cchoice($cchoice, $lRead1, $lRead2);
-                    
-                }
-                else {
-                    simPrint("could not open ", $filehistoName);
-                }
-            fclose($filehistoName);
-            }
             
             $ImageName = 'https:' . $escaped_url . "/" . $pictsValue ."/" . $short_histo_names[0] . $pictsExt;
             $ImageName = str_replace($racine_html, $racine_eos, $ImageName);//simPrint('image', $ImageName);
