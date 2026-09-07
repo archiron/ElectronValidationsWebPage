@@ -21,13 +21,11 @@ if (isset($_POST['file_to_delete'])) {
     echo "Chemin testé : " . $path . "<br>";
     echo "Fichier existe : " . (file_exists($path) ? 'OUI' : 'NON') . "<br>";
     echo "Nom reçu : " . $file . "<br>";
-    echo "Contenu du dossier (si lisible) : <br><pre>";
     if (is_dir($baseDir . 'BasketList/')) {
-        print_r(scandir($baseDir . 'BasketList/'));
+        echo "Le dossier BasketList existe et est lisible.";
     } else {
         echo "Le dossier BasketList n'existe pas ou n'est pas lisible.";
     }
-    echo "</pre><hr>";
     // ---------------
 
     if (file_exists($path)) {
