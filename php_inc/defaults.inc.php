@@ -1,6 +1,5 @@
 <?php
 $url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; 
-//echo $url . "<br>\n";
 $tmp2 = str_replace('//cms-egamma', '', $url);
 $tmp2 = substr($tmp2, 0, 4);
 if ($tmp2 =='.web') {

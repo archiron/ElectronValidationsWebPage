@@ -34,8 +34,9 @@
         // SÉCURITÉ 2 : Protection XSS sur l'affichage brut de debug
         echo htmlspecialchars($_POST['basketFile'], ENT_QUOTES, 'UTF-8') . '<br>' . "\n"; 
         
-        $basketFile = stripcslashes($_POST['basketFile']);
-        $basketFile = json_decode($basketFile, true);
+        /*$basketFile = stripcslashes();
+        $basketFile = json_decode($basketFile, true);*/
+        $basketFile = securePath($_POST['basketFile']);
         
         // Validation structurelle du JSON reçu
         if (!is_array($basketFile)) {

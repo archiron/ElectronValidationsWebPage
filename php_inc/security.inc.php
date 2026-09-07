@@ -77,4 +77,10 @@ function check_php_injection($data) {
     }
 }
 
+function securePath($chemin) {
+    $tmp = stripcslashes($chemin);
+    $tmp = json_decode($tmp, true);
+    return $tmp;
+}
+
 ?>

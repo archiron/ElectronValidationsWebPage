@@ -49,8 +49,9 @@ $forbiddenExtensions = ['php', 'php5', 'phtml', 'htaccess'];
         // Sécurisation de l'affichage direct (XSS)
         echo htmlspecialchars($_POST['pTableData'], ENT_QUOTES, 'UTF-8') . '<br>' . "\n";
         
-        $tableData = stripcslashes($_POST['pTableData']);
-        $tableData = json_decode($tableData, true);
+        /*$tableData = stripcslashes($_POST['pTableData']);
+        $tableData = json_decode($tableData, true);*/
+        $tableData = securePath($_POST['pTableData']);
         
         // Vérification que le JSON est bien un tableau valide
         if (!is_array($tableData)) {
