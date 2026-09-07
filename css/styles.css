@@ -51,6 +51,12 @@ footer {
 .m-auto { /* margin */
     margin: auto !important;
 }
+.ml-auto {
+    margin-left: auto !important;
+}
+.mr-auto {
+    margin-right: auto !important;
+}
 .m-0-auto { /* margin */
     margin: 0 auto !important;
 }
@@ -167,6 +173,9 @@ footer {
 .whiteClass {
   color: white;
 }
+.blackBorder0 {
+  border: 0px solid black !important;
+}
 .blackBorder1 {
   border: 1px solid black !important;
 }
@@ -240,24 +249,30 @@ table.tab6 {
   border: 2px solid rgb(168, 156, 235);
 }
 .RtextAlign {
-  text-align: right;
+  text-align: right !important;
 }
 .CtextAlign {
-  text-align: center;
+  text-align: center !important;
 }
 .LtextAlign {
-  text-align: left;
+  text-align: left !important;
 }
 .VtextAlign {
-  vertical-align:50%;
+  vertical-align:50% !important;
 }
-.MtextAlign { /* middle align */
+.MtextAlign { /* vertical align middle */
   vertical-align: middle !important;
 }
-.TtextAlign { /* middle align */
+.TtextAlign { /* vertical align top */
   vertical-align: top !important;
 }
-.text-150 {
+.text-16px {
+  font-size: 16px !important;
+}
+.text-30px {
+  font-size: 30px !important;
+}
+.text-150pct {
   font-size: 150% !important;
 }
 /* Pourcentages */
@@ -285,6 +300,9 @@ table.tab6 {
 .w-60pct {
   width:60%;
 }
+.w-85pct {
+  width: 85%;
+}
 .w-100pct {
   width: 100%;
 }
@@ -300,6 +318,9 @@ table.tab6 {
 }
 .w-60px { /* pixels */
   width: 60px;
+}
+.w-100px {
+  width: 100px;
 }
 .w-130px { /* pixels */
   width: 130px;
@@ -321,6 +342,9 @@ table.tab6 {
 }
 .w-500px { /* pixels */
   width: 500px;
+}
+.w-700px { /* pixels */
+  width: 700px;
 }
 
 a.greyClass:link{

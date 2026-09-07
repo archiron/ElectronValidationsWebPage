@@ -1,33 +1,5 @@
 
 <?php
-/*header('Content-Type: text/plain; charset=utf-8');
-
-session_start();
-    //$uploadDir = dirname(__DIR__) ; // . '/BasketList/'
-    $uploadDir = '/eos/project/c/cmsweb/www/egamma/validation/Electrons/';
-    echo "upload dir : " . $uploadDir;
-
-    // Vérifiez la sécurité (ex: token de session) pour éviter qu'un tiers ne supprime des fichiers
-    if (isset($_POST['file_to_delete'])) {
-        $file = basename($_POST['file_to_delete']); // Sécurité : empêche la remontée de dossier
-        $path = $uploadDir . '/' . $file;
-
-        // Supprime le fichier s'il existe
-        if (file_exists($path)) {
-            // Optionnel : ne supprimer que si vide
-            if (filesize($path) === 0) {
-                //unlink($path);
-                if (unlink($path)) {
-                    echo "Fichier supprimé avec succès : " . $path;
-                } else {
-                    echo "Échec de la suppression : " . $path;
-                }
-            }
-        }
-    }
-*/
-
-
 session_start();
 
 // Chemin de base (à vérifier)

@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://jquery.com;">
 
 <title>Dev list webpage</title>
+<link rel="icon" type="image/x-icon" href="/validation/Electrons/img/filetype-root-256.ico"> 
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/all.min.css">
 <link rel="stylesheet" href="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.css">
@@ -88,7 +89,7 @@
         $url_from_safe = ''; 
         // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/indexNG.php';
     }
-    echo 'url from : ' . $url_from_safe;
+    //echo 'url from : ' . $url_from_safe;
 
 // --- END SECURITY ---
 

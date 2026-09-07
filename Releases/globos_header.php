@@ -1,16 +1,23 @@
 <header>
     
     <?php
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        //'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => true,      // Nécessite HTTPS
+        'httponly' => true,    // Bloque l'accès JS
+        'samesite' => 'Strict' // Protection CSRF
+    ]);
     session_start();
 
     
-    $short_histo_name  = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
-    $url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
     $url = 'https:' . $url;
     //echo 'url : ' . $url . "<br>";
 
     $base_dir = __DIR__;
     include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
     
@@ -44,28 +51,25 @@
     $parties = explode("/", $url);
     $Np = count($parties);
     
-    echo "<table class=\"tab0\">";
+    echo '<table class="tab0">';
     echo '<tr><td class="b0">';
     writeHeaderLinks($base_dir, $url);
-    echo "</td>";
+    echo '</td>';
 
     echo '<td><th><span class="redClass">';
     echo "<b>electron validation: Kolmogorov - Smirnov</b>";
-    echo "</span>";
+    echo '</span>';
     echo '<span class="darkBlueClass">';
     echo " / ";
-    echo "<b>" . $short_histo_name  . "</b>";
-    echo "</span></th></td>";
-    echo "<td class=\"RtextAlign\">";
-    //$web_rootsD2 = str_replace('http', 'https', $web_rootsD);
-    //$actionFrom = str_replace($web_rootsD2, '', $url);
+    echo "<b>" . $short_histo_name  . '</b>';
+    echo '</span></th></td>';
+    echo '<td class="RtextAlign">';
     $returnAddr = $web_roots .  "/index.php?actionFrom=" . $actionFrom  . "&cchoice=diff#" . $short_histo_name ;
-    //echo htmlspecialchars( $returnAddr, ENT_QUOTES, 'UTF-8' ) . "<br>";
-    echo "<a href=\"" . $returnAddr . "\">BACK</a>";
+    echo '<a href="' . $returnAddr . '">BACK</a>';
     
-    echo "</td>";
-    echo "</tr>";
-    echo "</table>\n";
+    echo '</td>';
+    echo '</tr>';
+    echo '</table>';
     
     $_SESSION['url'] = $url;
 
@@ -125,15 +129,15 @@
         }
     }
 
-    echo "<table class=\"tab0\">";
-    echo '<tr><td>';// class="b3"
+    echo '<table class="tab0">';
+    echo '<tr><td>';
     {
         filter($url);
     }
 
-    echo "</td>";
-    echo "</tr>";
-    echo "</table>";
+    echo '</td>';
+    echo '</tr>';
+    echo '</table>';
 
     $choiceValue = $_REQUEST['choiceValue'];
     if ($choiceValue != '')
@@ -142,16 +146,16 @@
     }
 
     echo "<br>";
-    echo '<table border="">';
-    echo "<tr><td>url = $url</td></tr>";
-    echo "<tr><td>actionFrom = $actionFrom</td></tr>";
-    echo "<tr><td>cchoice = $cchoice</td></tr>";
-    echo "<tr><td>basket = $basket</td></tr>";
-    echo "<tr><td>createF = $createF</td></tr>";
-    echo "<tr><td>fileForHistos = $fileForHistos</td></tr>";
-    echo "<tr><td>curveChoice = $curveChoice</td></tr>";
-    echo "<tr><td>sharedF = $sharedF</td></tr>";
-    echo "<tr><td>short_histo_name = $short_histo_name</td></tr>";
+    echo '<table class="blackBorder0">';
+    echo '<tr><td>url = $url</td></tr>';
+    echo '<tr><td>actionFrom = $actionFrom</td></tr>';
+    echo '<tr><td>cchoice = $cchoice</td></tr>';
+    echo '<tr><td>basket = $basket</td></tr>';
+    echo '<tr><td>createF = $createF</td></tr>';
+    echo '<tr><td>fileForHistos = $fileForHistos</td></tr>';
+    echo '<tr><td>curveChoice = $curveChoice</td></tr>';
+    echo '<tr><td>sharedF = $sharedF</td></tr>';
+    echo '<tr><td>short_histo_name = $short_histo_name</td></tr>';
     echo '</table>';
     echo "<br>";
     

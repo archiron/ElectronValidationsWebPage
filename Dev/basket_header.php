@@ -4,11 +4,15 @@
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'domain' => $_SERVER['HTTP_HOST'],
+        //'domain' => $_SERVER['HTTP_HOST'],
         'secure' => true,      // Nécessite HTTPS
         'httponly' => true,    // Bloque l'accès JS
         'samesite' => 'Strict' // Protection CSRF
     ]);
+    //ini_set('display_errors', 1);
+    //ini_set('display_startup_errors', 1);
+    //error_reporting(E_ALL);
+
     session_start();
     //echo "session id : " . session_id() . "<br><br>\n";
 
@@ -42,22 +46,16 @@
     // Reconstruction
     $url = "//{$clean_host}{$clean_uri}";
 
-    $fileName_0 = getFileName(session_id());
-    $fileName = $web_roots . "/" . $fileName_0;
-    $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);
+    $fileName_0 = getFileName(session_id());//simPrintC('file basket', $fileName_0);
+    $fileName = $web_roots . "/" . $fileName_0;//simPrintC('file basket', $fileName);
+    $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);//simPrintC('file basket', $fileName_eos);
     $_SESSION['localFileForHistos_eos'] = $fileName_eos;
     if (empty($_SESSION['fileForHistos_eos'])){
         $_SESSION['fileForHistos_eos'] = $_SESSION['localFileForHistos_eos'];
     }
     
-    //$corresp = 0;
-    //$url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
-
-    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');simPrintC('actionFrom ', $actionFrom);
-    //$basket = (isset($_REQUEST['basket']) ? $_REQUEST['basket'] : '');
-    //$site  = (isset($_REQUEST['site']) ? $_REQUEST['site'] : '');
-    $issetArray = ['url' => $url, 'actionFrom' => $actionFrom, 'basket' => $basket, 'site' => $site];
-    displayIsset($issetArray);
+    /*$issetArray = ['url' => $url, 'actionFrom' => $actionFrom, 'basket' => $basket, 'site' => $site];
+    displayIsset($issetArray);*/
     
     $i2_flag = false;
     if ($site == 'Dev2') {
@@ -65,29 +63,24 @@
         $i2_flag = true;
     }
     //simPrintC('site', $site);
-    //$short_histo_name  = $_SESSION[$site . '-' . 'short_histo_name'];
-    simPrintC('short histo name', $short_histo_name);
     if ($short_histo_name == '') {
         $tt = $_SESSION[$site . '-url']; //echo $tt . $_fDL;
         $short_histo_name = explode('.', end(explode('/', $tt)))[0];
         $short_histo_name = shorterHistoName($short_histo_name);
-        echo $short_histo_name. $_fDL;
+        //echo $short_histo_name. $_fDL;
         $_SESSION[$site . '-' . 'short_histo_name'] = $short_histo_name;
     }
     #$long_histo_name = $_SESSION[$site . '-' . 'long_histo_name'];
     if ($long_histo_name == '') {
         $long_histo_name = end(explode('/', $_SESSION[$site . '-url']));
         $long_histo_name = explode('.', $long_histo_name)[0];
-        #$_SESSION[$site . '-' . 'long_histo_name'] = $long_histo_name;
     }
     //simPrintC('long histo name', $long_histo_name);
-    $fileForHistos = (isset($_REQUEST['sharedF']) ? $_REQUEST['sharedF'] : '');
     if (!empty($fileForHistos)) {
         //echo "non empty fileForHistos<br>\n";
         $fileForHistos = "sharedList." . $fileForHistos . ".txt";
         $fileForHistos_eos=str_replace($racine_html, $racine_eos, $fileForHistos);
         $_SESSION['fileForHistos_eos'] = $fileForHistos_eos;
-        //echo "You are using a <font color=\"red\"><b>shared</b></font> file : " . getReducedName($fileForHistos_eos) . "<br>\n";
     }
     
     if (($_SESSION['url'] !== '') && ($actionFrom == '')) {
@@ -114,7 +107,7 @@
         }
     }
     $actionFrom = str_replace('//', '/', $actionFrom);
-    simPrintC('actionFrom after ', $actionFrom);
+    //simPrintC('actionFrom after ', $actionFrom);
     if (empty($url)) {
         $url = $_SESSION[$site . '-' . 'url'];
     }
@@ -127,11 +120,12 @@
     
     $chemin = $chemin . '/' . $actionFrom;
     $chemin_eos=str_replace($racine_html, $racine_eos, $chemin);
-    $chemin_eos_base = str_replace($racine_html, $racine_eos, $web_roots);//simPrintC("chemin_eos_base", $chemin_eos_base);
+    $chemin_eos_base = str_replace($racine_html, $racine_eos, $web_roots);//simPrintC("chemin_eos_base", $chemin_eos_base . '/BasketList/');
     
     $filesList = array();
     $sharedFilesList = array();
-    $files = array_slice(scandir($chemin_eos_base), 2);
+    $files = array_slice(scandir($chemin_eos_base . '/BasketList/'), 2);
+    //prePrint("shared Files List", $files);
     
     $filesList = array();
     $lineHisto = array();
@@ -185,53 +179,51 @@
         $option_B = "url=" . $url . "&basket=view";
     }
 
-    echo '<table class="tab0" border="0" cellpadding="1">';
+    echo '<table class="tab0 blackBorder0 p-1px">';
     echo '<tr class="ValidationsMenu">';
-    echo '<td width=" 25%" class="b0">';
+    echo '<td class="w-25pct b0">';
     writeHeaderMenu();
     echo '</td>';
 
     echo '<th><span class="redClass">';
-    echo "<b>electron validation: signal</b>";
-    echo "</span>";
+    echo '<b>electron validation: signal</b>';
+    echo '</span>';
     if ($short_histo_name != '') {
         echo '<span class="darkBlueClass">';
-        echo " / ";
-        echo "<b>" . $short_histo_name  . "</b>";
-        echo "</span></th>";
+        echo ' / ';
+        echo '<b>' . $short_histo_name  . '</b>';
+        echo '</span></th>';
     }
-    echo "<td style=\"vertical-align:middle\" class=\"RtextAlign\">";
+    echo '<td class="MtextAlign RtextAlign">';
     if ($basket == 'display') {
-        echo "<a href=\"" . $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=work&actionFrom=" . $actionFrom . "#000\">BACK</a>";
-        echo "&nbsp; - &nbsp;\n";
+        echo '<a href="' . $web_roots . "/basket.php?short_histo_name=" . $short_histo_name . "&basket=work&actionFrom=" . $actionFrom . '#000">BACK</a>';
+        echo '&nbsp; - &nbsp;' . $_fDL;
     }
     elseif ($basket == 'view') {
         ;
-        echo "<a href=\"$web_roots/basket.php?url=" . $url . "&basket=work\">Basket</a>" . "\n";
-        echo "&nbsp; &nbsp;\n";
+        echo '<a href="' . $web_roots . '/basket.php?url=' . $url . '&basket=work">Basket</a>' . "\n";
+        echo '&nbsp; &nbsp;' . $_fDL;
     }
     else { // work
         if ( $short_histo_name != '' ) {
-            $returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=view&actionFrom=" . $actionFrom . "#000" ;
-            echo "<a href=\"" . $returnAddr . "\">basket view</a>";
-            //echo "&nbsp; - &nbsp;\n";
+            $returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=view&actionFrom=" . $actionFrom . '#000"' ;
+            echo '<a href="' . $returnAddr . '">basket view</a>';
         }
         else {
             $returnAddr = $web_roots .  "/index.php?actionFrom=" . $actionFrom . "&cchoice=diff#000" ;
-            echo '<a href="' . $returnAddr . '">BACK to histos</a>';
-            //echo "&nbsp; - &nbsp;\n";
+            echo '<a href="' . $returnAddr . '" target="_blank" rel="noopener noreferrer">BACK to histos</a>';
         }
-        echo "&nbsp; - &nbsp;\n";
-        echo "<a href=\"$web_roots/basket.php?" . $option_B . "\">Basket view</a>" . "\n";
-        echo "&nbsp; &nbsp;\n";
+        echo '&nbsp; &nbsp;' . $_fDL;
+        echo '<a href="' . $web_roots . '/basket.php?' . $option_B . '">Basket view</a>' . "\n";
+        echo '&nbsp; &nbsp;' . $_fDL;
     }
-    echo "</td>";
-    echo "</tr>";
-    echo "</table>\n";
+    echo '</td>';
+    echo '</tr>';
+    echo '</table>' . $_fDL;
     
     foreach ($files as $key => $value)
     {
-        if (is_file($chemin_eos_base . DIRECTORY_SEPARATOR . $value))
+        if (is_file($chemin_eos_base . DIRECTORY_SEPARATOR . "BasketList" . DIRECTORY_SEPARATOR . $value))
         {
             $filesList[] = $value;
             if (stristr($value, 'sharedList') !== FALSE)
@@ -241,14 +233,14 @@
         }
     }
     
-    echo "<table class=\"tab0\" border=\"0\">";
-    echo '<tr>';// class="b3"
+    echo '<table class="tab0 blackBorder0">';
+    echo '<tr>';
 
     if ($basket == "view") {
         echo '<td class="CtextAlign">';
-            echo '<table class="clickable Releases" width="500px" border="1">';
+            echo '<table class="clickable Releases w-500px blackBorder1">';
             echo '<tr>';
-            echo '<td align="center" id="Histos"><span class="blueClass"><b>Press here to display Releases array</b></span></td>';
+            echo '<td class="CTextAlign" id="Histos"><span class="blueClass"><b>Press here to display Releases array</b></span></td>';
             echo '<td>&nbsp;</td>';
             $tag1 = explode('/', $actionFrom)[3];
             $tag2 = explode('_', $tag1, 2)[0];
@@ -257,32 +249,32 @@
             $newUrl .= '&tag=' . $tag2;
             $newUrl .= '&file4histos=ElectronMcSignalHistos.txt&release=&dataset=' . $tag3;
             $newUrl .= '&reference=&long_histo_name='.$long_histo_name.'&compFullFast=';
-            echo '<td align="center" id="displayHistosLink"><span class="blueClass">';
+            echo '<td class="CtextAlign" id="displayHistosLink"><span class="blueClass">';
             echo '<b>Display histos comparison (dev)</b></span></td>';
-            echo "</tr>";
-            echo "</table>";/**/
+            echo '</tr>';
+            echo '</table>';
         echo '</td>';
-        echo '<td align="center">';
+        echo '<td class="CtextAlign">';
             $pict_name1 = $web_roots . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_1.png';
             $pict_name2 = $web_roots . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_2.png';
             $pict_name3 = $web_roots . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_3.png';
             $chemin_KS_eos = str_replace($racine_html, $racine_eos, $web_roots);
             if (file_exists($chemin_KS_eos . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_3.png')) {
-                echo '<a href="' . $pict_name3 . '">';
-                echo '<img class="image img" width="200" src="' . $pict_name3 . '" alt="" style="border: 2px solid blue;" ></a>';
+                echo '<a href="' . $pict_name3 . '" target="_blank" rel="noopener noreferrer">';
+                echo '<img class="image img blueBorder2 w-200px" src="' . $pict_name3 . '" alt="" ></a>';
             }
             else {
                 if (file_exists($chemin_KS_eos . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_1.png')) {
-                    echo '<a href="' . $pict_name1 . '">';
-                    echo '<img class="image img" width="200" src="' . $pict_name1 . '" alt="" style="border: 2px solid blue;" ></a>';
+                    echo '<a href="' . $pict_name1 . '" target="_blank" rel="noopener noreferrer">';
+                    echo '<img class="image img blueBorder2 w-200px" src="' . $pict_name1 . '" alt="" ></a>';
                 }
                 if (file_exists($chemin_KS_eos . $actionFrom . '/pngs/maxDiff_comparison_' . $long_histo_name . '_2.png')) {
-                    echo '<a href="' . $pict_name2 . '">';
-                    echo '<img class="image img" width="200" src="' . $pict_name2 . '" alt="" style="border: 2px solid blue;" ></a>';
+                    echo '<a href="' . $pict_name2 . '" target="_blank" rel="noopener noreferrer">';
+                    echo '<img class="image img blueBorder2 w-200px"" src="' . $pict_name2 . '" alt="" ></a>';
                 }
             }
             echo '</td>';
-        echo "<td>";
+        echo '<td>';
         simPrintC('site', $site);
         $code = $_SESSION[$site . '-code'];
         $code = substr_replace($code, "0", -1, 1);
@@ -300,14 +292,14 @@
             echo 'KO' . $_fDL;
         }
         imageSize($returnAddr);
-        echo "<script type='text/javascript'>\n";
+        echo '<script type="text/javascript" nonce="<?php echo $nonce; ?>">' . "\n";
         echo '$(\'[size-choice="480"]\').addClass("Gras")';
-        echo "</script>";
-        echo "</td>";
+        echo '</script>';
+        echo '</td>';
     }
 
-    echo "</tr>";
-    echo "</table>";
+    echo '</tr>';
+    echo '</table>';
 
     if (array_key_exists('choiceValue', $_REQUEST)) {
         $choiceValue = $_REQUEST['choiceValue'];
@@ -322,8 +314,9 @@
     echo '<span valInfo="t12"></span>';
 
     //echo "session id : " . session_id() . $_fDL;
-    echo "file for histos name : " . $_SESSION['fileForHistos_eos'] . $_fDL;
+    //echo "file for histos name : " . $_SESSION['fileForHistos_eos'] . $_fDL;
     //simPrintC('test uuid : ', guidv4());
+//prePrint('files', $filesList);
 
 ?>
 </header>

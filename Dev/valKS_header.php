@@ -1,13 +1,21 @@
 <header>
     
     <?php
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => true,      // Nécessite HTTPS
+        'httponly' => true,    // Bloque l'accès JS
+        'samesite' => 'Strict' // Protection CSRF
+    ]);
     session_start();
     
-    $actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
-    $url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
-    $curveChoice = (isset($_REQUEST['curveChoice']) ? $_REQUEST['curveChoice'] : '');
-    $cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
-    $short_histo_name = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
+    //$url = (isset($_REQUEST['url']) ? $_REQUEST['url'] : '');
+    //$curveChoice = (isset($_REQUEST['curveChoice']) ? $_REQUEST['curveChoice'] : '');
+    //$cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
+    //$short_histo_name = (isset($_REQUEST['short_histo_name']) ? $_REQUEST['short_histo_name'] : '');
     //echo 'url : ' . $url . "<br>";
     $histoName = explode('.', end(explode('/', $url)))[0];
     //echo 'action : ' . $action . "<br>";
@@ -18,6 +26,7 @@
     
     $base_dir = __DIR__;
     include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
 
@@ -26,17 +35,26 @@
     $chemin_eos=str_replace($racine_html, $racine_eos, $url);
     //echo 'nom histo : ' . $short_histo_name . "<br>";
 
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
     $fileName_0 = getFileName(session_id());
     $fileName = $web_roots . "/" . $fileName_0;
     $fileName_eos=str_replace($racine_html, $racine_eos, $fileName);
     $_SESSION['localFileForHistos_eos'] = $fileName_eos;
     $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
     $escaped_url = str_replace("/checkKS.php?action=/", "/", $escaped_url);
-    //echo "escap : ".$escaped_url . "<br>";
     $classical_roots = htmlspecialchars( $web_roots, ENT_QUOTES, 'UTF-8' );
     $classical_roots = str_replace("/checkKS.php?action=/", "/", $classical_roots);
     $classical_path = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
-    //echo "classical_path : ".$classical_path . "<br>";
     $classical_path = str_replace("/checkKS.php?action=/", "/", $classical_path);
     $previous_url = dirname($url);
     
@@ -71,7 +89,7 @@
     $rel_num = str_replace('_', '', $rel_num);
     $rel_num = substr($rel_num, 0, 4);
 
-    echo "<table class=\"tab0\">";
+    echo '<table class="tab0">';
     echo '<tr><td class="b0">';
     writeHeaderLinks($base_dir, $url);
     echo "</td>";
@@ -83,10 +101,10 @@
     echo " / ";
     echo "<b>" . $short_histo_name  . "</b>";
     echo "</span></th></td>";
-    echo "<td class=\"RtextAlign\">";
+    echo '<td class="RtextAlign">';
 
     $returnAddr = $web_roots .  "/checkKS.php?actionFrom=" . $actionFrom   . "&curveChoice=" . $curveChoice . "&cchoice=" . $cchoice . '#' . $short_histo_name;
-    echo "<a href=\"" . $returnAddr . "\">BACK</a>";
+    echo '<a href="' . $returnAddr . '">BACK</a>';
     
     echo "</td>";
     echo "</tr>";
@@ -224,17 +242,17 @@
         $KSCompFlag = True;
     }
 
-    echo "<table class=\"tab0\" border=\"0\">";
-    echo '<tr><td>';// class="b3"
+    echo '<table class="tab0 blueBorder0">';
+    echo '<tr><td>';
     filter($url, $image_loupe);
     echo "</td>";
 
-    echo "<td class=\"CtextAlign\">";
+    echo '<td class="CtextAlign">';
     echo "<b><span> " . "Release  : " . " </span></b>" . " \n";
-    echo "<b><span class=\"darkBlueClass\"> " . $rel_secon . " </span></b>" . " \n";
+    echo '<b><span class="darkBlueClass"> ' . $rel_secon . " </span></b>" . " \n";
     echo '&nbsp;-&nbsp;';
     echo "<b><span> " . "Release used for KS comparison : " . " </span></b>" . " \n";
-    echo "<b><span class=\"blueClass\"> " . $rel_princ . " </span></b>" . " <br>\n";
+    echo '<b><span class="blueClass"> ' . $rel_princ . " </span></b>" . " <br>\n";
     echo "</td>";
 
     echo "</tr>";
@@ -246,17 +264,17 @@
         echo "value  : " . $choiceValue . " <br>";
     }
     
-    echo "<table class=\"tab0\" border=\"0\">";
-    echo '<tr><td>';// class="b3"
+    echo '<table class="tab0 blueBorder0">';
+    echo '<tr><td>';
     $textValues = displayVariablesValues2($url, $actionFrom, $cchoice, $basket, $createF, $fileForHistos, $curveChoice, $sharedF, $short_histo_name);
     echo '<p>+ Variables values</p>';
     echo '<span valInfo="t12"></span>';
     echo "</td>";
 
-    echo "<td class=\"CtextAlign\">";
-    echo '<table border="1" class="clickable displayChoice" style="margin-left:auto;margin-right:auto" width="700">' . "\n";
+    echo '<td class="CtextAlign">';
+    echo '<table class="clickable displayChoice blackBorder1 ml-auto mr-auto w-700px">' . "\n";
 
-    echo '<tr><td class="CtextAlign blueClass" display-choice="mono" title="classique" " width = "50%" style="font-size:16px;">' . "\n";
+    echo '<tr><td class="CtextAlign blueClass w-50pct text-16px" display-choice="mono" title="classique" >' . "\n";
     echo 'Comparaison ' . substr($rel_secon,6) . ' - ' . substr($rel_princ,6) . "\n";
     echo '</td><td class="CtextAlign blueClass" display-choice="comp" title="comparaison de toutes les releases" >' . "\n";
     echo 'Comparaison pour toutes les releases' . "\n";
@@ -265,7 +283,7 @@
     echo '</table>' . "\n";
     echo '<br>' . "\n";
 
-    echo '<table border="0" style="margin-left:auto;margin-right:auto;"><tr><td style="font-weight: normal; font-size:16px;">';
+    echo '<table class="ml-auto mr-auto;"><tr><td class="noGras text-16px;">';
     echo 'the reference is in <span class="greenClass">green</span> and the choosen release in <span class="blueClass">blue</span>';
     echo '</td></tr></table>';
 

@@ -1,7 +1,5 @@
 <?php
 
-require '../php_inc/sorties.inc.php';
-
 function testExtension($histoName, $histoPrevious){
 
     $after = ""; # $histoName;
@@ -29,7 +27,7 @@ function testExtension($histoName, $histoPrevious){
             }
         }
         else {
-            if ( $histoPrevious = "" ) {
+            if ( $histoPrevious == "" ) {
                 $before = $histoName;
                 $after = ""; 
                 $common = $histoName;
@@ -65,14 +63,22 @@ function cleanArray($tmpArray) {
     return $tmpArray2;
 }
 
+function cleanAddr($name) {
+    //simPrint('avant', $name);
+    $name = str_replace('//', '/', $name);
+    $name = str_replace(':/', '://', $name);
+    //simPrint('apres', $name);
+    return $name;
+}
+
 function getFileName($num) {
-    $name = "basketList." . $num . ".txt";
+    $name = "BasketList/basketList." . $num . ".txt";
     return $name;
 }
 
 function getSharedFileName($num) {
     $today = date("YmdHis");  
-    $name = "sharedList." . $num . "." . $today . ".txt";
+    $name = "BasketList/sharedList." . $num . "." . $today . ".txt";
     return $name;
 }
 
@@ -224,57 +230,46 @@ function histosFileNameJSON($data) {
     
     //echo "len tmp : " . count($tmp) . "<br>";
     foreach ($tmp as $k1) {
-        //$k1 = $tmp[0];
         echo "0 " . $k1 . "<br>"; // affiche Cases
         $aa = $obj->$k1;
         //print_r ($aa );
-        //echo "<br>";//<br>
         $tmp2 = array();
         foreach($aa as $key => $value) { //
             echo "1 " . $key . "<br>" ;//. " => " . $value . "<br>";
             $tmp2[] = $key;
         }
-        //echo "len tmp2 : " . count($tmp2) . "<br>";
         
         foreach ($tmp2 as $k2) {
-            //$k2 = $tmp2[1];
             echo "00 " . $k2 . "<br>"; // affiche 1
             $aa2 = $aa[$k2];
             //print_r ($aa2 );
-            //echo "<br>";//<br>
             $tmp3 = array();
             foreach($aa2 as $key => $value) { //
                 echo "11 " . $key. " => " . $value . "<br>" ;//. " => " . $value . "<br>";
                 $tmp3[] = $key;
-            }/**/
-            //echo "len tmp3 : " . count($tmp3) . "<br>";
+            }
             foreach ($tmp3 as $k3) {
-                //$k3 = $tmp3[0];
                 echo "000 " . $k3 . "<br>"; // 
                 $aa3 = $aa2->$k3;
                 //print_r ($aa3 );
-                //echo "<br>";//<br>
                 $tmp4 = array();
                 foreach($aa3 as $key => $value) { //
                     echo "111 " . $key . "<br>" ;//. " => " . $value . "<br>";
                     $tmp4[] = $key;
-                }/**/
-                //echo "len tmp4 : " . count($tmp4) . "<br>";
+                }
                 foreach ($tmp4 as $k4) {
-                    //$k4 = $tmp4[0];
                     echo "0000 " . $k4 . "<br>"; // 
                     $aa4 = $aa3[$k4];
                     //print_r ($aa4 );
-                    //echo "<br>";//<br>
                     $tmp5 = array();
                     foreach($aa4 as $key => $value) { //
                         echo "1111 " . $key. " => " . $value . "<br>" ;//. " => " . $value . "<br>";
                         $tmp5[] = $key;
-                    }/**/
+                    }
                 }
             }
         }
-    }/**/
+    }
 
     return array($obj, $tmp5);
 }
@@ -287,13 +282,41 @@ function pageFooter($image_up, $previous_url, $text1, $text2) {
     echo '<td class="LtextAlign">' . $text1 . '</td>';
 
     echo '<td class="LtextAlign">';
-    echo $previous_url;/**/
+    echo $previous_url;
     echo '</td>';
     
     echo'<td class="RtextAlign">' . $text2 . '</td>';
     echo '<td>';
     echo '<a href="' . $previous_url . '"><img class="s18" src="' . $image_up . '" alt="Up"></a>';
     echo '&nbsp; </td>';
+    
+    echo '<td></td>';
+    echo '</tr>';
+    echo '</table>';
+}
+
+function pageFooter_V2($image_up, $previous_url, $l_aF=4) {
+    //echo 'l_aF = ' . $l_aF . '<br>';
+    $text = ['Back to top', 'Up to Release choice', 'Up to folder choice', 'Up to dataset choice'];
+    echo '<table class="tab0">';
+    echo '<tr><td class="LtextAlign b0">';
+    echo '<a href="#"><img class="s18" src=' . $image_up . ' alt="Top"></a>';
+    echo '</td>';
+    echo '<td class="LtextAlign">' . $text[0] . '</td>';
+
+    echo '<td class="LtextAlign">';
+    echo $previous_url ;#. ' - ' . $l_aF;
+    echo '</td>';
+    
+    if ($l_aF >= 2) {
+        echo'<td class="RtextAlign blueClass">' . $text[$l_aF - 1] . '</td>';
+        echo '<td>';
+        echo '<a href="' . $previous_url . '"><img class="s18" src="' . $image_up . '" alt="Up"></a>';
+        echo '&nbsp; </td>';
+        /*echo'<td class="RtextAlign blueClass">';
+        echo '<a href="' . $previous_url . '">' . $text[$l_aF - 1] . '<img class="s18" src="' . $image_up . '" alt="Up"></a>';
+        echo '&nbsp; </td>';*/
+    }
     
     echo '<td></td>';
     echo '</tr>';
@@ -325,7 +348,8 @@ function writeHeaderLinks($base_dir, $url) {
     $parties = explode("/", $url);
     $Np = count($parties);
     
-    $piece = getPathPiece($base_dir);//echo $piece;
+    $piece = getPathPiece($base_dir);
+    //echo ">" . $base_dir . " - " . $piece;
     echo "<a href=\"$web_rootsR/index.php\">";
     if ($piece == "Releases") {
         echo "<b>Releases</b>";
@@ -352,7 +376,7 @@ function writeHeaderLinks($base_dir, $url) {
         echo "Dev";
     }
     echo "</a>";
-    echo "&nbsp; - &nbsp;\n";
+    /*echo "&nbsp; - &nbsp;\n";
     echo "<a href=\"https://cms-egamma.web.cern.ch/validation/Electrons/Comparisons/main_display_comparison.php\">";
     if ($piece == "Comparisons") {
         echo "<b>Comparisons</b>";
@@ -369,9 +393,19 @@ function writeHeaderLinks($base_dir, $url) {
     else {
         echo "KS Evaluation";
     }
+    echo "</a>";*/
+    // TEMPORAIRE
+    /*echo "&nbsp; - &nbsp;\n";
+    echo "<a href=\"https://cms-egamma.web.cern.ch/validation/Electrons/Valid4ML/main_Valid4ML.php\">";
+    if ($piece == "Valid4ML") {
+        echo "<b>Valid4ML</b>";
+    }
+    else {
+        echo "Valid4ML";
+    }*/
     echo "</a>";
 
-}
+    }
 
 function writeHeaderMenu() {
     //include '../php_inc/defaults.inc.php';
@@ -383,8 +417,9 @@ function writeHeaderMenu() {
                 echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/Test/index.php">Test</a>';
                 echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/Releases/index.php">Releases</a>';
                 echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/Dev/index.php">Dev</a>';
-                echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/Comparisons/main_display_comparison.php">Comparisons</a>';
-                echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/KS_Evaluation/main_display_KS.php">KS Evaluation</a>';
+                //echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/Comparisons/main_display_comparison.php">Comparisons</a>';
+                //echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/KS_Evaluation/main_display_KS.php">KS Evaluation</a>';
+                //echo '<a href="https://cms-egamma.web.cern.ch/validation/Electrons/Valid4ML/main_Valid4ML.php">Validations for ML</a>';
             echo '</div>';
         echo '</div> '; // subnav
         echo '<div class="subnav">';
@@ -396,7 +431,7 @@ function writeHeaderMenu() {
             echo '</div>';
         echo '</div> '; // subnav
         echo '<a href="#contact">Contact</a>';
-    echo '</div>';/**/ // navbar
+    echo '</div>'; // navbar
 }
 
 function writeAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsValue, $pictsExt, $histoSize, $url_flag, $code, $site) {
@@ -408,10 +443,10 @@ function writeAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsVa
         for ($i_line = 0; $i_line< $nb_pHA; $i_line++) {
             $partialA3 = $partialArray2[$i_line];
             $histoToWrite .= '<div class="line">';
-            $histoToWrite .= '<table border="0" bordercolor="pink" class="clickable addLink">';
+            $histoToWrite .= '<table class="clickable addLink pinkBorder0">';
             $histoToWrite .= '<tr>';
 
-            $histoToWrite .= '<td style="vertical-align:top">';
+            $histoToWrite .= '<td class="TtextAlign">';
             $histoToWrite .= '<div class="cellUp"><a href="#" onclick="goToTable()"><img class="s18" src=' . $image_up . ' alt="Top"></a></div>' . "\n";
             $histoToWrite .= '<a id="' . $ic.$j . '0" class="anchor6"></a>';
             $histoToWrite .= '</td>';
@@ -438,30 +473,29 @@ function writeAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsVa
                 // new options
                 $urlOptions = 'url=' . $pict_name . '&basket=view&addLink=KO&code='.$ic.$jd . '0&site=' . $site . '"';
                 $histoToWrite .= '<td img_id="' . $urlOptions . '">';
-                //$histoToWrite .= '<td>';
                 $histoToWrite .= '<div class="cell">';//
                 if ($pictFlag) {
                     $n_code = $i.$j.$k;//
                     //simPrintC('new code', $n_code);
                     if ( $url_flag && ($code == $n_code) ) {
-                        $histoToWrite .= '<img class="image img" width="' . $histoSize . '" src="' . $pict_name . '" alt="" style="border: 3px solid red;" id="' . $short_histo_name . '_1">';//</a>
+                        $histoToWrite .= '<img class="image img redBorder3" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
                     }
                     else {
-                        $histoToWrite .= '<img class="image img" width="' . $histoSize . '" src="' . $pict_name . '" alt="" style="border: 2px solid blue;" id="' . $short_histo_name . '_1">';//</a>
+                        $histoToWrite .= '<img class="image img redBorder2" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
                     }
                 }
                 else { // no file
-                    $histoToWrite .= '<img class="image img" width="200px" src="' . $image_missingFile . '" alt="" style="border: 3px solid red;" id="' . $short_histo_name . '_1">';
+                    $histoToWrite .= '<img class="image img redBorder3" width="200px" src="' . $image_missingFile . '" alt="" id="' . $short_histo_name . '_1">';
                 }
                 $histoToWrite .= '</div>'; // fin Cell
                 $histoToWrite .= "\n";
 
                 $histoToWrite .= '</td>';
                 if ( $testExistUrl) {
-                    $histoToWrite .= '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" style="width=:60px;text-align:center"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'.$ic.$jd.$kd; // </td>
+                    $histoToWrite .= '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'.$ic.$jd.$kd; // </td>
                 }
                 else {
-                    $histoToWrite .= '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" style="width=:60px;text-align:center"><img width="32" height="32" src="' . $image_add . '" alt="Add">'.$ic.$jd.$kd; // </td>
+                    $histoToWrite .= '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_add . '" alt="Add">'.$ic.$jd.$kd; // </td>
                 }
                 $histoToWrite .= '</td>';
                 $kd += 1;
@@ -549,15 +583,15 @@ function getNbOfLines($histoArray) {
 }
 
 function imageSize($returnAddr) {
-    echo '<table border="1" cellpadding="15" style="width=:60%;text-align:right" class="clickable sizeChoice">';//
+    echo '<table class="clickable sizeChoice blackBorder1 w-60pct RtextAlign p-15px">';//
     echo '<tr>';
-    echo '<td colspan="6"  style="text-align:center"><font color="blue"><b>picture definition</b></font></td>';
+    echo '<td colspan="6" class="CtextAlign blueClass" <b>picture definition</b></td>';
     for($x = 480; $x <= 960; $x+=120)
     {
-        echo '<td style="text-align:center" size-choice="' . $x . '">' . $x . "</td>";
+        echo '<td class="CtextAlign" size-choice="' . $x . '">' . $x . "</td>";
     }
     echo "<td></td>";
-    echo '<td colspan="6"  style="text-align:center">';
+    echo '<td colspan="6"  class="CtextAlign">';
     echo "<a href=\"" . $returnAddr . "\">BACK to histos</a>";// . "\n"; 
     echo "</td>";
     echo "</tr>";
@@ -565,15 +599,15 @@ function imageSize($returnAddr) {
 }
 
 function imageSize2($returnAddr, $name) {
-    echo '<table border="1" cellpadding="15" style="width=:50%"; text-align:right" class="clickable sizeChoice">';//
+    echo '<table class="clickable sizeChoice blackBorder1 w-50pct RtextAlign p-15px">';//
     echo '<tr>';
-    echo '<td colspan="6"  style="text-align:center"><font color="blue"><b>picture definition</b></font></td>';
+    echo '<td colspan="6" class="CtextAlign blueClass" <b>picture definition</b></td>';
     for($x = 480; $x <= 960; $x+=120)
     {
-        echo '<td  style="text-align:center" size-choice="' . $x . '">' . $x . "</td>";
+        echo '<td  class="CtextAlign" size-choice="' . $x . '">' . $x . "</td>";
     }
     echo "<td></td>";
-    echo '<td colspan=\"6\"  style="text-align:center\">';
+    echo '<td colspan="6" class="CtextAlign">';
     echo '<a href="' . $returnAddr . '" onclick="goToHisto(' . $name . ')>BACK to histos</a>';// . "\n"; 
     echo "</td";
     echo "</tr>";
@@ -608,41 +642,52 @@ function displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom) {
 function displayVariablesValues($url, $actionFrom, $cchoice, $basket, $fileForHistos, $curveChoice, $sharedF, $short_histo_name) {
     echo "<br>";
     echo '<p>variables values</p>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">url = </span><span>' . $url . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">cchoice = </span><span>' . $cchoice . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">basket = </span><span>' . $basket . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">fileForHistos = </span><span>' . $fileForHistos . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">curveChoice = </span><span>' . $curveChoice . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">sharedF = </span><span>' . $sharedF . '</span><br>';
-    echo '<span class="blueClass" style="font-weight: bold" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">url = </span><span>' . $url . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">cchoice = </span><span>' . $cchoice . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">basket = </span><span>' . $basket . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">fileForHistos = </span><span>' . $fileForHistos . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">curveChoice = </span><span>' . $curveChoice . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">sharedF = </span><span>' . $sharedF . '</span><br>';
+    echo '<span class="blueClass Gras" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
     echo "<br>";
 }
 
 function displayVariablesValues2($url, $actionFrom, $cchoice, $basket, $fileForHistos, $curveChoice, $sharedF, $short_histo_name) {
     $tmp = '';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">url = </span><span>' . $url . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">cchoice = </span><span>' . $cchoice . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">basket = </span><span>' . $basket . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">fileForHistos = </span><span>' . $fileForHistos . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">curveChoice = </span><span>' . $curveChoice . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">sharedF = </span><span>' . $sharedF . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">url = </span><span>' . $url . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">cchoice = </span><span>' . $cchoice . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">basket = </span><span>' . $basket . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">fileForHistos = </span><span>' . $fileForHistos . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">curveChoice = </span><span>' . $curveChoice . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">sharedF = </span><span>' . $sharedF . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
+    return $tmp;
+}
+
+function displayVariablesValues3($url, $actionFrom, $basket, $fileForHistos, $curveChoice, $sharedF, $short_histo_name) {
+    $tmp = '';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">url = </span><span>' . $url . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">basket = </span><span>' . $basket . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">fileForHistos = </span><span>' . $fileForHistos . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">curveChoice = </span><span>' . $curveChoice . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">sharedF = </span><span>' . $sharedF . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
     return $tmp;
 }
 
 function displayVariablesValues1($url, $actionFrom, $cchoice, $choice, $htmlName, $timeFolderName, $short_histo_name, $long_histo_name) {
     $tmp = ''; //"<br>";
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">url = </span><span>' . $url . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">cchoice = </span><span>' . $cchoice . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">choice = </span><span>' . $choice . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">htmlName = </span><span>' . $htmlName . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">timeFolderName = </span><span>' . $timeFolderName . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
-    $tmp .= '<span class="blueClass" style="font-weight: bold" valInfo="t11">long_histo_name = </span><span>' . $long_histo_name . '</span><br>';
-    //$tmp .= "<br>";
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">url = </span><span>' . $url . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">actionFrom = </span><span>' . $actionFrom . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">cchoice = </span><span>' . $cchoice . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">choice = </span><span>' . $choice . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">htmlName = </span><span>' . $htmlName . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">timeFolderName = </span><span>' . $timeFolderName . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">short_histo_name = </span><span>' . $short_histo_name . '</span><br>';
+    $tmp .= '<span class="blueClass Gras" valInfo="t11">long_histo_name = </span><span>' . $long_histo_name . '</span><br>';
     return $tmp;
 }
 
@@ -657,15 +702,13 @@ function displayHistos($histoArray, $clefs, $lineHisto1, $i, $escaped_url, $pict
 
         echo '<div class="line">'; // line
 
-        echo '<table style="margin:auto;border:0px solid pink;" class="clickable addLink">'; // center align
-        //echo '<table border="0" bordercolor="pink" class="clickable addLink">'; // left align
+        echo '<table class="clickable addLink pinkBorder0 m-auto">'; // center align
         echo '<tr>';
 
         $j = $i_line;
         $k = 0;
-        echo '<td style="vertical-align:top">';
+        echo '<td Class="TtextAlign">';
         echo '<div class="cellUp"><a href="#" onclick="goToTable()"><img class="s18" src=' . $image_up . ' alt="Top"></a></div>' . "\n";
-        //echo '<a id="' . $i.$j . '0" class="anchor6"></a>';
         echo '</td>';
 
         foreach ($partialA3 as $elem) {
@@ -695,24 +738,24 @@ function displayHistos($histoArray, $clefs, $lineHisto1, $i, $escaped_url, $pict
             if ($pictFlag) {
                     $n_code = $i.$j.$k;//
                     if ( $url_flag && ($code == $n_code) ) {
-                    echo '<img class="image img" width="' . $histoSize . '" src="' . $pict_name . '" alt="" style="border: 3px solid red;" id="' . $short_histo_name . '_1">';//</a>
+                    echo '<img class="image img redBorder3" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
                 }
                 else {
-                    echo '<img class="image img" width="' . $histoSize . '" src="' . $pict_name . '" alt="" style="border: 2px solid blue;" id="' . $short_histo_name . '_1">';//</a>
+                    echo '<img class="image img blueBorder2" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
                 }
             }
             else { // no file
-                echo '<img class="image img" width="200px" src="' . $image_missingFile . '" alt="" style="border: 3px solid red;" id="' . $short_histo_name . '_1">';
+                echo '<img class="image img redBorder3" width="200px" src="' . $image_missingFile . '" alt="" id="' . $short_histo_name . '_1">';
             }
             echo '</div>'; // fin Cell
             echo "\n";
 
             echo '</td>';
             if ( $testExistUrl) {
-                echo '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" style="width=:60px;text-align:center"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'; // </td>.$i.$j.$k
+                echo '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'; // </td>.$i.$j.$k
             }
             else {
-                echo '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" style="width=:60px;text-align:center"><img width="32" height="32" src="' . $image_add . '" alt="Add">'; // </td>.$i.$j.$k
+                echo '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_add . '" alt="Add">'; // </td>.$i.$j.$k
             }
             echo '</td>';
             $k += 1;
@@ -737,13 +780,12 @@ function displayAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $picts
 
             echo '<div class="line">'; // line
 
-            echo '<table style="margin:auto;border:0px solid pink;" class="clickable addLink">'; // center align
-            //echo '<table border="0" bordercolor="pink" class="clickable addLink">'; // left align
+            echo '<table class="clickable addLink pinkBorder0 m-auto">'; // center align
             echo '<tr>';
 
             $j = $i_line;
             $k = 0;
-            echo '<td style="vertical-align:top">';
+            echo '<td class="TtextAlign">';
             echo '<div class="cellUp"><a href="#" onclick="goToTable()"><img class="s18" src=' . $image_up . ' alt="Top"></a></div>' . "\n";
             echo '<a id="' . $i.$j . '0" class="anchor6"></a>';
             echo '</td>';
@@ -765,30 +807,29 @@ function displayAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $picts
                 }
                 // new options
                 $urlOptions = 'url=' . $pict_name . '&basket=view&addLink=KO&code='.$i.$j.$k . '&site=' . $site . '"';
-                //$urlOptions = 'url=' . $pict_name . '&basket=view&addLink=KO&code='.$i.$j . '0&site=' . $site . '"';
                 echo '<td img_id="' . $urlOptions . '">';
                 echo '<div class="cell">'; // Cell
                 if ($pictFlag) {
                     $n_code = $i.$j.$k;//
                     if ( $url_flag && ($code == $n_code) ) {
-                        echo '<img class="image img" width="' . $histoSize . '" src="' . $pict_name . '" alt="" style="border: 3px solid red;" id="' . $short_histo_name . '_1">';//</a>
+                        echo '<img class="image img redBorder3" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
                     }
                     else {
-                        echo '<img class="image img" width="' . $histoSize . '" src="' . $pict_name . '" alt="" style="border: 2px solid blue;" id="' . $short_histo_name . '_1">';//</a>
+                        echo '<img class="image img blueBorder2" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
                     }
                 }
                 else { // no file
-                    echo '<img class="image img" width="200px" src="' . $image_missingFile . '" alt="" style="border: 3px solid red;" id="' . $short_histo_name . '_1">';
+                    echo '<img class="image img redBorder3" width="200px" src="' . $image_missingFile . '" alt="" id="' . $short_histo_name . '_1">';
                 }
                 echo '</div>'; // fin Cell
                 echo "\n";
 
                 echo '</td>';
                 if ( $testExistUrl) {
-                    echo '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" style="width=:60px;text-align:center"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'; // </td>.$i.$j.$k
+                    echo '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'; // </td>.$i.$j.$k
                 }
                 else {
-                    echo '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" style="width=:60px;text-align:center"><img width="32" height="32" src="' . $image_add . '" alt="Add">'; // </td>.$i.$j.$k
+                    echo '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_add . '" alt="Add">'; // </td>.$i.$j.$k
                 }
                 echo '</td>';
                 $k += 1;
@@ -800,6 +841,100 @@ function displayAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $picts
         } // i_line
     } // loop i
     echo '<br><br>';
+}
+
+function displayAllHistos_2($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsValue, $pictsExt, $histoSize, $code, $site) {
+    include '../php_inc/defaults.inc.php';
+    for ($i = 0; $i < count($clefs); $i++) {
+        $partialHistoArray = $histoArray[$clefs[$i]];
+        list ($nb_pHA, $partialArray2) = getNbOfLines($partialHistoArray);
+
+        echo '<b>' . $clefs[$i] . '</b>'; 
+        for ($i_line = 0; $i_line< $nb_pHA; $i_line++) {
+            $partialA3 = $partialArray2[$i_line];
+
+            echo '<div class="line">'; // line
+
+            echo '<table class="clickable addLink pinkBorder0 m-auto">'; // center align
+            echo '<tr>';
+
+            $j = $i_line;
+            $k = 0;
+            echo '<td class="TtextAlign">';
+            echo '<div class="cellUp"><a href="#" onclick="goToTable()"><img class="s18" src=' . $image_up . ' alt="Top"></a></div>' . "\n";
+            echo '<a id="' . $i.$j . '0" class="anchor6"></a>';
+            echo '</td>';
+
+            foreach ($partialA3 as $elem) {
+                list ($short_histo_name, $short_histo_names) = shortHistoName2($elem);
+                $pict_name = $escaped_url . "/" . $pictsValue ."/" . $short_histo_names[0] . $pictsExt;
+                $pict_name_eos = str_replace($racine_html, $racine_eos, 'https:' . $pict_name);
+                // Test if url_http exist into the $lineHisto array //
+                $testExistUrl = false;
+                foreach ($lineHisto1 as $key => $value) {
+                    if ( $value == 'https:' . $pict_name ) {
+                        $testExistUrl = true;
+                    }
+                }
+                $pictFlag = true;
+                if (!file_exists($pict_name_eos)) {
+                    $pictFlag = false;
+                }
+                // new options
+                $urlOptions = 'url=' . $pict_name . '&basket=view&addLink=KO&code='.$i.$j.$k . '&site=' . $site . '"';
+                echo '<td img_id="' . $urlOptions . '">';
+                echo '<div class="cell">'; // Cell
+                if ($pictFlag) {
+                    $n_code = $i.$j.$k;//
+                    if ( $code == $n_code ) {
+                        echo '<img class="image img redBorder3" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
+                    }
+                    else {
+                        echo '<img class="image img blueBorder2" width="' . $histoSize . '" src="' . $pict_name . '" alt="" id="' . $short_histo_name . '_1">';//</a>
+                    }
+                }
+                else { // no file
+                    echo '<img class="image img redBorder3" width="200px" src="' . $image_missingFile . '" alt="" id="' . $short_histo_name . '_1">';
+                }
+                echo '</div>'; // fin Cell
+                echo "\n";
+
+                echo '</td>';
+                if ( $testExistUrl) {
+                    echo '<td addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_remove . '" alt="Add">'; // </td>.$i.$j.$k
+                }
+                else {
+                    echo '<td addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $pict_name . '" class="w-60px CtextAlign"><img width="32" height="32" src="' . $image_add . '" alt="Add">'; // </td>.$i.$j.$k
+                }
+                echo '</td>';
+                $k += 1;
+            } // partialA3
+            echo '</tr>';
+            echo '</table>';
+            echo '</div>'; // line
+            $k = 0;
+        } // i_line
+    } // loop i
+    echo '<br><br>';
+}
+
+function getNonEmptyKeysNumber($arr) {
+    $count = count(array_filter($arr, function($value) {
+        return $value !== '';
+    }));
+    return $count;
+}
+function displayIsset($arr) { // display a list of isset variables set as a dictionnary
+    $count = getNonEmptyKeysNumber($arr);
+    if ($count > 0) {
+        echo '<b><span class="redClass">Display ISSET variables : </span></b><br>';
+        foreach($arr as $key => $value) {
+            simPrintC($key, $value);
+            if ($value != '') { //!== null
+                echo '<b><span class="redClass">' . $key . '</span></b> : <span class="greyClass">' . $value . '</span><br>';
+            }
+        };
+    }
 }
 
 function getFolderName1($name, $tab, $nb) {
@@ -835,21 +970,6 @@ function getFolderName2($name, $tab, $nb) {
             echo $name . ' != ' . $aa[1] . '<br>';
         }
     }
-}
-
-function prePrint($text1, $text2) {
-    echo "<pre>";
-    echo $text1 . ' : ';
-    print_r($text2);
-    echo "</pre>";
-}
-
-function simPrintC($text1, $text2) {
-    echo '<b><span class="blueClass">' . $text1 . '</span></b> : <span class="greyClass">' . $text2 . '</span><br>';
-}
-
-function simPrint($text1, $text2) {
-    echo $text1 . ' : ' . $text2 . '<br>';
 }
 
 function rotate($tablo, $name) {
@@ -1003,5 +1123,6 @@ function guidv4($data = null) {
     // Output the 36 character UUID.
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
+
 ?>
 

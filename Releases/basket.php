@@ -1,15 +1,26 @@
 <!DOCTYPE HTML>
 <html lang="en">
 
+<?php
+// On génère un jeton aléatoire sécurisé (si ce n'est pas déjà fait)
+if (!isset($nonce)) {
+    $nonce = base64_encode(random_bytes(16));
+}
+?>
+
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="UTF-8" >
+<!--meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>' https://jquery.com; style-src 'self' 'nonce-<?php echo $nonce; ?>';" -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'nonce-<?php echo $nonce; ?>' https://jquery.com; style-src 'self' 'unsafe-inline';">
+
 <title>Releases list webpage</title>
-<link rel="stylesheet" href="../php_inc/styles.css">
-<script src="../js/jQuery-3.6.3/jquery-3.6.3.min.js"></script>
-<script src="../js/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="../js/jquery-ui.min.css">
-<link rel="stylesheet" href="../js/jquery-ui.theme.min.css">
-<link rel="stylesheet" href="../js/jquery-ui.structure.min.css">
+<link rel="icon" type="image/x-icon" href="/validation/Electrons/img/filetype-root-256.ico"> 
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/all.min.css">
+<link rel="stylesheet" href="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.css">
+<script src="../js/jQuery-4.0.0/jquery.min.js"></script>
+<script src="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.js"></script>
+
 </head>
 
 <body>
@@ -48,6 +59,8 @@
 </div>
 <main>
 <?php
+//prePrint('shared', $sharedFilesList);
+//prePrint('files', $filesList);
 
 if ($basket == "view") {
     $returnAddr = $web_roots .  "/index.php?action=" . $actionFrom . "#" . $short_histo_name ;
@@ -56,9 +69,9 @@ if ($basket == "view") {
         backToLocal();
     }
 
-    echo '<table border=1 style="border-color:blue">';
-    echo "<tr>";
-    echo "<td>";
+    echo '<table class="blueBorder1">';
+    echo '<tr>';
+    echo '<td>';
 
     $parts = explode('/', $actionFrom);
     $new = $parts[1];
@@ -73,11 +86,11 @@ if ($basket == "view") {
         echo '<b><span class="redClass">' . $ref . '</span></b>' . ' - ';
         echo '<b><span class="blueClass">' . $new . '</span></b>' . '<br>' . $_fDL;
         echo '<a id="' . $short_histo_name  . '" name="' . $short_histo_name  . '"';
-        echo ' href="' . $url_http . '"><img border="0" class="image" width="480" src="' . $url_http . '" id="displayHisto"></a>' . "\n";
+        echo ' href="' . $url_http . '" target="_blank" rel="noopener noreferrer"><img class="image" width="480" src="' . $url_http . '" id="displayHisto"></a>' . "\n";
     }
-    echo "</td>";
+    echo '</td>';
 
-    echo "<td>";
+    echo '<td>';
 
     /* Test if url_http exist into the $lineHisto array */
     $testExistUrl = false;
@@ -86,27 +99,27 @@ if ($basket == "view") {
             $testExistUrl = true;
         }
     }
-    echo "<br>";
-    echo '<table border="1" width = "100" class="clickable addLink">';//
-    echo '<tr>';// valign=\"top\"
+    echo '<br>';
+    echo '<table class="clickable addLink w-100px blackBorder1">';//
+    echo '<tr>';
     if ( $testExistUrl) {
-        echo '<td align="center" addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" width="60"><img width="32" height="32" src="' . $image_remove . '" alt="Rem"/></td>';
+        echo '<td class="CtextAlign w-60px blackBorder1" addlink-choice="remove from basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" ><img width="32" height="32" src="' . $image_remove . '" alt="Rem"/></td>';
     }
     else {
-        echo '<td align="center" addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" width="60"><img width="32" height="32" src="' . $image_add . '" alt="Add"/></td>';
+        echo '<td class="CtextAlign w-60px blackBorder1" addlink-choice="add to basket" addlink-id="' . $short_histo_name . '" addlink-url="' . $url_http . '" ><img width="32" height="32" src="' . $image_add . '" alt="Add"/></td>';
     }
-    echo "</tr>";
-    echo  "</table>";
-    echo "<br><br><br>";
+    echo '</tr>';
+    echo '</table>';
+    echo '<br><br><br>';
 
-    echo "<br><div>";
-    echo "&nbsp;<a href=\"$web_roots/basket.php?basket=work&actionFrom=" . $actionFrom . "\">Manage the links</a>&nbsp;" . "\n";
-    echo "<br></div>";
+    echo '<br><div>';
+    echo '&nbsp;<a href="' . $web_roots . '/basket.php?basket=work&actionFrom=' . $actionFrom . '" target="_blank" rel="noopener noreferrer">Manage the links</a>&nbsp;' . "\n";
+    echo '<br></div>';
 
-    echo "</td>";
+    echo '</td>';
 
-    echo '<td class="CtextAlign">';
-    echo '<span class="darkBlueClass" style="font-size:150%; " id="Liste"><b>List of releases for comparison</b></span>' . $_fDL;
+    echo '<td class="CtextAlign blackBorder1">';
+    echo '<span class="darkBlueClass text-150pct" id="Liste"><b>List of releases for comparison</b></span>' . $_fDL;
     $listDir0 = array();
     $listDir1 = array();
     $listDir2 = array();
@@ -162,34 +175,34 @@ if ($basket == "view") {
     }
     $timestamp = time();
     $dateString = date($format, $timestamp);
-    echo "Fin du calcul : " . $dateString . $_fDL;
+    simPrint("Fin du calcul", $dateString);
 
-    echo '<div id="ListeReleases" style="display: none;">';
+    echo '<div id="ListeReleases hidden">';
     echo '<table border=1>';
     echo '<tr><td class="CtextAlign"><b>Release</b></td><td class="CtextAlign"><b>Reference</b></td></tr>';
     foreach ($tableau as $key3 => $value3)
     {
         echo '<tr><td class="LtextAlign">' . $key3;
         echo '</td><td class="LtextAlign">';
-        echo '<table border=0 width="100%">';
+        echo '<table class="blackBorder0 w-100pct">';
         foreach ($value3 as $key4 => $value4) {
             $value5 = str_replace('FullvsFull_', '', $value4);
-            echo '<tr><td>' . explode(".", $value5)[0] . '</td>';// . $_fDL
-            echo '<td width="20px">' . '<input type="checkbox" onchange="checkFunction()" id="' . $key3. DIRECTORY_SEPARATOR . $value4 . '" ';
+            echo '<tr><td>' . explode(".", $value5)[0] . '</td>';
+            echo '<td class="w-20px">' . '<input type="checkbox" onchange="checkFunction()" id="' . $key3. DIRECTORY_SEPARATOR . $value4 . '" ';
             if (($ref == explode(".", $value5)[0]) && ($new == $key3)) {
                 echo ' checked';
             }
             echo '>' . '</td></tr>' . "\n";
         }
-        echo "</table>";
+        echo '</table>';
 
         echo '</td></tr>';
     }
     echo '</table>';
 
-    echo "</td>";
-    echo "</tr>";
-    echo "</table>";
+    echo '</td>';
+    echo '</tr>';
+    echo '</table>';
     echo '<br><br><br>';
 
     echo '</div>'; // ListeReleases
@@ -212,73 +225,73 @@ elseif ($basket == "work") {
     $lineHisto = array_filter($lineHisto);
     $text_0 = "[0] " . $refLink . "\n\n";
     
-    echo "<table border=\"1\" cellpadding=\"5\" width=\"100%\">";
-    echo "\n<tr valign=\"top\">";
-    echo "<td align=\"center\"><font color=\"blue\"><b>link to select</b></font></td>\n";
-    echo "<td align=\"center\"><font color=\"blue\"><b>comparison</b></font></td>\n";
-    echo "<td align=\"center\"><font color=\"blue\"><b>dataset</b></font></td>\n";
-    echo "<td align=\"center\"><font color=\"blue\"><b>histoName</b></font></td>\n";
-    echo "<td align=\"center\"><font color=\"blue\"><b>url</b></font></td>\n";
-    echo "</tr>\n";
+    echo '<table class="tab1">';
+    echo '<tr class="TtextAlign">';
+    echo '<td class="CtextAlign blueClass blackBorder1"><b>link to select</b></td>';
+    echo '<td class="CtextAlign blueClass blackBorder1"><b>comparison</b></td>';
+    echo '<td class="CtextAlign blueClass blackBorder1"><b>dataset</b></td>';
+    echo '<td class="CtextAlign blueClass blackBorder1"><b>histoName</b></td>';
+    echo '<td class="CtextAlign blueClass blackBorder1"><b>url</b></td>';
+    echo '</tr>';
     foreach($lineHisto as $key => $value)
     {
-        echo "\n<tr valign=\"top\">";
+        echo '<tr class="TtextAlign">';
         $value2 = str_replace($racine_html . 'validation/Electrons/', '', $value);
         $parts = explode("/", $value2); # so, there is 6 parts
         $histoName = substr($parts[5], 0, -4);
         $compAnddataset = explode("_", $parts[3], 2);
-        echo '<td align="center">' . sprintf('%02d', $key + 1) . ' <input type="checkbox" onchange="checkFunction2()" name="choix[]" id="' . sprintf('%02d', $key + 1);
+        echo '<td class="CtextAlign">' . sprintf('%02d', $key + 1) . ' <input type="checkbox" onchange="checkFunction2()" name="choix[]" id="' . sprintf('%02d', $key + 1);
         echo '" value="' . $key ;
         if (count($checked) >= 1) {
             if ($checked[$key] == '1') {
                 echo '" checked="checked"';
             }
-        }/**/
+        }
         echo '" />' . "</td>\n";
-        echo "<td align=\"center\">" . $compAnddataset[0] . "</td>\n"; // comparison (RECO vs RECO, PU vs PU, ..)
-        echo "<td align=\"center\">" . $compAnddataset[1] . "</td>\n"; // dataset (ZEE, TTbar, ..)
-        echo "<td align=\"center\">" . $histoName . "</td>\n";
+        echo '<td class="CtextAlign">' . $compAnddataset[0] . '</td>'; // comparison (RECO vs RECO, PU vs PU, ..)
+        echo '<td class="CtextAlign">' . $compAnddataset[1] . '</td>'; // dataset (ZEE, TTbar, ..)
+        echo '<td class="CtextAlign">' . $histoName . '</td>';
         
         if (strpos($url, $parts[1]) !== false)
         {
-            echo "<td align=\"center\"><font color=\"blue\">" . $value . "</font>";
+            echo '<td class="CtextAlign blueClass">' . $value;
         }
         else {
-            echo "<td align=\"center\"><font color=\"darkgrey\">" . $value . "</font>";
+            echo '<td class="CtextAlign darkGreyClass">' . $value;
         }
-        echo "</td>\n";
-        echo "</tr>\n";
+        echo '</td>';
+        echo '</tr>';
     }
-    echo  "</table>\n";
+    echo '</table>';
 
     echo '<br>';
-    echo '<table border="1" cellpadding="5" class="clickable buttonChoice">';
+    echo '<table class="clickable buttonChoice p-5px blackBorder1">';
     echo '<tr><td class="CtextAlign" button-choice="line0" title="Click on text to add it on textArea" id="line0">';
     echo 'Release link : ' . $text_0 ;
-    echo "</td></tr>";
-    echo  "</table>\n";
+    echo '</td></tr>';
+    echo '</table>';
 
     echo '<br>';
-    echo '<table style="border:1px solid black;" cellpadding="5" class="clickable actionChoice">';
+    echo '<table class="clickable actionChoice blackBorder1 p-5px">';
     echo '<tr>';
-    echo '<td id="selectAll" style="border:1px solid black;width:180px" class="CtextAlign">Select/UnSelect all links</td>' . "\n"; 
-    echo '<td id="removeAll" style="border:1px solid black;width:130px" class="CtextAlign">Remove all links</td>' . "\n"; 
-    echo '<td id="removeSelected" style="border:1px solid black;width:160px" class="CtextAlign">Remove selected links</td>' . "\n"; 
-    echo '<td id="copySelected" style="border:1px solid black;width:130px" class="CtextAlign">Copy selected links</td>' . "\n";
-    echo '<td style="border:1px solid black;width:130px" class="CtextAlign">&nbsp;</td>' . "\n";
-    echo '<td id="shareFile" style="border:1px solid black;width:130px" class="CtextAlign"><font color="grey">Select histos for sharing</font></td>' . "\n";
-    echo '<td style="border:1px solid black;width:130px" class="CtextAlign">&nbsp;</td>' . "\n";
-    echo '<td style="border:1px solid black;width:130px" class="CtextAlign">' . '<a href="' . $displayAddr . '">Display histos</a>' . '</td>' . "\n";
-    echo "</tr>";
-    echo  "</table>";
+    echo '<td id="selectAll" class="CtextAlign MtextAlign blackBorder1 w-180px">Select/UnSelect all links</td>' . "\n"; 
+    echo '<td id="removeAll" class="CtextAlign MtextAlign blackBorder1 w-130px">Remove all links</td>' . "\n"; 
+    echo '<td id="removeSelected" class="CtextAlign MtextAlign blackBorder1 w-160px">Remove selected links</td>' . "\n"; 
+    echo '<td id="copySelected" class="CtextAlign MtextAlign blackBorder1 w-130px">Copy selected links</td>' . "\n";
+    echo '<td class="CtextAlign MtextAlign blackBorder1 w-130px">&nbsp;</td>' . "\n";
+    echo '<td id="shareFile" class="CtextAlign MtextAlign blackBorder1 w-130px greyClass">Select histos for sharing</td>' . "\n";
+    echo '<td class="CtextAlign MtextAlign blackBorder1 w-130px">&nbsp;</td>' . "\n";
+    echo '<td class="CtextAlign MtextAlign blackBorder1 w-130px">' . '<a href="' . $displayAddr . '" target="_blank" rel="noopener noreferrer">Display histos</a>' . '</td>' . "\n";
+    echo '</tr>';
+    echo '</table>';
 
-    echo "&nbsp;&nbsp;<font color=\"blue\">Please, note that the <b>remove</b> function act on the file</font> <b><font color=\"red\">AND NOT ONLY</font></b> <font color=\"blue\">on this webpage ! </font><br>" ;
+    echo '&nbsp;&nbsp;<span class="blueClass">Please, note that the <b>remove</b> function act on the file</span> <b><span class="redClass">AND NOT ONLY</span></b> <span class="blueClass">on this webpage ! </span><br>' ;
     echo '<br>';
     
     echo '<textarea name="message_content" cols="100" rows="10" class="contentfont" id="textArea">' . $text . '</textarea>' . "<br>\n"; #
 
     echo '<br>';
-        echo '<label style="border:2px solid red;display:none" id="sharedAddress">Shared address : </label>';
+        echo '<label class="redBorder2 hidden" id="sharedAddress">Shared address : </label>';
     echo '<br>';
 
     $returnAddr = $web_roots . "/basket.php?short_histo_name=" . $short_histo_name   . "&basket=view&actionFrom=" . $actionFrom;
@@ -291,17 +304,16 @@ elseif ($basket == "work") {
         $returnAddr = $url;
     }
 
-    echo '<table style="margin:0 auto;border:1px solid black;" cellpadding="5" width="30%">';
-    echo '<tr valign="top">';
-    echo '<td align="center" style="margin:0 auto;border:1px solid black;"><font color="black"><b>shared files to use</b></font></td>';
+    echo '<table class="m-0-auto blackBorder1 p-5px w-30pct" >';
+    echo '<tr class="TtextAlign">';
+    echo '<td class="CtextAlign blackBorder1 blackClass m-0-auto"><b>shared files to use</b></td>';
     echo '</tr>';
 
     //prePrint('sharedFilesList', $sharedFilesList);
     foreach ($sharedFilesList as $key => $value) {
-        $name = $chemin_eos_base . '/' . $value;
+        $name = $chemin_eos_base . '/BasketList/' . $value;
         if (file_exists($name) && (filesize($name) !== 0)) {
-            echo '<tr valign="top"><td align="center" style="margin:0 auto;border:1px solid black;">';
-            //echo '[' . $key . '] := ' . $name . ' (' . filesize($name) . ')' . $_fDL;
+            echo '<tr class="TtxtAlign"><td class="CtextAlign blackBorder1 m-0-auto">';
             $reducedValue = str_replace('sharedList.', '', $value);
             $reducedValue = str_replace('.txt', '', $reducedValue);
             // recompute actionFrom
@@ -316,12 +328,10 @@ elseif ($basket == "work") {
             //simPrintC('aF1', $tmp_aF3);
 
             $address = $web_roots . "/basket.php?actionFrom=" . $tmp_aF3 . "&sharedF=" . $reducedValue . '&basket=work';
-            //echo '[' . $key . '] := ' . $address . $_fDL;
-            //echo '<a href="' . $address . '">sharedList.' . $reducedValue . '.txt</a>';
             $tmp_aF4 = explode('.', $reducedValue)[1];
             $tmp_AF5 = substr($tmp_aF4, 0, 8);//simPrintC('$tmp_AF5', $tmp_AF5);
             $tmp_AF6 = substr($tmp_aF4, 8);//simPrintC('$tmp_AF5', $tmp_AF6);
-            echo '<a href="' . $address . '">' . $tmp_AF5 . ' - ' . $tmp_AF6 . '</a>';
+            echo '<a href="' . $address . '" target="_blank" rel="noopener noreferrer">' . $tmp_AF5 . ' - ' . $tmp_AF6 . '</a>';
             echo '</td></tr>';
         }
     }
@@ -333,39 +343,39 @@ elseif ($basket == "display") {
     $returnAddr2 = $web_roots . "/index.php?actionFrom=" . $actionFrom . "#";
     
     $lineHisto = array_filter($lineHisto);
-    echo "<h2><center><b><font color=red>shared histos display</font></b></center></h2><br>";
+    echo '<h2><center><b><span class="redClass">shared histos display</span></b></center></h2><br>';
 
     $i=0;
-    echo "<table border=\"1\" cellpadding=\"5\" width=\"100%\">";
+    echo '<table class="tab1 p-5px w-100pct">';
     foreach ($lineHisto as $key => $value) {
         $value2 = substr($value, 52);
         $parts = explode("/", $value2); # so, there is 6 parts
 
         if ( $i % 3  == 0 ) {
-            echo "\n<tr valign=\"top\">";
+            echo '<tr class="TtextAlign">';
         }
-        echo "\n<td width=\"10\">\n ";
+        echo '<td class="w-10px"> ';
         if (strpos($url, $parts[1]) !== false)
         {
-            echo "<font color=\"blue\">" . "https:" . $parts[1] . "</font>";
+            echo '<span class="blueClass">' . "https:" . $parts[1] . '</span>';
         }
         else {
-            echo "<font color=\"darkgrey\">" . "https:" . $parts[1] . "</font>";
+            echo '<span class="darkGreyClass">' . "https:" . $parts[1] . '</span>';
         }
-        echo "<a href=\"" . $value . "\"><img border=\"0\" class=\"image\" width=\"" . "440" . "\" src=\"" . $value . "\"></a>" . "\n";
+        echo '<a href="' . $value . '" target="_blank" rel="noopener noreferrer"><img class="image" width="' . "440" . '" src="' . $value . '"></a>' . "\n";
 
-        echo "</td>";
+        echo '</td>';
         if ( $i % 3 == 2 ) {
-            echo "</tr>";
+            echo '</tr>';
         }
         $i+=1;
     }
-    echo  "</table>\n";
+    echo '</table>';
             
-    echo "<br><br>";
-    echo "<a href=\"" . $returnAddr . "\">BACK to links management</a>" . "\n"; 
-    echo "&nbsp; - &nbsp;";
-    echo "<a href=\"" . $returnAddr2 . "\">BACK to histos selection</a>" . "\n"; 
+    echo '<br><br>';
+    echo '<a href="' . $returnAddr . '" target="_blank" rel="noopener noreferrer">BACK to links management</a>' . "\n"; 
+    echo '&nbsp; - &nbsp;';
+    echo '<a href="' . $returnAddr2 . '" target="_blank" rel="noopener noreferrer">BACK to histos selection</a>' . "\n"; 
     
 }
 else { # manage the basket
@@ -374,7 +384,7 @@ else { # manage the basket
 
 ?>
 
-<script>
+<script nonce="<?php echo $nonce; ?>">
     var text_0 = <?php echo json_encode($text_0); ?>;
     var text_values = <?php echo json_encode($textValues); ?>;
     var lineHisto1 = <?php echo json_encode($lineHisto); ?>;
@@ -394,7 +404,7 @@ else { # manage the basket
     var img_remove = <?php echo json_encode($image_remove); ?>;
 </script>
 
-<script> // t12
+<script nonce="<?php echo $nonce; ?>"> // t12
 $(document).ready(function(){
   $("p").click(function(){
     if ( $('[valInfo="t12"]').html() != '' ) {
@@ -407,7 +417,7 @@ $(document).ready(function(){
 });
 </script>
 
-<script> // check buttons, size, releases, ..
+<script nonce="<?php echo $nonce; ?>"> // check buttons, size, releases, ..
     $(document).ready(function(){
         // la class clickable est appliquée à tous les table qui auront des "boutons"
         $('table.clickable td').on('click', checkButtonChoice );
@@ -435,7 +445,6 @@ $(document).ready(function(){
         if (typeof cc !== "undefined") {
             if (cc.indexOf("add") >= 0) {
                 obj.attr('addlink-choice', "remove from basket");
-                //obj.html('<font color="red"><b>Remove</b></font>');
                 obj.html('<img width="32" height="32" src="' + img_remove + '" alt="Rem"/>');
                 lineHisto1.push(imageName);
                 var nb = lineHisto1.length;
@@ -521,7 +530,7 @@ $(document).ready(function(){
                 i_c += 1
             });
             $("textarea#textArea").val(text);
-        }/**/
+        }
 
     }
     function checkActionChoice() {
@@ -549,7 +558,7 @@ $(document).ready(function(){
                         textA = textA.replace('[0]', '[00]')
                     }
                     $('textarea#textArea').val(textA)
-                    $('#shareFile').html('<font color="grey">Select histos for sharing</font>')
+                    $('#shareFile').html('<span class="greyClass">Select histos for sharing</span>')
                 }
                 else {
                     $('#selectAll').addClass('Gras');
@@ -573,7 +582,7 @@ $(document).ready(function(){
                     }
                     ).fail(function(){
                         console.log('ERROR from basket::bc::removeAll !');
-                    });/**/
+                    });
             }
             else if (bc == 'removeSelected') {
                 console.log('remove Selected')
@@ -595,7 +604,7 @@ $(document).ready(function(){
                         }
                         ).fail(function(){
                             console.log('ERROR from basket::bc::removeSelected !');
-                        });/**/
+                        });
                 }
                 else {
                     console.log('meme valeur : ' + unselected.length + ', rien a retirer')
@@ -631,7 +640,8 @@ $(document).ready(function(){
                         ListA.push(lineHisto1[element-1])
                     });
                     var destination = webRoots + '/basket.php?actionFrom=' + actionFrom + '&basket=work'
-                    console.log(destination)
+                    console.log('destination : ' + destination)
+                    console.log('shareFileName : ' + shareFileName)
                     sharedText = JSON.stringify([webRoots, shareFileName, ListA]);
                     console.log('sharedText = ' + sharedText)
                     $.post(
@@ -646,12 +656,10 @@ $(document).ready(function(){
                             console.log('ERROR from basket::zc::sharedFile !');
                         });
                     var tmp1 = shareFileName.replace('sharedList.', '').replace('.txt', '')
-                    //'<a href="' . $address . '">sharedList.' . $redValue . '.txt</a>';
+                    //'<a href="' . $address . '" target="_blank" rel="noopener noreferrer">sharedList.' . $redValue . '.txt</a>';
                     var addr = 'https://cms-egamma.web.cern.ch/validation/Electrons/Releases/basket.php?actionFrom=' + actionFrom
                     addr += '&sharedF=' + tmp1 + '&basket=work'                
-                    //var tmp2 = '<font color="blue">https://cms-egamma.web.cern.ch/validation/Electrons/Releases/basket.php?actionFrom=' + actionFrom
-                    //tmp2 += '&sharedF=' + tmp1 + '&basket=work' + '</font>'
-                    var tmp2 = '<a href="' + addr + '">' + addr + '</a>'
+                    var tmp2 = '<a href="' + addr + '" target="_blank" rel="noopener noreferrer">' + addr + '</a>'
                     $('#sharedAddress').html('Shared address : ' + tmp2)
                     $('#sharedAddress').show()
                 }
@@ -684,7 +692,7 @@ $(document).ready(function(){
             $('[size-choice="' + cc + '"]').addClass('Gras');
             $('#displayHisto').attr('width', cc);
             //console.log(affiche)
-        }/**/
+        }
         
     }
     function checkReleases() {
@@ -718,7 +726,7 @@ $(document).ready(function(){
 
 </script>
 
-<script> // checked
+<script nonce="<?php echo $nonce; ?>"> // checked
     function checkFunction() {
         var select1 = [];
         console.log(tags);
@@ -737,12 +745,11 @@ $(document).ready(function(){
         var affiche = '';
 
         if (select1.length >= 1) {
-            affiche = '<table border=1><tr>'; //'<img border="0" class="image" width="480" src="' + urlhttp + '">' + "\n";
-            //affiche += '<td>' + origin + '<img border="0" class="image" width="480" src="' + urlhttp + '"></td>';
+            affiche = '<table border=1><tr>';
             $.each(select1, function(key, value) {
                 tmp1 = value.split(".");
                 var name = webRoots + '/' + tmp1[0] + '/' + tags + '/' + tmp1[1] + 's/' + histoName1 + '.' + tmp1[1];
-                 affiche += '<td>' + tmp1[0] + '<img border="0" class="image" width="480" src="' + name + '"></td>';
+                 affiche += '<td>' + tmp1[0] + '<img class="image" width="480" src="' + name + '"></td>';
             });
             affiche += '</tr></table><br>';
         }
@@ -758,7 +765,7 @@ $(document).ready(function(){
     }
 </script>
 
-<script> // checked2
+<script nonce="<?php echo $nonce; ?>"> // checked2
     function checkFunction2() {
         //var select2 = [];
         var nb = 0
@@ -770,29 +777,59 @@ $(document).ready(function(){
             $('#shareFile').html('Share selected links')
         }
         else { // 
-            $('#shareFile').html('<font color="grey">Select histos for sharing</font>')
+            $('#shareFile').html('<span class="greyClass">Select histos for sharing</span>')
         }
     }
 </script>
 
-<script> // display/remove Releases array
+<script nonce="<?php echo $nonce; ?>"> // display/remove Releases array
 $(document).ready(function(){
   $("#Liste").click(function(){
     var tild = $("#Histos").html();//console.log('histos : '+tild)
     if (tild.indexOf("remove") >= 0) {
-        //$("#Histos").html('<span class="blueClass"><b>Press here to remove Releases array</b></span>');
         $("#Histos").html('<span class="blueClass"><b>Press here to display Releases array</b></span>');
     }
     else if (tild.indexOf("display") >= 0) {
         $("#Histos").html('<span class="blueClass"><b>Press here to remove Releases array</b></span>');
-        //$("#Histos").html('<span class="blueClass"><b>Press here to display Releases array</b></span>');
     }
     $("#ListeReleases").toggle();
   });
 });
 </script>
 
+<script nonce="<?php echo $nonce; ?>">
+$(document).ready(function() {
+    // Liste des événements en ligne courants à intercepter et nettoyer
+    var eventsToFix = ['onclick', 'onchange', 'onkeyup', 'onkeydown', 'onsubmit'];
+
+    $.each(eventsToFix, function(index, eventName) {
+        // jQuery trouve tous les éléments qui possèdent cet attribut (ex: [onchange])
+        $("[" + eventName + "]").each(function() {
+            var rawCode = $(this).attr(eventName); // Récupère le code JS brut
+            
+            if (rawCode) {
+                $(this).removeAttr(eventName); // Supprime l'attribut pour valider la CSP
+                
+                // Extrait le nom de l'événement jQuery (ex: "click", "change")
+                var jqEvent = eventName.substring(2); 
+                
+                // Attache l'événement de manière moderne et autorisée
+                $(this).on(jqEvent, function(event) {
+                    // Pour le changement d'un select/input, on ne bloque pas forcément le comportement par défaut
+                    if (jqEvent === 'click') { event.preventDefault(); }
+                    
+                    // Exécute le code d'origine dans le contexte de l'élément (conserve "this")
+                    new Function(rawCode).call(this); 
+                });
+            }
+        });
+  });
+});
+</script>
+
 </main>
 <?php include('basket_footer.php'); ?>
+
+
 </body>
 </html>

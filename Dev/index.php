@@ -1,27 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<?php
+// On génère un jeton aléatoire sécurisé (si ce n'est pas déjà fait)
+if (!isset($nonce)) {
+    $nonce = base64_encode(random_bytes(16));
+}
+?>
+
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8" >
+<!--meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>' https://jquery.com; style-src 'self' 'nonce-<?php echo $nonce; ?>';" -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>' https://jquery.com; style-src 'self' 'unsafe-inline';">
+
 <title>Dev list webpage</title>
-<link rel="stylesheet" href="../php_inc/styles.css">
-<link rel="stylesheet" href="../php_inc/all.min.css">
-<link rel="stylesheet" href="../js/jquery-ui.min.css">
-<script src="../js/jQuery-3.6.3/jquery-3.6.3.min.js"></script>
-<script src="../js/jquery-ui.min.js"></script>
+<link rel="icon" type="image/x-icon" href="/validation/Electrons/img/filetype-root-256.ico"> 
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/all.min.css">
+<link rel="stylesheet" href="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.css">
+<script src="../js/jQuery-4.0.0/jquery.min.js"></script>
+<script src="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.js"></script>
 <!-- the modification of img style (img.anchor) is a precious help of M. Mellin ! -->
+
 </head>
 
 <body>
+<div id="modal-overlay">
 <?php
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
 // --- SECURITY (Haut de page) ---
     include '../php_inc/security.inc.php';
 
     // 1. Sanitization de l'URL avant toute utilisation
     $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
     $cchoice    = cleanInput_V2($_REQUEST['cchoice'] ?? '', true);    // false bloque les slashes
-    echo "<-- DEBUG: Original = " . htmlspecialchars($_REQUEST['cchoice'] ?? 'vide') . " -->" . '<br>' . "\n";
-    echo "<-- DEBUG: Cleaned = " . htmlspecialchars($cchoice) . " -->" . '<br>' . "\n";
     $short_histo_name    = cleanInput_V2($_REQUEST['short_histo_name'] ?? '', false);    // false bloque les slashes
 
     $url_safe = cleanInput($_GET['redirect'] ?? '', 'url');
@@ -48,11 +61,9 @@
 </div>
 <main>
 <?php
-//$url = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL);
-
-echo '====<br>' . "\n";
+/*echo '====<br>' . "\n";
 prePrint('SESSION', $_SESSION);
-echo '====<br>' . "\n";/**/
+echo '====<br>' . "\n";*/
 
 if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 {
@@ -68,34 +79,34 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 
     $histoArray_0 = createHistoArray($lineHisto);
     $clefs_0 = array_keys($histoArray_0);
-    $displayPaths .= '<span class="blueClass" style="font-weight: bold">ImageName = </span><span>' . 'https:' . $escaped_url . "/" . $pictsValue . '</span><br>';
+    $displayPaths .= '<span class="blueClass Gras">ImageName = </span><span>' . 'https:' . $escaped_url . "/" . $pictsValue . '</span><br>';
 
     ##### test with Title/Histo name choice
         $histoArray = $histoArray_0;
         $clefs = array_keys($histoArray);
     if ( $choiceValue != '' ) {
         $histoArray = cleanHistoArray($histoArray, $clefs, $choiceValue);
-        echo " <br>";
+        echo ' <br>';
     }
     ##### end test with Title/Histo name choice
 
     /* Write the TABLE with all histos */
     if ( $url_flag ) {
-        echo '<div id="tableHistos" class="parent" style="border:1px solid black;display:none;">';
+        echo '<div id="tableHistos" class="parent blackBorder1 hidden">';
     }
     else {
-        echo '<div id="tableHistos" class="parent" style="border:1px solid black;display:block;">';
+        echo '<div id="tableHistos" class="parent blackBorder1 d-block">';
     }
     echo '<table class="tab6">';
     for ($ic = 0; $ic < count($clefs); $ic++) {
         $aaa = $ic % 5;
         if ( $aaa == 0 ) {
-            echo "\n<tr>";
+            echo '<tr>';
         }
         $textToWrite = "";
         echo '<td class="b2"><b> ' . $clefs[$ic] . '</b>';
         echo '&nbsp;&nbsp;' . "\n" . '<a href="#' . $ic . '" onclick="goToHisto()">' ; // write group title
-        echo "<img width=\"18\" height=\"15\" src=" . $image_point . " alt=\"Top\">" . " <br><br>";
+        echo '<img width="18" height="15" src=' . $image_point . ' alt="Top"> <br><br>';
         $textToWrite .= "</a>";
         $histoPrevious = "";
         $numLine = 0;
@@ -131,8 +142,8 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                     
                 }
                 else {
-                    echo "could not open " . $filehistoName . "<br>";
-                }/**/
+                    simPrint("could not open ", $filehistoName);
+                }
             fclose($filehistoName);
             }
             
@@ -143,7 +154,8 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             } else {
                 $classColor = "lightGreyClass";
                 //echo $ImageName."<br>";
-            }/**/
+            }
+
             if ( $elem == "endLine" ) {
                 $otherTextToWrite .= " <br>";
                 $jc += 1;
@@ -187,7 +199,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 
             $otherTextToWrite = str_replace("<br><br>", "<br>", $otherTextToWrite);
             $textToWrite .= $otherTextToWrite ;
-        }/**/
+        }
         $textToWrite .= " <br>"; 
         $textReplace = TRUE;
         while ( $textReplace ) {
@@ -203,25 +215,25 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 $textToWrite = str_replace("</a><br><a", "</a><a", $textToWrite);
         }
         echo $textToWrite;
-        echo "</td>";
+        echo '</td>';
         if ( $aaa == 4 ) {
-            echo "</tr>";
+            echo '</tr>';
         }
     }
 
-    echo  "</table>\n";
+    echo '</table>';
     echo '</div>';
     
     $lineFlag = True;
     /* Write the HISTOS pictures */
-    echo '<div id="listeHistos" class="parent" style="border:0px solid green;display:block;text-align: center;">';
+    echo '<div id="listeHistos" class="parent greenBorder0 d-block CtextAlign">';
     displayAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsValue, $pictsExt, $histoSize, $url_flag, $code, 'Dev');
     echo '</div>'; // listeHistos
     echo '<br><br><br><br>';
 
 } // end of web page construction of histos
 else { // construction of folders list web page
-    echo '<div id="part1" class="parent" style="border:0px solid blue;float:left;text-align: center;width: 45%;">';
+    echo '<div id="part1" class="parent blueBorder0 CtextAlign w-45pct fl-left">';
     $temp = substr($web_roots,6) . "/index.php";
 
     if ( $actionFrom != '') {
@@ -231,7 +243,7 @@ else { // construction of folders list web page
         echo '<br><br>';
         
         echo '<table class="tab0">';
-        echo '<tr><td style="width:50%">';
+        echo '<tr><td class="w-50pct">';
         echo '<b>Release references</b>';
         echo '</td><td>';
         echo '<b>Last Modified On </b>';
@@ -243,7 +255,7 @@ else { // construction of folders list web page
             if ( $choiceValue != '' ) {
                 if ( stristr($filename, $choiceValue) != FALSE ) {
                     $new_path = $filename;
-                    echo '<tr><td style="width:50%">';
+                    echo '<tr><td class="w-50pct">';
                     echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
                     echo '</td><td>';
                     echo @date('F d, Y, H:i:s', filemtime($new_path));
@@ -252,7 +264,7 @@ else { // construction of folders list web page
             }
             else {
                 $new_path = $filename;
-                echo '<tr><td style="width:20%">';
+                echo '<tr><td class="w-20pct">';
                 echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
                 echo '</td><td>';
                 echo @date('F d, Y, H:i:s', filemtime($new_path));
@@ -262,37 +274,38 @@ else { // construction of folders list web page
         echo  '</table>';
     }
     else {
-        //simPrintC('actionFrom', $actionFrom); // actionFrom = ''
-        //echo "len : " . gettype($actionFrom) . $_fDL;
-        //if ( $url == $temp ) { // test for root url
-            echo "<p>List of the 5 last releases candidates ";
+            echo '<p>List of the 5 last releases candidates ';
             usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
+            //prePrint('dirList', $dirsList_date);
             echo '( here <b><span class="redClass">' . $dirsList_date[0] .'</span> and <span class="blueClass">' . $dirsList_date[1] .'</span></b> folders).</p>';//
 
             echo '<table class="tab5 clickable folders">';
             echo '<tr><td width="50%">';
-            echo "<b>Last release candidates";
-            echo '</td><td width="50%">';
-            echo "<b>Last Modified On ";
-            echo "</td></tr><tr>\n";
+            echo '<b>Last release candidates';
+            echo '</td><td class="w-50pct">';
+            echo '<b>Last Modified On ';
+            echo '</td></tr><tr>';
         
             $i = 0;
             echo '<td>' . "\n";
             foreach($dirsList_date as $filename)
             {
-                if ( $i < 5 ) {
-                    $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
-                    if ( $i == 0 ) {
-                        echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
+                $firstChar = array_reverse(explode('/', $filename))[0][0];
+                if (is_numeric($firstChar)) {
+                    if ( $i < 5 ) {
+                        $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
+                        if ( $i == 0 ) {
+                            echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
+                            }
+                        elseif ( $i ==1 ) {
+                            echo '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b><br>';//
                         }
-                    elseif ( $i ==1 ) {
-                        echo '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b><br>';//
+                        else {
+                            echo '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b><br>';//
+                        }
                     }
-                    else {
-                        echo '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b><br>';//
-                    }
+                    $i++;
                 }
-                $i++;
             }
             echo '</td><td>';
             $i = 0;
@@ -306,31 +319,27 @@ else { // construction of folders list web page
             echo '</td></tr></table>';
             echo ' <br>';
             echo ' <br>';
-        //}
     }
     echo '</div>'; // part1
 
     $action_tmp = substr($actionFrom,1);
     $action_list = explode("/", $action_tmp);
     if ( count($action_list) == 2) {
-        //echo 'count(action_list) == 2';
         echo '<h2><center><b>' . $action_list[1] . '</b></center></h2><br>';
     }
     if (!(strpos($url, 'index') !== false)) {
-        //echo 'strpos(url, index) !== false';
         echo ' <br><b><a href="'.$web_roots.'/index.php">Roots</a></b>';
         echo ' <br><br>';
     }
     if ( count($action_list) == 2) {
-        //echo 'count(action_list) == 2';
         echo '<b>Up to release folder : </b>' . $_fDL;
         echo '<b> ' . '<a href="' . $web_roots.'/index.php?actionFrom=/' . $action_list[0] . '&cchoice=diff">' . $action_list[0] . '</a></b>' . '<br>';
     }
 
     echo '<br>';
-    echo '<div id="part2" class="parent" style="border:0px solid green;float:right;text-align: center;width: 54%;">';
+    echo '<div id="part2" class="parent greenBorder0 fl-right CtextAlign w-54pct">';
     if ($l_actionFrom == 1){
-        echo "<p>List of all releases " . "<br>";
+        echo '<p>List of all releases <br>';
         echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';//
     }
     if ( $actionFrom == '') {
@@ -406,7 +415,7 @@ else { // construction of folders list web page
                         }
                     echo '</div>';
                     echo '</div>';
-                }/**/
+                }
                 echo '</div>';
             }
 
@@ -428,24 +437,19 @@ else { // construction of folders list web page
                 foreach($tab_Others as $item)
                 {
                     displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
-                }/**/
+                }
                 echo '</div>';
             }
         echo '</div>';
     }
     echo '</div>'; // part2
 
-    //echo 'blow';
-
 } // end of folders list web page construction
 
-/*echo '====<br>' . "\n";
-prePrint('SESSION', $_SESSION);
-echo '====<br>' . "\n"*/
 
 ?>
 
-<script>
+<script nonce="<?php echo $nonce; ?>">
     var text_values = <?php echo json_encode($textValues);  ?>;
     var lineHisto1 = <?php echo json_encode($lineHisto1);  ?>;
     var url = <?php echo json_encode($url); ?>;
@@ -462,7 +466,7 @@ echo '====<br>' . "\n"*/
     var displayPaths= <?php echo json_encode($displayPaths); ?>;
 </script>
 
-<script> // t12
+<script nonce="<?php echo $nonce; ?>"> // t12
 $(document).ready(function(){ // p=t12
   $("p").click(function(){
     if ( $('[valInfo="t12"]').html() != '' ) {
@@ -481,7 +485,7 @@ $(document).ready(function(){ // p=t12
 });
 </script>
 
-<script> // accordion
+<script nonce="<?php echo $nonce; ?>"> // accordion
     // jQuery
     $('#accordion').accordion({
         active: false,
@@ -500,7 +504,7 @@ $(document).ready(function(){ // p=t12
     });
 </script>
 
-<script> // addLink
+<script nonce="<?php echo $nonce; ?>"> // addLink
     $(document).ready(function(){
         // la class clickable est appliquée à tous les table qui auront des "boutons"
         $('table.clickable td').on('click', checkAddLink );
@@ -510,12 +514,12 @@ $(document).ready(function(){ // p=t12
         var nb = lineHisto1.length;
         //console.log('nb : ' + nb);
         if ((nb == 1) && (lineHisto1[0] == '')) {
-            $('[soCol="bleu"]').html('<font color="blue">Unselect All</font>');
+            $('[data-soCol="bleu"]').html('<span class="blueClass">Unselect All</span>');
         }
         else { // if ( nb >= 1 ) 
             var nb2 = nb - 0;
-            $('[soCol="bleu"]').html('<font color="red"><b>Unselect All (' + nb2 + ')</b></font>');
-            $('[soCol="visio"]').show();
+            $('[data-soCol="bleu"]').html('<span class="redClass"><b>Unselect All (' + nb2 + ')</b></span>');
+            $('[data-soCol="visio"]').removeClass("hidden");
         }
         }
     );
@@ -532,7 +536,6 @@ $(document).ready(function(){ // p=t12
             //console.log("selectPictFormat");
         }
         if ($(this).parents('table.clickable').hasClass('folders')) {
-            //$('table.selectPictFormat td').removeClass('Gras');//
             folders($(this));
             //console.log("folders");
         }
@@ -561,7 +564,6 @@ $(document).ready(function(){ // p=t12
         if (typeof gg !== "undefined") {
             //console.log('=== img_id= ' + gg)
             dataSession = JSON.stringify(gg);
-            //$("#listeHistos").hide();
             $.post(
                 url2, 
                 {dataS: dataSession},
@@ -605,7 +607,7 @@ $(document).ready(function(){ // p=t12
                     //someText += ' - ' + lineHisto1[j] + '<br>';
                 }
             };
-            lineHisto1 = lineHisto2;/**/
+            lineHisto1 = lineHisto2;
             TableData = JSON.stringify(lineHisto1);
             //console.log('tableData' + TableData);
             $.post(
@@ -620,17 +622,15 @@ $(document).ready(function(){ // p=t12
                 });
             //someText += nb + '<br>';
             //$('[soDiv="Arghhhhh"]').html(someText);
-            $('[soCol="bleu"]').html('<font color="blue">Unselect All</font>');
-            $('[soCol="visio"]').hide();
+            $('[data-soCol="bleu"]').html('<span class="blueClass">Unselect All</span>');
+            $('[data-soCol="visio"]').addClass("hidden");
         }
         else if (typeof cc !== "undefined") {
             if (cc.indexOf("add") >= 0) {
                 obj.attr('addlink-choice', "remove from basket");
-                //obj.html('<font color="red"><b>Remove</b></font>');
                 obj.html('<img width="32" height="32" src="' + img_remove + '" alt="Rem">');
                 $('[addlink-id="'+id+'"] img').css('border', "solid 3px blue");
-                //$('[addlink-id="'+id+'"] img').addClass('selected');
-                $('[soCol="visio"]').show();
+                $('[data-soCol="visio"]').removeClass("hidden");
                 lineHisto1.push(imageName);
                 lineHisto1 = clearArray(lineHisto1);
                 var nb = lineHisto1.length;
@@ -653,23 +653,21 @@ $(document).ready(function(){ // p=t12
                     	console.log('ERROR from index::cc::add !');
                     });
                 if ((nb == 1) && (lineHisto1[0] == '')) {
-                    $('[soCol="bleu"]').html('<font color="blue">Unselect All</font>');
+                    $('[data-soCol="bleu"]').html('<span class="blueClass">Unselect All</span>');
                 }
                 else { // if ( nb >= 1 ) 
                     var nb2 = nb - 0;
                     //console.log('nb2 : ' + nb2);
-                    $('[soCol="bleu"]').html('<font color="red"><b>Unselect All (' + nb2 + ')</b></font>');
+                    $('[data-soCol="bleu"]').html('<span class="redClass"><b>Unselect All (' + nb2 + ')</b></span>');
                 }
 
             }
             else if (cc.indexOf("remove") >= 0) {
                 //console.log("remove");
-                //$('[addlink-choice="remove from basket"]').attr('addlink-choice', "add to basket");
                 obj.attr('addlink-choice', "add to basket");
-                //obj.html('<font color="blue"><b>Add</b></font>');
                 obj.html('<img width="32" height="32" src="' + img_add + '" alt="Add">');
                 $('[addlink-id="'+id+'"] img').css('border', "solid 0px blue");
-                $('[soCol="visio"]').hide();
+                $('[data-soCol="visio"]').addClass("hidden");
                 
                 lineHisto1 = $.grep(lineHisto1, function(value) {
                     return value != imageName;
@@ -699,12 +697,12 @@ $(document).ready(function(){ // p=t12
                     	console.log('ERROR from index::cc::remove !');
                     });
                 if (((nb == 1) && (lineHisto1[0] == '')) || (nb == 0)) {
-                    $('[soCol="bleu"]').html('<font color="blue">Unselect All</font>');
+                    $('[data-soCol="bleu"]').html('<span class="blueClass">Unselect All</span>');
                 }
                 else { // if ( nb >= 1 ) 
                     var nb2 = nb - 0;
                     //console.log('nb2 : ' + nb2);
-                    $('[soCol="bleu"]').html('<font color="red"><b>Unselect All (' + nb2 + ')</b></font>');
+                    $('[data-soCol="bleu"]').html('<span class="redClass"><b>Unselect All (' + nb2 + ')</b></span>');
                 }
 
             }
@@ -729,8 +727,6 @@ $(document).ready(function(){ // p=t12
         var affiche = 'gg : ' + gg;
         //console.log(affiche)
         if (typeof gg !== "undefined") {
-            //$('#'+code).addClass('Gras');
-            //$('[curve-choice="' + cc + '"]').addClass('Gras');
             if (gg == 'gif') {
                 //console.log('gif')
                 $('[pictFormat="gif"]').addClass('Gras')
@@ -738,7 +734,6 @@ $(document).ready(function(){ // p=t12
             else if (gg == 'png') {
                 //console.log('png')
                 $('[pictFormat="png"]').addClass('Gras')
-                //$('[pictFormat="png"]').html('<font color="blue"><b>png</b></font>')
             }
             var pictFormat = JSON.stringify(gg);
             //console.log("pict format : " + pictFormat);
@@ -816,7 +811,7 @@ $(document).ready(function(){ // p=t12
     }
 </script>
 
-<script> // gotoHisto
+<script nonce="<?php echo $nonce; ?>"> // gotoHisto
     function goToHisto(valeur) {
         //console.log('goToHisto ' )
         console.log('valeur='+valeur)
@@ -838,26 +833,26 @@ $(document).ready(function(){ // p=t12
             })
         }
         if ($('#tableHistos').is(":hidden")) {
-            $('#tableHistos').show()
+            $('#tableHistos').removeClass("hidden")
         }
         else {
-            $('#tableHistos').hide()
+            $('#tableHistos').addClass("hidden")
         }
     }
 </script>
 
-<script> // gotoTable
+<script nonce="<?php echo $nonce; ?>"> // gotoTable
     function goToTable(valeur) {
         console.log('goToTable ' )
         $('div.cell img.image.img').each(function(index, elt) {
             var cc = $(this).attr('id').slice(0,-2) ;
             $('#'+cc+'_1').css('border', "solid 2px blue");
         })
-        $('#tableHistos').show()
+        $('#tableHistos').removeClass("hidden")
     }
 </script>
 
-<script> // KS click
+<script nonce="<?php echo $nonce; ?>"> // KS click
     function KS_Evclick() {
         console.log(Transf)
         var transfert = {run: Transf[0], operation: Transf[1], dataSet: Transf[2], precision: Transf[3], buttons: ''};
@@ -873,7 +868,7 @@ $(document).ready(function(){ // p=t12
             ).fail(function(){
                 console.log('ERROR from url4 !');
         });
-        $(location).attr('href', web_roots_KS);/**/
+        $(location).attr('href', web_roots_KS);
     }
 </script>
 

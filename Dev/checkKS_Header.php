@@ -12,6 +12,14 @@
 
     
     <?php
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => true,      // Nécessite HTTPS
+        'httponly' => true,    // Bloque l'accès JS
+        'samesite' => 'Strict' // Protection CSRF
+    ]);
     session_start();
     if (array_key_exists('hiName', $_COOKIE)) {
         $hiName = $_COOKIE['hiName'];
@@ -25,12 +33,24 @@
     
     $base_dir = __DIR__;
     include '../php_inc/defaults.inc.php';
+    include '../php_inc/sorties.inc.php';
     include '../php_inc/fonctions.inc.php';
     $web_roots = getRootPath($base_dir);
 
     $chemin = $web_roots;
     $chemin = str_replace("/Dev", "/Store/KS_Curves", $chemin);
     
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    $url = "//{$clean_host}{$clean_uri}";
+
     $fileName_0 = getFileName(session_id());
     $fileName = $web_roots . "/" . $fileName_0;
     //echo $fileName . '<br>';
@@ -79,9 +99,9 @@
     $rel_princ = '';
     $rel_secon = '';
     
-    $actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
-    $curveChoice = (isset($_REQUEST['curveChoice']) ? $_REQUEST['curveChoice'] : '');
-    $cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
+    //$actionFrom = (isset($_REQUEST['actionFrom']) ? $_REQUEST['actionFrom'] : '');
+    //$curveChoice = (isset($_REQUEST['curveChoice']) ? $_REQUEST['curveChoice'] : '');
+    //$cchoice = (isset($_REQUEST['cchoice']) ? $_REQUEST['cchoice'] : '');
     if ($cchoice == '') {
         $cchoice = "diff";
     }
@@ -110,23 +130,23 @@
         $checkFlag = True;
     }
 
-    echo "<table class=\"tab0\">";
+    echo '<table class="tab0">';
     echo '<tr><td class="b0">';
     writeHeaderLinks($base_dir, $url);
     echo "</td>";
 
-    echo "<td class=\"CtextAlign\">";
+    echo '<td class="CtextAlign">';
     echo "<b><span> " . "Release  : " . " </span></b>" . " \n";
-    echo "<b><span class=\"darkBlueClass\"> " . $rel_secon . " </span></b>" . " \n";
+    echo '<b><span class="darkBlueClass"> ' . $rel_secon . " </span></b>" . " \n";
     echo '&nbsp;-&nbsp;';
     echo "<b><span> " . "Release used for KS comparison : " . " </span></b>" . " \n";
-    echo "<b><span class=\"blueClass\"> " . $rel_princ . " </span></b>" . " <br>\n";
+    echo '<b><span class="blueClass"> ' . $rel_princ . " </span></b>" . " <br>\n";
     echo "</td>";
-    echo "<td class=\"RtextAlign\">";
+    echo '<td class="RtextAlign">';
     $tmp_add = explode("/", $actionFrom);
     if (count($tmp_add) == 3) {
         $return_address = $web_roots . "/checkKS.php?actionFrom=/" . $tmp_add[1];
-        echo '<a href=' . $return_address . '>BACK</a>' . "\n";
+        echo '<a href=' . $return_address . ' target="_blank" rel="noopener noreferrer">BACK</a>' . "\n";
     }
     echo "</td>";
     echo "</tr>";
@@ -147,8 +167,6 @@
         if (is_dir($devPath . DIRECTORY_SEPARATOR . $value))
         {
             if ( substr($value, 0, 7) != '.sys.v#' ) {
-                //echo $value . '<br>' . "\n";
-                //echo substr($value, 0, 7) . '<br>' . "\n";
                 $dirsDevList1[] = $value;
             }
         }
@@ -366,19 +384,16 @@
                     $nb_bgr[2] += 1;
                 }
             }
-            /*else {
-                echo 'no ' . $filehistoname . "<br>";
-            }*/
         }
     }
-    echo'<td class="redClass LtextAlign">';
-    echo "<b><font style=\"font-size:30px\">electron validation: check KS</font></b>";
+    echo'<td class="redClass LtextAlign text-30px">';
+    echo '<b>>electron validation: check KS</b>';
     echo '<br>';
     echo'</td>';
     echo "</tr>";
     echo "</table>";
 
-    echo '<table class="tab0">'; //  border="2" border=\"1\"
+    echo '<table class="tab0">'; //  
     /*echo '<tr>';
     echo'<td>';
     filter($url, $image_loupe);
@@ -409,9 +424,9 @@
         $lineEnd = $resume[count($resume)-1];
         $tmp_04 = explode(" ttl ", $lineEnd);
         $tmp_05 = explode(" : ", $tmp_04[0]);
-        $line = $tmp_05[0] . " curves : " . "<b><span class=\"redClass\">" . $tmp_05[1] . " </span></b>";
+        $line = $tmp_05[0] . " curves : " . '<b><span class="redClass">' . $tmp_05[1] . " </span></b>";
         $tmp_05 = explode(" - ", $tmp_04[1]);
-        $line .= $tmp_05[0] . " - " . "<b><span class=\"greenClass\">" . $tmp_05[1] . " </span></b>";
+        $line .= $tmp_05[0] . " - " . '<b><span class="greenClass">' . $tmp_05[1] . " </span></b>";
         $line .= 'green';
         echo $line . '<br>';
     }
@@ -426,30 +441,30 @@
         $rootFile1 = $definitions[3]; 
         $tmp_01 = explode("__", $rootFile1);
         $tmp_02 = explode("-", $tmp_01[2]);
-        $rootFile2 = $tmp_01[0] . "__<b><span class=\"greenClass\">" . $tmp_01[1] . "</span></b>__";
+        $rootFile2 = $tmp_01[0] . '__<b><span class="greenClass">' . $tmp_01[1] . "</span></b>__";
         if (count($tmp_02) == 3) {
-            $rootFile2 .= $tmp_02[0] . "-" . "<b><span class=\"redClass\">" . $tmp_02[1] . "-" . $tmp_02[2] . "</span></b>__" . $tmp_01[3];
+            $rootFile2 .= $tmp_02[0] . '-<b><span class="redClass">' . $tmp_02[1] . "-" . $tmp_02[2] . "</span></b>__" . $tmp_01[3];
         }
         else {
-            $rootFile2 .= $tmp_02[0] . "-" . "<b><span class=\"redClass\">" . $tmp_02[1] . "</span></b>__" . $tmp_01[3];
+            $rootFile2 .= $tmp_02[0] . '-<b><span class="redClass">' . $tmp_02[1] . "</span></b>__" . $tmp_01[3];
         }
-        $rootFile3 = "<b><span class=\"redClass\"> " . $definitions[1] . " " . $definitions[2] . " </span></b>" . " : " . $rootFile2 . " <br>\n";
+        $rootFile3 = '<b><span class="redClass"> ' . $definitions[1] . " " . $definitions[2] . " </span></b>" . " : " . $rootFile2 . " <br>\n";
         echo $rootFile3;
         $rootFile1 = $definitions[6]; 
         $tmp_01 = explode("__", $rootFile1);
         $tmp_02 = explode("-", $tmp_01[2]);
-        $rootFile2 = $tmp_01[0] . "__<b><span class=\"greenClass\">" . $tmp_01[1] . "</span></b>__";
+        $rootFile2 = $tmp_01[0] . '__<b><span class="greenClass">' . $tmp_01[1] . "</span></b>__";
         if (count($tmp_02) == 3) {
-            $rootFile2 .= $tmp_02[0] . "-" . "<b><span class=\"blueClass\">" . $tmp_02[1] . "-" . $tmp_02[2] . "</span></b>__" . $tmp_01[3];
+            $rootFile2 .= $tmp_02[0] . '-<b><span class="blueClass">' . $tmp_02[1] . "-" . $tmp_02[2] . "</span></b>__" . $tmp_01[3];
         }
         else {
-            $rootFile2 .= $tmp_02[0] . "-" . "<b><span class=\"blueClass\">" . $tmp_02[1] . "</span></b>__" . $tmp_01[3];
+            $rootFile2 .= $tmp_02[0] . '-<b><span class="blueClass">' . $tmp_02[1] . "</span></b>__" . $tmp_01[3];
         }
-        $rootFile3 = "<b><span class=\"redClass\"> " . $definitions[4] . " " . $definitions[5] . " </span></b>" . " : " . $rootFile2 . " <br>\n";
+        $rootFile3 = '<b><span class="redClass"> ' . $definitions[4] . " " . $definitions[5] . " </span></b>" . " : " . $rootFile2 . " <br>\n";
         echo $rootFile3;
 
         echo "</td>";
-        echo '<td style="text-align: middle;">';// vertical-align: middle;
+        echo '<td class="MtextAlign">';
         if ($nb_bgr[0] > 0) {
             echo '<span class="blueClass"><b>nb blue : </b></span>' . $nb_bgr[0];
         }
@@ -473,46 +488,37 @@
         $lineEnd = $resume[count($resume)-1];
         $tmp_04 = explode(" ttl ", $lineEnd);
         $tmp_05 = explode(" : ", $tmp_04[0]);
-        $line = "<b>" . $tmp_05[0] . " curves : </b>" . "<b><span class=\"redClass\">" . $tmp_05[1] . " </span></b>";
+        $line = "<b>" . $tmp_05[0] . " curves : </b>" . '<b><span class="redClass">' . $tmp_05[1] . " </span></b>";
         $tmp_05 = explode(" - ", $tmp_04[1]);
-        $line .= $tmp_05[0] . " - " . "<b><span class=\"greenClass\">" . $tmp_05[1] . " </span></b>";
+        $line .= $tmp_05[0] . " - " . '<b><span class="greenClass">' . $tmp_05[1] . " </span></b>";
         $line .= 'green';
         echo $line . '<br><br>';
 
-        echo "<table border=\"0\" class=\"CtextAlign\">";
+        echo '<table class="CtextAlign">';
         echo "<tr>";
         $hiName = $_COOKIE['hiName'];
         $_SESSION["hiName"] = $hiName;
         if ($cchoice == "diff"){
-            echo "<td><a href=\"$web_roots/checkKS.php?actionFrom=" . $actionFrom . '&cchoice=diff&curveChoice=' . $curveChoice . '#' . '"><b><span class="blueClass">Diff</span></b></a></td>';//. $hiName
+            echo '<td><a href="$web_roots/checkKS.php?actionFrom=' . $actionFrom . '&cchoice=diff&curveChoice=' . $curveChoice . '#' . '"><b><span class="blueClass">Diff</span></b></a></td>';
         }
         else {
-            echo "<td><a href=\"$web_roots/checkKS.php?actionFrom=" . $actionFrom . '&cchoice=diff&curveChoice=' . $curveChoice . '#' . '"><span class="blueClass">Diff</span></a></td>';//. $hiName
+            echo '<td><a href="$web_roots/checkKS.php?actionFrom=' . $actionFrom . '&cchoice=diff&curveChoice=' . $curveChoice . '#' . '"><span class="blueClass">Diff</span></a></td>';
         }
-        echo '<td>&nbsp;:&nbsp;</td><td> <span class="blueClass">0&le;diff&le;5 %</span> - <span class="greyClass">5&lt;diff&le;10 %</span> - <span class="redClass"> diff&gt;10 %</span><br></td>';/**/
+        echo '<td>&nbsp;:&nbsp;</td><td> <span class="blueClass">0&le;diff&le;5 %</span> - <span class="greyClass">5&lt;diff&le;10 %</span> - <span class="redClass"> diff&gt;10 %</span><br></td>';
         echo "</tr>";
         echo "<tr>";
         if ($cchoice == "pValue"){
-            echo "<td><a href=\"$web_roots/checkKS.php?actionFrom=" . $actionFrom . '&cchoice=pValue&curveChoice=' . $curveChoice . '#' . '"><b><span class="blueClass">p-Value</span></b></a></td>';//. $hiName
+            echo '<td><a href="$web_roots/checkKS.php?actionFrom=' . $actionFrom . '&cchoice=pValue&curveChoice=' . $curveChoice . '#' . '"><b><span class="blueClass">p-Value</span></b></a></td>';
         }
         else {
-            echo "<td><a href=\"$web_roots/checkKS.php?actionFrom=" . $actionFrom . '&cchoice=pValue&curveChoice=' . $curveChoice . '#' . '"><span class="blueClass">p-Value</span></a></td>';//. $hiName
+            echo '<td><a href="$web_roots/checkKS.php?actionFrom=' . $actionFrom . '&cchoice=pValue&curveChoice=' . $curveChoice . '#' . '"><span class="blueClass">p-Value</span></a></td>';
         }
-        echo '<td>&nbsp;:&nbsp;</td><td> <span class="redClass"> pV&lt;0.05</span> - <span class="greyClass">0.05&lt;pV&le;0.95</span> - <span class="blueClass">0.95&lt;pV&le;1.</span><br></td>';/**/
+        echo '<td>&nbsp;:&nbsp;</td><td> <span class="redClass"> pV&lt;0.05</span> - <span class="greyClass">0.05&lt;pV&le;0.95</span> - <span class="blueClass">0.95&lt;pV&le;1.</span><br></td>';
         echo "</tr>";
         echo "</table>";
         echo "</td>" . "\n";
         
-        echo "<td>";// class=\"RtextAlign\"
-        /*$resume = file($chemin_eos . '/histo_resume.txt');
-        $lineEnd = $resume[count($resume)-1];
-        $tmp_04 = explode(" ttl ", $lineEnd);
-        $tmp_05 = explode(" : ", $tmp_04[0]);
-        $line = $tmp_05[0] . " curves : " . "<b><span class=\"redClass\">" . $tmp_05[1] . " </span></b>";
-        $tmp_05 = explode(" - ", $tmp_04[1]);
-        $line .= $tmp_05[0] . " - " . "<b><span class=\"greenClass\">" . $tmp_05[1] . " </span></b>";
-        $line .= 'green';
-        echo $line . '<br>';*/
+        echo "<td>";
 
         if ( $rel_princ != '' && $rel_secon != '' && $rel_secon != 'Check'){
             echo '<table border="1" class="clickable curveChoice"><tr>';
@@ -529,10 +535,6 @@
                 echo '<td curve-choice-all="ttAll">all</td>' . "\n";
             }
             echo "</tr><tr>";
-            /*if ($cumulativeFlag){
-                echo '<td class="CtextAlign" curve-choice="cumul">cumulatives</td>';
-                echo '<td  curve-choice-all="cuAll">all</td>' . "\n";
-            }*/
             if ( intval($rel_num) >= 1250 || $flag_CMSSW_12_1_0_pre5 ) {
                 echo "</tr><tr>";
                 echo '<td class="CtextAlign" curve-choice="comp">KSCompHisto</td>';
@@ -545,41 +547,33 @@
     }
     else {
         echo "<tr>";
-        echo "<td width=50%></td><td width=30%></td><td class=\"RtextAlign\">";
+        echo '<td class="w-50pct" ></td><td class="w-30pct"></td><td class="RtextAlign">';
         if ( $rel_princ != '' && $rel_secon != '' && $rel_secon != 'Check'){
-            echo "<table border=\"0\"><tr>";
-            echo "<td colspan=\"4\">";
+            echo '<table border="0"><tr>';
+            echo '<td colspan="4">';
             echo "<b>Curves : &nbsp;</b>";
             if ( $gifFlag ) {
                 if (($curveChoice == 'classic') || ($curveChoice == '')){
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=classic&cchoice=' . $cchoice . '#' . $hiName . '"><b>classic</b></a>' . "\n";
+                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=classic&cchoice=' . $cchoice . '#' . $hiName . '" target="_blank" rel="noopener noreferrer"><b>classic</b></a>' . "\n";
                 }
                 else {
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=classic&cchoice=' . $cchoice . '#' . $hiName . '">classic</a>' . "\n";
+                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=classic&cchoice=' . $cchoice . '#' . $hiName . '" target="_blank" rel="noopener noreferrer">classic</a>' . "\n";
                 }
             }
             if ($KS_ttlDiffFlag) {
                 if ($curveChoice == 'ttlDiff') {
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=ttlDiff&cchoice=' . $cchoice . '#' . $hiName . '"><b>KS-ttlDiff</b></a>' . "\n";
+                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=ttlDiff&cchoice=' . $cchoice . '#' . $hiName . '" target="_blank" rel="noopener noreferrer"><b>KS-ttlDiff</b></a>' . "\n";
                 }
                 else {
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=ttlDiff&cchoice=' . $cchoice . '#' . $hiName . '">KS-ttlDiff</a>' . "\n";
+                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=ttlDiff&cchoice=' . $cchoice . '#' . $hiName . '" target="_blank" rel="noopener noreferrer">KS-ttlDiff</a>' . "\n";
                 }
             }
-            /*if ($cumulativeFlag){
-                if ($curveChoice == 'cumul'){
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=cumul&cchoice=' . $cchoice . '#' . $hiName . '"><b>cumulatives</b></a>' . "\n";
-                }
-                else {
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=cumul&cchoice=' . $cchoice . '#' . $hiName . '">cumulatives</a>' . "\n";
-                }
-            }*/
             if ( intval($rel_num) >= 1250 || $flag_CMSSW_12_1_0_pre5 ) {
                 if ($curveChoice == 'comp'){
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=comp&cchoice=' . $cchoice . '#' . $hiName . '"><b>KSCompHisto</b></a>' . "\n";
+                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=comp&cchoice=' . $cchoice . '#' . $hiName . '" target="_blank" rel="noopener noreferrer"><b>KSCompHisto</b></a>' . "\n";
                 }
                 else {
-                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=comp&cchoice=' . $cchoice . '#' . $hiName . '">KSCompHisto</a>' . "\n";
+                    echo '<a href="' . $web_roots . '/checkKS.php?&actionFrom =' . $actionFrom  . '&curveChoice=comp&cchoice=' . $cchoice . '#' . $hiName . '" target="_blank" rel="noopener noreferrer">KSCompHisto</a>' . "\n";
                 }
             }
             echo "</tr></table>";

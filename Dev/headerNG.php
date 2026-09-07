@@ -13,7 +13,7 @@
     $web_roots = getRootPath($base_dir);
     
     $chemin = $web_roots;
-    simPrintC('chemin', $chemin);
+    //simPrintC('chemin', $chemin);
 
     $url_tmp = explode('?', $url_from_safe)[0];
     $url_tmp = end(explode('/', $url_tmp));
@@ -193,7 +193,7 @@
     if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     {
         echo '&nbsp; - &nbsp;';
-        echo '<a href="$web_roots/basket.php?url=' . $url . '&basket=work&site=Releases' . '">Basket</a>' . "\n";
+        echo '<a href="' . $web_roots . '/basket.php?url=' . $url . '&basket=work&site=Releases' . '">Basket</a>' . "\n";
     }
     echo '</td>';
     echo '</tr>';

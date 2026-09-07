@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" >
 <title>releases list webpage</title>
-<link rel="stylesheet" href="../php_inc/styles.css">
-<script src="../js/jQuery-3.6.3/jquery-3.6.3.min.js"></script>
-<script src="../js/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="../js/jquery-ui.min.css">
-<link rel="stylesheet" href="../js/jquery-ui.theme.min.css">
-<link rel="stylesheet" href="../js/jquery-ui.structure.min.css">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/all.min.css">
+<link rel="stylesheet" href="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.css">
+<script src="../js/jQuery-4.0.0/jquery.min.js"></script>
+<script src="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.js"></script>
 
 <!-- the modification of img style (img.anchor) is a precious help of M. Mellin ! -->
 <script>
@@ -21,6 +21,34 @@
 </head>
 
 <body>
+<?php
+// --- SECURITY (Haut de page) ---
+    include '../php_inc/security.inc.php';
+
+    // 1. Sanitization de l'URL avant toute utilisation
+    $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
+    $curveChoice = cleanInput_V2($_REQUEST['curveChoice'] ?? '', true);    // false bloque les slashes
+    $cchoice = cleanInput_V2($_REQUEST['cchoice'] ?? '', false);    // false bloque les slashes
+
+    $url_safe = cleanInput($_GET['redirect'] ?? '', 'url');
+    if (!empty($url_safe) && !preg_match('#^https?://#i', $url_safe)) {
+        $url_safe = ''; // Fallback si jamais le protocole a été altéré
+    }
+
+    // Vérification CRITIQUE anti-traversal
+    if (strpos($actionFrom, '..') !== false) {
+        die("Chemin invalide : tentative de traversal détectée");
+    }
+
+    // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
+    $_REQUEST['actionFrom'] = $actionFrom;
+    $_REQUEST['curveChoice'] = $curveChoice;
+    $_REQUEST['cchoice'] = $cchoice;
+    $_REQUEST['redirect'] = $url_safe;
+
+// --- END SECURITY ---
+
+?>
 <div class="sticky">    
     <?php include('checkKS_Header.php'); ?>
 </div>
@@ -114,7 +142,7 @@ if ( $boul1 ) { // histos web page construction
             elseif ( $histo_positions[3] == "0" ) {
                 if ($numLine == 0) {
                     if ($display_dataset) {
-                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '">' . $short_histo_name . '</a>' . ' &nbsp;';
+                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '" target="_blank" rel="noopener noreferrer">' . $short_histo_name . '</a>' . ' &nbsp;';
                     }
                     $common = $short_histo_name;
                     $numLine += 1;
@@ -122,10 +150,10 @@ if ( $boul1 ) { // histos web page construction
                 else { // $numLine > 0
                     if ($display_dataset) {
                         if ( $after == "" ) {
-                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '">' . $before . '</a>' . ' &nbsp;';
+                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '" target="_blank" rel="noopener noreferrer">' . $before . '</a>' . ' &nbsp;';
                         }
                         else{ // $after != ""
-                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '">' . $after . '</a>' . ' &nbsp;';
+                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '" target="_blank" rel="noopener noreferrer">' . $after . '</a>' . ' &nbsp;';
                         }
                     }
                     $common = $before;
@@ -134,17 +162,17 @@ if ( $boul1 ) { // histos web page construction
             else { //$histo_positions[3] == "1"
                 if ($numLine == 0) {
                     if ($display_dataset) {
-                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onClick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '">' . $short_histo_name . '</a>' . ' &nbsp;';
+                        $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onClick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '" target="_blank" rel="noopener noreferrer">' . $short_histo_name . '</a>' . ' &nbsp;';
                     }
                     $common = $short_histo_name;
                 }
                 else { // $numLine > 0
                     if ($display_dataset) {
                         if ( $after == "" ) {
-                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '">' . $before . '</a>' . ' &nbsp;';
+                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '" target="_blank" rel="noopener noreferrer">' . $before . '</a>' . ' &nbsp;';
                         }
                         else{ // $after != ""
-                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '">' . $after . '</a>' . ' &nbsp;';
+                            $otherTextToWrite .= ' &nbsp;<a href="#' . $ic . '-' . $j . '" class="' . $classColor . '" onclick="onclick_evt(\'' . $short_histo_name . '\');" id="'. $short_histo_name . '" target="_blank" rel="noopener noreferrer">' . $after . '</a>' . ' &nbsp;';
                         }
                     }
                 }
@@ -231,7 +259,7 @@ if ( $boul1 ) { // histos web page construction
                         echo $short_histo_name . '<br>';
                         echo '<a href="' . $web_roots . '/valKS.php?actionFrom=' . $actionFrom . '&url=' . $picture_name;
                         echo '&curveChoice=' . $curveChoice . '&short_histo_name=' . $short_histo_name . '&cchoice=' . $cchoice;
-                        echo '">';
+                        echo '" target="_blank" rel="noopener noreferrer">';
                         echo '<img class="img" width="300" src="' . $picture_name . '" alt="" id="' . $short_histo_name . '_1"></a>';
                         $hiName = $short_histo_name;
                         echo '</td>';
@@ -243,7 +271,7 @@ if ( $boul1 ) { // histos web page construction
                         echo $short_histo_name . '<br>';
                         echo '<a href="' . $web_roots . '/valKS.php?actionFrom=' . $actionFrom . '&url=' . $picture_name;
                         echo '&curveChoice=' . $curveChoice . '&short_histo_name=' . $short_histo_name . '&cchoice=' . $cchoice;
-                        echo '">';
+                        echo '" target="_blank" rel="noopener noreferrer">';
                         echo '<img class="img" width="300" src="' . $picture_name . '" alt="" id="' . $short_histo_name . '_1"></a>';
                         $hiName = $short_histo_name;
                         echo '</td>';
@@ -352,7 +380,7 @@ else { // construction of folders list web page
     }*/
     if ( count($action_list) == 2) {
         echo '<h2><center><b>' . $action_list[1] . '</b></center></h2><br>';
-        echo '<b> ' . '<a href="' . $web_roots.'/index.php?action=/' . $action_list[0] . '">' . $action_list[0] . '</a></b>' . '<br>';//
+        echo '<b> ' . '<a href="' . $web_roots.'/index.php?action=/' . $action_list[0] . '" target="_blank" rel="noopener noreferrer">' . $action_list[0] . '</a></b>' . '<br>';//
     }
 
     echo '<table class="tab0">';
@@ -373,7 +401,7 @@ else { // construction of folders list web page
                         $new_path = $chemin_eos . '/' . $filename;
                         echo $new_path . '<br>' . "\n";
                         echo '<tr><td width="20%">';
-                        echo '<b><a href="' . $_SERVER[PHP_SELF] . '?actionFrom=' . $actionFrom . '/' . $filename . '">' . $filename . '</a></b>' . "\n";//
+                        echo '<b><a href="' . $_SERVER[PHP_SELF] . '?actionFrom=' . $actionFrom . '/' . $filename . '" target="_blank" rel="noopener noreferrer">' . $filename . '</a></b>' . "\n";//
                         echo '</td><td>';
                         echo @date('F d, Y, H:i:s', filemtime($new_path));
                         echo '</td></tr>';
@@ -383,7 +411,7 @@ else { // construction of folders list web page
                     $new_path = $chemin_eos . '/' . $filename;
                     echo $new_path . '<br>' . "\n";
                     echo '<tr><td width="20%">';
-                    echo '<b><a href="' . $_SERVER[PHP_SELF] . '?actionFrom=' . $actionFrom . '/' . $filename . '">' . $filename . '</a></b>' . "\n";//
+                    echo '<b><a href="' . $_SERVER[PHP_SELF] . '?actionFrom=' . $actionFrom . '/' . $filename . '" target="_blank" rel="noopener noreferrer">' . $filename . '</a></b>' . "\n";//
                     echo '</td><td>';
                     echo @date('F d, Y, H:i:s', filemtime($new_path));
                 echo '</td></tr>';/**/

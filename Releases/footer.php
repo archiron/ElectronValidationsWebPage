@@ -1,6 +1,6 @@
 <footer>
 
 <?php 
-    pageFooter($image_up, $previous_url, 'Back to top', 'Up to dataset choice');
+    pageFooter_V2($image_up, $previous_url, $l_actionFrom);
 ?>
 </footer>
