@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<?php
+// On génère un jeton aléatoire sécurisé (si ce n'est pas déjà fait)
+if (!isset($nonce)) {
+    $nonce = base64_encode(random_bytes(16));
+}
+?>
+
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://jquery.com;">
+<!--meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://jquery.com;"-->
 
 <title>Dev list webpage</title>
 <link rel="icon" type="image/x-icon" href="/validation/Electrons/img/filetype-root-256.ico"> 
-<link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/all.min.css">
-<link rel="stylesheet" href="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.css">
+<link rel="stylesheet" href="../css/styles.css">
 <script src="../js/jQuery-4.0.0/jquery.min.js"></script>
-<script src="../js/jQuery-4.0.0/jquery-ui-1.14.2/jquery-ui.min.js"></script>
 
 </head>
 
 <body>
 <?php
-    define('MAIN_INDEX_LOADED', true);
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+
+define('MAIN_INDEX_LOADED', true);
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
@@ -28,11 +36,22 @@
     ]);
     session_start();
 
+    // Autoriser uniquement /mon/chemin/index.php, rien d'autre
+    $allowed = '/validation/Electrons/Dev/indexNG.php';
+    $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhost'];
+
+    if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) !== $allowed || !empty($_GET)) {
+        http_response_code(404);
+        die();
+    }
+
     // --- SECURITY (Haut de page) ---
     require_once '../php_inc/security.inc.php';
     require_once '../php_inc/defaults.inc.php';
     require_once '../php_inc/sorties.inc.php';
     require_once '../php_inc/fonctions.inc.php';
+    require_once '../php_inc/pathAnalyze.inc.php';
+    require_once '../php_inc/init_vars.inc.php';
 
     // 1. Sanitization de l'URL avant toute utilisation
     $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
@@ -55,33 +74,24 @@
     $_REQUEST['short_histo_name'] = $short_histo_name;
     $_REQUEST['redirect'] = $url_safe;
 
-    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
-    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
-    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
-
-    // Suppression des caractères de contrôle (Header Injection)
-    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
-    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
-
-    // Reconstruction
-    $url = "//{$clean_host}{$clean_uri}";
+    $url = secureURL();
 
     // 2. Préparez la version échappée pour le HTML si nécessaire
     $url_html = htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-    $url_graph = explode('&', $url)[0];
-    $url_graph = str_replace('/indexNG.php?actionFrom=/', '/', $url_graph);
-    
     // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
-    $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
-    $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
+    /*
+        $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
+        $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
 
-    // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
-    $url_from_safe = cleanInput($clean_referer, 'url');
+        // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
+        $url_from_safe = cleanInput($clean_referer, 'url');
+    */
+    $url_safe = cleanReferer();
+    simPrintC('referer', $url_safe);
 
     // 3. Vérification CRITIQUE du domaine (Whitelist)
     // Empêche la redirection vers google.com, evil.com, etc.
-    $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhost'];
     $host = parse_url($url_from_safe, PHP_URL_HOST);
 
     if ($url_from_safe && !in_array($host, $allowed_hosts)) {
@@ -89,16 +99,322 @@
         $url_from_safe = ''; 
         // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/indexNG.php';
     }
-    //echo 'url from : ' . $url_from_safe;
 
 // --- END SECURITY ---
 
 ?>
-<div class="sticky">
-    <?php include('headerNG.php'); ?>
-</div>
 <main>
 <?php
+    $base_dir = __DIR__;
+    $web_roots = getRootPath($base_dir);
+    $chemin = $web_roots;
+
+    $url_tmp = explode('?', $url_from_safe)[0];
+    $url_tmp = end(explode('/', $url_tmp));
+ 
+    if ($url == '//cms-egamma.web.cern.ch/validation/Electrons/Releases/indexNG.php') {
+        session_unset(); // back to beginning & free $_SESSION
+    }
+    $fileName_0 = getFileName(session_id());
+    $fileName = $web_roots . "/" . $fileName_0;
+    $fileName_eos = str_replace($racine_html, $racine_eos, $fileName);
+    $classical_roots = htmlspecialchars( $web_roots, ENT_QUOTES, 'UTF-8' );
+    $classical_roots = str_replace("/indexNG.php?actionFrom=/", "/", $classical_roots);
+    $classical_path = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
+    $classical_path = str_replace("/indexNG.php?actionFrom=/", "/", $classical_path);
+    $previous_url = dirname($url);
+    
+    if ( !file_exists($fileName_eos) ) {
+        echo $file . " does not exist. Create it<br>\n";
+        fopen($fileName_eos, "w");
+    }
+
+    $url_http = 'https:' . $url;
+    $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
+
+    $_SESSION['url'] = $url_http;
+
+    $chemin = $chemin . '/' . $actionFrom;
+    $chemin_eos = str_replace($racine_html, $racine_eos, $chemin);
+    
+    $files = array_slice(scandir($chemin_eos), 2);
+    // Fill arrays with dirs & files
+    $allList = extractAllFolders($files);
+    $allKeys = array_keys($allList);
+    $dirsList_date = array_map(fn($t) => $chemin_eos . $t, $allKeys);
+    //prePrint('dirsList_date', $dirsList_date); // TEMP
+    //prePrint('all folders', $allList);
+    //prePrint('all Keys', $allKeys);
+    
+    $l_actionFrom = count(explode('/', $actionFrom));
+    simPrint('l actionFrom', $l_actionFrom);
+    if ($l_actionFrom == 4){
+        foreach ($dirsList as $key => $value)
+        {
+            if ( $value == "gifs" )
+            {
+                $pictsDir = True;
+                $pictsValue="gifs";
+                $pictsExt=".gif";
+                $allFormat+=1;
+            }
+            elseif ( $value == "pngs" ) // pbm : si le dernier repertoire est un png, ça zappe les gifs
+            {
+                $pictsDir = True;
+                $pictsValue="pngs";
+                $pictsExt=".png";
+                $allFormat+=1;
+            }
+        }
+    }
+    $allFormat = count($dirsList);
+    $boldFormat = '';
+    if (isset($_SESSION['pictFormat'])) {
+        if ($allFormat < 2) {
+            $_SESSION['pictFormat'] = 'gif';
+        }
+        $pictsValue=$_SESSION['pictFormat'] . "s";
+        $pictsExt="." . $_SESSION['pictFormat'];
+        $boldFormat = $_SESSION['pictFormat'][0];
+    }
+
+    foreach ($filesList as $key => $value)
+    {
+        if ( $value == "index.html" )
+        {
+            $indexHtml = True;
+        }
+        elseif ( $value == "definitions.txt" )
+        {
+            $indexHtml = True;
+        }
+        // test sur histosFile
+        elseif ((stristr($value, "ElectronMcFakeHistos") !== FALSE) and (stristr($value, ".txt") !== FALSE))
+        {
+            // ElectronMcFakeHistos.txt,
+            $histosFile = True;
+            $histosFileName = 'ElectronMcFakeHistos.txt';
+        }
+        elseif ((stristr($value, 'ElectronMcSignalHistos') !== FALSE) and (stristr($value, '.txt') !== FALSE))
+        {
+            // ElectronMcSignalHistosMiniAOD.txt,
+            // ElectronMcSignalHistos.txt,
+            // ElectronMcSignalHistosPt1000.txt
+            $histosFile = True;
+            $histosFileName = $value;
+        }
+        elseif ((stristr($value, 'config_target') !== FALSE) and (stristr($value, '.txt') !== FALSE))
+        {
+            // config_target.txt
+            $histosFile = True;
+            $histosFileName = $value;
+        }
+        elseif ((stristr($value, "HistosConfigFiles") !== FALSE) and (stristr($value, ".json") !== FALSE))
+        {
+            // HistosConfigFiles.json,
+            $jsonFile = True;
+            $histosFileNameJSON = $chemin_eos . "/HistosConfigFiles.json";
+            $data = file_get_contents($histosFileNameJSON);
+        }
+    }
+    
+    echo '<div class="sticky">';
+    include('headerNG.php');
+    echo '</div>';
+
+    // construction of folders list web page
+    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct">';
+
+    echo '<p>Here is the list of the 5 last releases candidates ';
+    usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
+    echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) .'</span> and <span class="blueClass">' . htmlspecialchars($dirsList_date[1]) .'</span></b> folders).</p>';//
+
+    echo '<table class="tab5 clickable folders">';
+    echo '<tr><td class="w-50pct">';
+    echo '<b>Last Release Candidates';
+    echo '</td><td class="w-50pct">';
+    echo '<b>Last Modified On ';
+    echo '</td></tr><tr>';
+
+    $i = 0;
+    echo '<td>' . "\n";
+    foreach($dirsList_date as $filename)
+    {
+        $firstChar = array_reverse(explode('/', $filename))[0][0];
+        if (is_numeric($firstChar)) {
+            if ( $i < 5 ) {
+                $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
+                if ( $i == 0 ) {
+                    echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
+                    }
+                elseif ( $i == 1 ) {
+                    echo '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b><br>';//
+                }
+                else {
+                    echo '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b><br>';//
+                }
+            }
+            $i++;
+        }
+    }
+    echo '</td><td>';
+    $i = 0;
+    foreach($dirsList_date as $filename)
+    {
+        if ( $i < 5 ) {
+            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
+        }
+        $i++;
+    }
+    echo '</td></tr></table>';
+    echo ' <br>';
+    echo ' <br>';
+echo '</div>'; // part1
+
+$tab_General = extractFolders4Accordion($allList);
+$tab_Keys = array_keys($tab_General);
+
+echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-54pct">';
+    echo '<p>List of all releases <br>';
+    echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';
+
+    echo '<div id="accordion">';
+        if ( count($tab_Keys) > 0 ) {
+            echo '<h3> General case level 0</h3>';
+            echo '<div>';
+            foreach($tab_General as $key => $value)
+            {
+                echo '<div class="cAccordion lv1">';//
+                    echo '<h3><b> ' . htmlspecialchars($key) . '</b> - Last : <span class="greenClass">' . $tab_General[$key][0] . ' level 1</span></h3>';
+                    echo '<div>';
+                    //displayReleaseDateTitle();
+                    foreach($tab_General[$key] as $key2 => $value2) {
+                        echo '<div class="cAccordion lv2">';
+                            //displayReleaseDate($key2, $chemin_eos);
+                            echo '<span class="ex2"><b>' . htmlspecialchars($key2) . ' level 2</b></span>'; // 
+                            echo '<div>';
+                            echo '<div class="cAccordion lv3">';
+                                foreach ($tab_General[$key][$key2] as $key3 => $value3) {
+                                    echo '<span class="ex2"><b>' . htmlspecialchars($key3) . ' level 3</b></span>'; //
+                                    echo '<div>';
+                                        echo '<table class="greenBorder1 tab5">';
+                                        foreach ($tab_General[$key][$key2][$key3] as $key4 => $value4) {
+                                            echo '<tr><td class="blueBorder1 p-5px">';
+                                            echo '<span class="ex2">' . htmlspecialchars($value4) . '</span>';
+                                            echo '</td></tr>';
+                                        }
+                                        echo '</table>';
+                                    echo '</div>';
+                                }
+                            echo '</div>';
+                            echo '</div>';
+                        echo '</div>';
+                        }
+                    echo '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+    echo '</div>';
+echo '</div>'; // fint div part3
+
+echo '<br><br><br>'. "\n";
+
+$action_tmp = substr($actionFrom,1);
+$action_list = explode("/", $action_tmp);
+if ( count($action_list) == 2) {
+    echo '<h2><center><b>' . $action_list[1] . '</b></center></h2><br>';
+}
+if (!(strpos($url, 'index') !== false)) {
+    echo ' <br><b><a href="'.$web_roots.'/indexNG.php">Roots</a></b>';
+    echo ' <br><br>';
+}
+if ( count($action_list) == 2) {
+    echo '<b>Up to release folder : </b>' . $_fDL;
+    echo '<b> ' . '<a href="' . $web_roots.'/indexNG.php?actionFrom=/' . $action_list[0] . '&cchoice=diff">' . $action_list[0] . '</a></b>' . '<br>';
+}
+
+/*echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">';
+if ($l_actionFrom == 1){
+    echo '<p>List of all releases <br>';
+    echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';//
+}
+if ( $actionFrom == '') {
+    //prePrint('others', $tab_Others); // TEMP
+    //prePrint('CMSSW', $tab_CMSSW); // TEMP
+    //prePrint('general', $tab_General); // TEMP
+
+    echo '<div id="accordion">';
+        if ( count($tab_Keys) > 0 ) {
+            echo '<h3> General case</h3>';
+            echo '<div>';
+            foreach($tab_General as $key => $value)
+            {
+                echo '<div class="cAccordion">';//
+                echo '<h3><b> ' . $key . '</b> - Last : <span class="greenClass">' . $tab_General[$key][0] . '</span></h3>';
+                echo '<div>';
+                displayReleaseDateTitle();
+                foreach($tab_General[$key] as $key2 => $value2) {
+                    displayReleaseLinkDate($value2, $chemin_eos, $web_roots, $actionFrom);
+                    }
+                echo '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+
+        if ( count($tab_CMSSW) > 0 ) {
+            echo '<h3> CMSSW case</h3>';
+            echo '<div>';
+            displayReleaseDateTitle();
+            foreach($tab_CMSSW as $item)
+            {
+                displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
+            }
+            echo '</div>';
+        }
+        
+        if ( count($tab_Others) > 0 ) {
+            echo '<h3> Others cases</h3>';
+            echo '<div>';
+            displayReleaseDateTitle();
+            foreach($tab_Others as $item)
+            {
+                displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
+            }
+            echo '</div>';
+        }
+    echo '</div>';
+}
+echo '</div>'; // part2*/
+
+// end of folders list web page construction
+
+
+if (array_key_exists('fileForHistos_eos', $_SESSION)) {
+    $file = $_SESSION['fileForHistos_eos'];
+    //simPrint("fileForHistos_eos", $file); 
+    if ( file_exists($file) ) {
+        $handleBasket = fopen($file, "r");
+        if ($handleBasket)
+        {
+            while(!feof($handleBasket))
+            {
+                $tmp = fgets($handleBasket);
+                $tmp = str_replace(array("\r", "\n"), '', $tmp);
+                $lineHisto1[] = $tmp;
+            }
+            fclose($handleBasket);
+        }
+        else {
+            simPrint("can not open", $file);
+        }
+    }
+    else {
+        echo $file . " does not exist. Create it<br>\n";
+        fopen($file, "w");
+    }
+}
 
 if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 {
@@ -316,220 +632,10 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     echo '</div>';
 
 } // end of web page construction of histos
-else { // construction of folders list web page
-    echo '<div id="part1" class="parent blueBorder0 CtextAlign w-45pct fl-left">';
-    $temp = substr($web_roots,6) . "/indexNG.php";
-    if ( $actionFrom != '') {
-        echo '<br>';
-        echo '<b>Release candidate : </b>';
-        echo '<span class="blueClass"><b>' . $action_list[0] . '</b></span>';
-        echo '<br><br>';
-        
-        echo '<table class="tab0">';
-        echo '<tr><td class="w-50pct">';
-        echo '<b>Release references</b>';
-        echo '</td><td>';
-        echo '<b>Last Modified On </b>';
-        echo '</td></tr>';
-
-        usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-        foreach($dirsList_date as $filename)
-        {
-            if ( $choiceValue != '' ) {
-                if ( stristr($filename, $choiceValue) != FALSE ) {
-                    $new_path = $filename;
-                    echo '<tr><td class="w-50pct">';
-                    echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
-                    echo '</td><td>';
-                    echo @date('F d, Y, H:i:s', filemtime($new_path));
-                    echo '</td></tr>';
-                }
-            }
-            else {
-                $new_path = $filename;
-                echo '<tr><td class="w-20pct">';
-                echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
-                echo '</td><td>';
-                echo @date('F d, Y, H:i:s', filemtime($new_path));
-                echo '</td></tr>';
-            }
-        }
-        echo  '</table>';
-    }
-    else {
-            echo '<p>List of the 5 last releases candidates ';
-            usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-            echo '( here <b><span class="redClass">' . $dirsList_date[0] .'</span> and <span class="blueClass">' . $dirsList_date[1] .'</span></b> folders).</p>';//
-
-            echo '<table class="tab5 clickable folders">';
-            echo '<tr><td class="w-50pct">';
-            echo '<b>Last release candidates';
-            echo '</td><td class="w-50pct">';
-            echo '<b>Last Modified On ';
-            echo '</td></tr><tr>';
-        
-            $i = 0;
-            echo '<td>' . "\n";
-            foreach($dirsList_date as $filename)
-            {
-                if ( $i < 5 ) {
-                    $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
-                    if ( $i == 0 ) {
-                        echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
-                        }
-                    elseif ( $i ==1 ) {
-                        echo '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b><br>';//
-                    }
-                    else {
-                        echo '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b><br>';//
-                    }
-                }
-                $i++;
-            }
-            echo '</td><td>';
-            $i = 0;
-            foreach($dirsList_date as $filename)
-            {
-                if ( $i < 5 ) {
-                    echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
-                }
-                $i++;
-            }
-            echo '</td></tr></table>';
-            echo ' <br>';
-            echo ' <br>';
-        //}
-    }
-    echo '</div>'; // part1
-
-    $action_tmp = substr($actionFrom,1);
-    $action_list = explode("/", $action_tmp);
-    if ( count($action_list) == 2) {
-        echo '<h2><center><b>' . $action_list[1] . '</b></center></h2><br>';
-
-    }
-    if (!(strpos($url, 'index') !== false)) {
-        echo ' <br><b><a href="'.$web_roots.'/indexNG.php">Roots</a></b>';
-        echo ' <br><br>';
-    }
-    if ( count($action_list) == 2) {
-        echo '<b>Up to release folder : </b><br>';
-        echo '<b> ' . '<a href="' . $web_roots.'/indexNG.php?actionFrom=/' . $action_list[0] . '&cchoice=diff">' . $action_list[0] . '</a></b>' . '<br>';
-    }
-
-    //echo '<br>';
-    echo '<div id="part2" class="parent greenBorder0class="w-54pct CtextAlign fl-right">';
-    if ($l_actionFrom == 1){
-        echo '<p>List of all releases ' . '<br>';
-        echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';//
-    }
-    if ( $actionFrom == '') {
-        $tab_Others = array();
-        $tab_CMSSW = array();
-        $tab_General = array();
-        $tab_Keys = array();
-        foreach($dirsList_date as $filename_0)
-        {
-            $filename = getPathPiece($filename_0);
-            if ( $choiceValue != '' ) {
-                if ( stristr($filename, $choiceValue) != FALSE ) {
-                    $nom = explode('_', $filename);
-                    $nom_0 = $nom[0];
-                    $long = count($nom);
-                    if ( $long == 1) {
-                        $tab_Others[] = $filename;
-                    }
-                    else {
-                        if ($nom_0 == 'CMSSW') {
-                            $tab_CMSSW[] = $filename;
-                        }
-                        else {
-                            if (is_numeric($nom_0[0])) {
-                                $tab_General[$nom_0][] = $filename;
-                            }
-                            else {
-                                $tab_Others[] = $filename;
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                $nom = explode('_', $filename);
-                $nom_0 = $nom[0];
-                $long = count($nom);
-                if ( $long == 1) {
-                    $tab_Others[] = $filename;
-                }
-                else {
-                    if ($nom_0 == 'CMSSW') {
-                        $tab_CMSSW[] = $filename;
-                    }
-                    else {
-                        if (is_numeric($nom_0[0])) {
-                            $tab_General[$nom_0][] = $filename;
-                        }
-                        else {
-                            $tab_Others[] = $filename;
-                        }
-                    }
-                }
-            }
-        }
-        foreach($tab_General as $key => $value)
-        {
-            $tab_Keys[] = $key;
-        }
-
-        echo '<div id="accordion">';
-            if ( count($tab_Keys) > 0 ) {
-                echo '<h3> General case</h3>';
-                echo '<div>';
-                foreach($tab_General as $key => $value)
-                {
-                    echo '<div class="cAccordion">';//
-                    echo '<h3><b> ' . $key . '</b> - Last : <span class="greenClass">' . $tab_General[$key][0] . '</span></h3>';
-                    echo '<div>';
-                    displayReleaseDateTitle();
-                    foreach($tab_General[$key] as $key2 => $value2) {
-                        displayReleaseLinkDate($value2, $chemin_eos, $web_roots, $actionFrom);
-                        }
-                    echo '</div>';
-                    echo '</div>';
-                }
-                echo '</div>';
-            }
-
-            if ( count($tab_CMSSW) > 0 ) {
-                echo '<h3> CMSSW case</h3>';
-                echo '<div>';
-                displayReleaseDateTitle();
-                foreach($tab_CMSSW as $item)
-                {
-                    displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
-                }
-                echo '</div>';
-            }
-            
-            if ( count($tab_Others) > 0 ) {
-                echo '<h3> Others cases</h3>';
-                echo '<div>';
-                displayReleaseDateTitle();
-                foreach($tab_Others as $item)
-                {
-                    displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
-                }
-                echo '</div>';
-            }
-        echo '</div>';
-    }
-    echo '</div>'; // part2
-
-} // end of folders list web page construction
 
 ?>
 
-<script>
+<script nonce="<?php echo $nonce; ?>"> // transfert
     var text_values = <?php echo json_encode($textValues);  ?>;
     var lineHisto1 = <?php echo json_encode($lineHisto1);  ?>;
     var url = <?php echo json_encode($url); ?>;
@@ -545,50 +651,58 @@ else { // construction of folders list web page
     var Transf = <?php echo json_encode($Transf); ?>;
 </script>
 
-<script>
-$(document).ready(function() {
-    var userName = "Guest"; // Donnée à sécuriser
-    var message = "Welcome on Dev site, " + userName + " ! Please click to access content.";
+<script nonce="<?php echo $nonce; ?>"> // accordéon
+// --- Niveau 0 : ferme tout avant de se fermer ---
+const h0 = document.querySelector('#accordion > h3');
+if (h0) {
+    h0.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const content = h0.nextElementSibling;
+        const isOpen = content.classList.contains('open');
 
-    // SÉCURISÉ : Neutralise les injections de code
-    $("#welcome-text").text(message);
-    
-    // 1. Bloque le défilement de la page en arrière-plan
-    $("body").css("overflow", "hidden");
+        if (isOpen) {
+            content.querySelectorAll('div.open').forEach(c => {
+                c.classList.remove('open');
+                c.previousElementSibling.classList.remove('active');
+            });
+        }
 
-    // 2. Affiche l'arrière-plan et la modale de façon fluide
-    $("#modal-overlay").fadeIn(300);
+        content.classList.toggle('open');
+        h0.classList.toggle('active');
+    });
+}
 
-    // 3. Déblocage uniquement lors du clic sur le bouton
-    $("#close-btn").on("click", function() {
-        $("#modal-overlay").fadeOut(200, function() {
-            // Réactive le défilement du site une fois fermée
-            $("body").css("overflow", "auto"); 
-        });
+// --- Niveaux 1-3 : toggle + fermeture des frères ---
+document.querySelectorAll('.cAccordion span.ex2, .cAccordion h3').forEach(el => {
+    // Skip le niveau 0 (géré séparément)
+    if (el.parentElement && el.parentElement.id === 'accordion') return;
+
+    const content = el.nextElementSibling;
+    if (!content || content.tagName !== 'DIV') return;
+
+    el.style.cursor = 'pointer';
+
+    el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = content.classList.contains('open');
+        const cAccordion = el.closest('.cAccordion');
+        const container = cAccordion.parentElement;
+
+        container.querySelectorAll(':scope > .cAccordion > span.ex2 + div.open, :scope > .cAccordion > h3 + div.open')
+            .forEach(c => {
+                c.classList.remove('open');
+                c.previousElementSibling.classList.remove('active');
+            });
+
+        if (!isOpen) {
+            content.classList.add('open');
+            el.classList.add('active');
+        }
     });
 });
 </script>
 
-<script>
-    // jQuery
-    $('#accordion').accordion({
-        active: false,
-        collapsible: true,
-        heightStyle: "content"
-    });
-    $('.cAccordion').accordion({
-        active: false,
-        collapsible: true,
-        heightStyle: "content"
-    });
-    $('#accordionHeader').accordion({
-        active: false,
-        collapsible: true,
-        heightStyle: "content",
-    });
-</script>
-
-<script> // addLink
+<script nonce="<?php echo $nonce; ?>"> // addLink
     $(document).ready(function(){
         // la class clickable est appliquée à tous les table qui auront des "boutons"
         $('table.clickable td').on('click', checkAddLink );
@@ -865,7 +979,7 @@ $(document).ready(function() {
     }
 </script>
 
-<script> // gotoHisto
+<script nonce="<?php echo $nonce; ?>"> // gotoHisto
     function goToHisto(valeur) {
         //console.log('goToHisto ' )
         console.log('valeur='+valeur)
@@ -895,7 +1009,7 @@ $(document).ready(function() {
     }
 </script>
 
-<script> // gotoTable
+<script nonce="<?php echo $nonce; ?>"> // gotoTable
     function goToTable(valeur) {
         console.log('goToTable ' )
         $('div.cell img.image.img').each(function(index, elt) {
@@ -906,7 +1020,7 @@ $(document).ready(function() {
     }
 </script>
 
-<script> // KS click
+<script nonce="<?php echo $nonce; ?>"> // KS click
     function KS_Evclick() {
         console.log(Transf)
         var transfert = {run: Transf[0], operation: Transf[1], dataSet: Transf[2], precision: Transf[3], buttons: ''};
