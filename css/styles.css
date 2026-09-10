@@ -179,6 +179,9 @@ footer {
 .blackBorder1 {
   border: 1px solid black !important;
 }
+.blackBorder2 {
+  border: 2px solid black !important;
+}
 .blueBorder0 {
   border: 0px solid blue !important;
 }
@@ -191,6 +194,9 @@ footer {
 .greenBorder0 {
   border: 0px solid green !important;
 }
+.greenBorder1 {
+  border: 1px solid green !important;
+}
 .redBorder2 {
   border: 2px solid red !important;
 }
@@ -202,6 +208,12 @@ footer {
 }
 .color1Border0 {
   border:0px solid #008000 !important;
+}
+.bgGreen {
+  background-color: green;
+}
+.bgGrey {
+  background-color: grey;
 }
 .button {
   border: none;
@@ -242,7 +254,7 @@ table.tab5 {
   padding: 5px;
   width: 100%;
   border: 1px solid #008000;
-  /*border-collapse: collapse;*/
+  border-collapse: collapse;
 }
 table.tab6 {
   width: 100%;
@@ -441,6 +453,7 @@ div.ex1 {
 }
 div.ex2 {
   width: 100%;
+  box-sizing: border-box;  /* ← le border est inclus dans les 100% */
   margin: auto;
   border: 3px solid #73AD21;
 }
@@ -448,25 +461,8 @@ span.ex1 {
   display: inline-block;
   width: 25%;
 }
-
-.ui-accordion-content-active {
-    padding: 0 !important;
-    border-style: none;
-    background-color: transparent;
-    background-image: none;
-}
-.ui-widget_content {
-    color: #ffcc00; /*lightgreen*/
-    background: lightgreen;
-}
-
-.ui-state_active {
-  border: 2px solid #008000;
-  background: #008000;
-}
-.ui-state_default {
-  color: #ffcc00; /*lightgreen*/
-  background: lightgreen;
+span.ex2 {
+  display: inline-block;
 }
 
 .navbar {
@@ -525,5 +521,80 @@ span.ex1 {
 
 .subnav:hover .subnav-content {
   display: block;
+}
+
+/* Niveau 0 */
+#accordion > h3 {
+    background: #d6eaf8;
+    color: #1a5276;
+}
+
+/* Niveau 1 */
+.cAccordion.lv1 > span,
+.cAccordion.lv1 > h3 {
+    color: #1a5276;  /* bleu foncé */
+    background: #d6eaf8;
+}
+
+/* Niveau 2 */
+.cAccordion.lv2 > span.ex2 {
+    color: #1e8449;  /* vert */
+    background: #d5f5e3;
+    display: block;
+    width: 100%;
+}
+
+/* Niveau 3 */
+.cAccordion.lv3 > span.ex2 {
+    color: #7d3c98;  /* violet */
+    background: #e8daef;
+    display: block;
+    width: 100%;
+}
+h3.ex2 {
+    display: block;
+    cursor: pointer;
+    margin: 0;
+    padding: 8px 12px;
+    font-size: 1em;
+}
+span.ex2 {
+    display: inline-block;
+}
+
+.cAccordion span.ex2 + div,
+.cAccordion h3 + div { display: none; }
+#accordion h3 + div { display: none; }
+
+.cAccordion span.ex2 + div.open,
+.cAccordion h3 + div.open { display: block; }
+#accordion h3 + div.open { display: block; }
+
+#accordion > h3,
+.cAccordion.lv1 > h3,
+.cAccordion.lv2 > span.ex2,
+.cAccordion.lv3 > span.ex2 {
+    font-size: 1.1em;
+}
+
+/* Effet hover */
+.cAccordion > h3:hover,
+.cAccordion > span.ex2:hover {
+    opacity: 0.85;
+}
+
+/* État actif (ouvert) */
+.cAccordion > h3.active,
+.cAccordion > span.ex2.active {
+    font-weight: bold;
+}
+.cAccordion.lv2 {
+    padding: 6px 0;
+}
+.cAccordion.lv3 {
+    padding: 5px 0;
+}
+.cAccordion.lv2 > span.ex2 {
+    padding: 10px 12px;
 }
 

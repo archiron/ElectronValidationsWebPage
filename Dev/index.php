@@ -9,7 +9,7 @@ if (!isset($nonce)) {
 ?>
 
 <head>
-<meta charset="UTF-8" >
+<meta charset="UTF-8">
 <!--meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>' https://jquery.com; style-src 'self' 'nonce-<?php echo $nonce; ?>';" -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>' https://jquery.com; style-src 'self' 'unsafe-inline';">
 
@@ -249,11 +249,10 @@ else { // construction of folders list web page
     else {
             echo '<p>List of the 5 last releases candidates ';
             usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-            //prePrint('dirList', $dirsList_date);
             echo '( here <b><span class="redClass">' . $dirsList_date[0] .'</span> and <span class="blueClass">' . $dirsList_date[1] .'</span></b> folders).</p>';//
 
             echo '<table class="tab5 clickable folders">';
-            echo '<tr><td width="50%">';
+            echo '<tr><td class="w-50pct">';
             echo '<b>Last release candidates';
             echo '</td><td class="w-50pct">';
             echo '<b>Last Modified On ';

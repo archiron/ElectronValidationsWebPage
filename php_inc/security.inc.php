@@ -83,4 +83,26 @@ function securePath($chemin) {
     return $tmp;
 }
 
+function secureURL(): string {
+    // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
+    $raw_host = $_SERVER['HTTP_HOST'] ?? '';
+    $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    // Suppression des caractères de contrôle (Header Injection)
+    $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
+    $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+
+    // Reconstruction
+    return "//{$clean_host}{$clean_uri}";
+}
+
+function cleanReferer() {
+    // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
+    $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
+
+    // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
+    return cleanInput($clean_referer, 'url');
+}
+
 ?>

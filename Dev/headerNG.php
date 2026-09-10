@@ -1,183 +1,15 @@
 <header>
-    <script nonce="<?php echo $nonce; ?>">
-        // introduced to correct the "old" access with action instead of actionFrom.
-        var url = window.location.href;
-        if (url.includes('/indexNG.php?action=/')) {
-            var url = url.replace('/indexNG.php?action=/', '/indexNG.php?actionFrom=/');
-            window.location.href = url;
-        }
-    </script>
 
     <?php
-    $base_dir = __DIR__;
-    $web_roots = getRootPath($base_dir);
-    
-    $chemin = $web_roots;
-    //simPrintC('chemin', $chemin);
-
-    $url_tmp = explode('?', $url_from_safe)[0];
-    $url_tmp = end(explode('/', $url_tmp));
-    $url_flag = false;
-    if ($url_tmp == 'basket.php') {
-        $url_flag = true;
-    }
- 
-    $histoSize = 440; // 200 440
-    //simPrint('histo size', $histoSize);
-    if ($url == '//cms-egamma.web.cern.ch/validation/Electrons/Releases/indexNG.php') {
-        session_unset(); // back to beginning & free $_SESSION
-    }
-    $fileName_0 = getFileName(session_id());
-    $fileName = $web_roots . "/" . $fileName_0;
-    $fileName_eos = str_replace($racine_html, $racine_eos, $fileName);
-    $_SESSION['localFileForHistos_eos'] = $fileName_eos;
-    $_SESSION['fileForHistos_eos'] = $_SESSION['localFileForHistos_eos'];
-    $classical_roots = htmlspecialchars( $web_roots, ENT_QUOTES, 'UTF-8' );
-    $classical_roots = str_replace("/indexNG.php?actionFrom=/", "/", $classical_roots);
-    $classical_path = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
-    $classical_path = str_replace("/indexNG.php?actionFrom=/", "/", $classical_path);
-    $previous_url = dirname($url);
-    
-    if ( !file_exists($fileName_eos) ) {
-        //echo $file . " does not exist. Create it<br>\n";
-        fopen($fileName_eos, "w");
-    }
-
-    $dirsList = array();
-    $dirsList_date = array(); // AC
-    $filesList = array();
-    $lineHisto1 = array();
-    $pictsDir=False;
-    $pictsValue="gifs"; // default
-    $pictsExt=".gif"; // default
-    $indexHtml=False;
-    $histosFile=False;
-    $choiceValue='';
-    $basket='';
-    $fileForHistos='';
-    $curveChoice='';
-    $sharedF='';
-    $short_histo_name='';
-    
-    if ($cchoice == '') {
-        $cchoice = "diff";
-    }
-
-    $url_http = 'https:' . $url;
-    $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
-    $escaped_url = str_replace("/indexNG.php?actionFrom=/", "/", $escaped_url);
-    $escaped_url = str_replace("&amp;cchoice=diff", "", $escaped_url);
-    $escaped_url = str_replace("&amp;cchoice=pValue", "", $escaped_url);
-
-    $_SESSION['url'] = $url_http;
-
-    $chemin = $chemin . '/' . $actionFrom;
-    $chemin_eos=str_replace($racine_html, $racine_eos, $chemin);
-    
-    $files = array_slice(scandir($chemin_eos), 2);
-    
-    // Fill arrays with dirs & files
-    foreach ($files as $key => $value)
-    {
-        if (is_dir($chemin_eos . DIRECTORY_SEPARATOR . $value))
-        {
-            $dirsList[] = $value;
-            if ( substr($value, 0, 5) !== '.sys.') {
-                $dirsList_date[] = $chemin_eos . DIRECTORY_SEPARATOR . $value;//
-            }
-        }
-        elseif (is_file($chemin_eos . DIRECTORY_SEPARATOR . $value))
-        {
-            $filesList[] = $value;
-        }
-        else
-        {
-            simPrint("unknown type :", $value);
-        }
-    }
-    
-    //prePrint('actionFrom', explode('/', $actionFrom));
-    $l_actionFrom = count(explode('/', $actionFrom));
-    //simPrint('l actionFrom', $l_actionFrom);
-    if ($l_actionFrom == 4){
-        foreach ($dirsList as $key => $value)
-        {
-            if ( $value == "gifs" )
-            {
-                $pictsDir = True;
-                $pictsValue="gifs";
-                $pictsExt=".gif";
-                $allFormat+=1;
-            }
-            elseif ( $value == "pngs" ) // pbm : si le dernier repertoire est un png, ça zappe les gifs
-            {
-                $pictsDir = True;
-                $pictsValue="pngs";
-                $pictsExt=".png";
-                $allFormat+=1;
-            }
-        }
-    }
-    $allFormat = count($dirsList);
-    $boldFormat = '';
-    if (isset($_SESSION['pictFormat'])) {
-        if ($allFormat < 2) {
-            $_SESSION['pictFormat'] = 'gif';
-        }
-        $pictsValue=$_SESSION['pictFormat'] . "s";
-        $pictsExt="." . $_SESSION['pictFormat'];
-        $boldFormat = $_SESSION['pictFormat'][0];
-    }
-
-    foreach ($filesList as $key => $value)
-    {
-        if ( $value == "index.html" )
-        {
-            $indexHtml = True;
-        }
-        elseif ( $value == "definitions.txt" )
-        {
-            $indexHtml = True;
-        }
-        // test sur histosFile
-        elseif ((stristr($value, "ElectronMcFakeHistos") !== FALSE) and (stristr($value, ".txt") !== FALSE))
-        {
-            // ElectronMcFakeHistos.txt,
-            $histosFile = True;
-            $histosFileName = 'ElectronMcFakeHistos.txt';
-        }
-        elseif ((stristr($value, 'ElectronMcSignalHistos') !== FALSE) and (stristr($value, '.txt') !== FALSE))
-        {
-            // ElectronMcSignalHistosMiniAOD.txt,
-            // ElectronMcSignalHistos.txt,
-            // ElectronMcSignalHistosPt1000.txt
-            $histosFile = True;
-            $histosFileName = $value;
-        }
-        elseif ((stristr($value, 'config_target') !== FALSE) and (stristr($value, '.txt') !== FALSE))
-        {
-            // config_target.txt
-            $histosFile = True;
-            $histosFileName = $value;
-        }
-        elseif ((stristr($value, "HistosConfigFiles") !== FALSE) and (stristr($value, ".json") !== FALSE))
-        {
-            // HistosConfigFiles.json,
-            $jsonFile = True;
-            $histosFileNameJSON = $chemin_eos . "/HistosConfigFiles.json";
-            $data = file_get_contents($histosFileNameJSON);
-        }
-    }
-    
     echo '<table class="tab0">';
     echo '<tr class="ValidationsMenu">';
     echo '<td class="w-25pct">';
     writeHeaderMenu();
     echo '</td>';
     echo '<th class="redClass">';
-    echo '<b>electron validation: signal</b>';
+    echo '<b>electron validation: signal NG</b>';
     echo '</th>';
-    echo '<td class="w-25pct" class="CtextAlign MtextAlign" >';
+    echo '<td class="CtextAlign w-25pct MtextAlign" >';
     writeHeaderLinks($base_dir, $url);
     echo '</td>';
     echo '<td class="RtextAlign MtextAlign">';
@@ -206,7 +38,7 @@
         }
     }
     echo '</td>';
-    echo '<td align="right">';
+    echo '<td class="RtextAlign">';
     if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     {    
         echo '<table border="1" class="clickable addLink w-150px">'; // Unselect All table
@@ -367,7 +199,7 @@
         }
 
     echo '</td>';
-    echo '<td align="center">';
+    echo '<td class="CtextAlign">';
     $diffMaxTag = true;
     if ((mb_substr($lineRead8_1, 0, -1) === 'RECO') && (mb_substr($lineRead9_1, 0, -1) === 'RECO')) {// && ($tmp_01[1] === 'RelValZEE_14')
         $diffMaxTag = True;
@@ -463,31 +295,6 @@ echo '<td>';
     echo '</td>';
     echo '</tr>';
     echo '</table>';
-
-    if (array_key_exists('fileForHistos_eos', $_SESSION)) {
-        $file = $_SESSION['fileForHistos_eos'];
-        //simPrint("fileForHistos_eos", $file); 
-        if ( file_exists($file) ) {
-            $handleBasket = fopen($file, "r");
-            if ($handleBasket)
-            {
-                while(!feof($handleBasket))
-                {
-                    $tmp = fgets($handleBasket);
-                    $tmp = str_replace(array("\r", "\n"), '', $tmp);
-                    $lineHisto1[] = $tmp;
-                }
-                fclose($handleBasket);
-            }
-            else {
-                simPrint("can not open", $file);
-            }
-        }
-        else {
-            echo $file . " does not exist. Create it<br>\n";
-            fopen($file, "w");
-        }
-    }
 
 ?>
 </header>

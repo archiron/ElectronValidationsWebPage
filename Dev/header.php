@@ -465,7 +465,7 @@
         else {
             if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_1.png')) {
                 echo '<a href="' . $pict_name1 . '">';
-                echo '<img class="image img blueBorder2 w-150 px" src="' . $pict_name1 . '" alt="" ></a>';
+                echo '<img class="image img blueBorder2 w-150px" src="' . $pict_name1 . '" alt="" ></a>';
             }
             if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_2.png')) {
                 echo '<a href="' . $pict_name2 . '">';

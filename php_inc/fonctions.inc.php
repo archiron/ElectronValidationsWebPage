@@ -629,7 +629,17 @@ function displayReleaseDateTitle() {
     echo'</span><br>';
 }
 
-function displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom) {
+function displayReleaseDate(string $item, string $chemin_eos) {
+    $new_path = $chemin_eos . '/' . $item;
+    echo '<span class="ex1">';
+    echo '<b>' . $item . '</b>' . "\n";
+    echo'</span>';
+    echo '<span class="ex1">';
+    echo @date('F d, Y, H:i:s', filemtime($new_path));
+    echo'</span><br>';
+}
+
+function displayReleaseLinkDate(string $item, string $chemin_eos, string $web_roots, string $actionFrom) {
     $new_path = $chemin_eos . '/' . $item;
     echo '<span class="ex1">';
     echo '<b><a href="' . $web_roots . '/index.php?actionFrom=' . $actionFrom . '/' . $item . '&cchoice=diff">' . $item . '</a></b>' . "\n";
@@ -639,7 +649,7 @@ function displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom) {
     echo'</span><br>';
 }
 
-function displayVariablesValues($url, $actionFrom, $cchoice, $basket, $fileForHistos, $curveChoice, $sharedF, $short_histo_name) {
+function displayVariablesValues(string $url, string $actionFrom, $cchoice, $basket, $fileForHistos, $curveChoice, $sharedF, string $short_histo_name) {
     echo "<br>";
     echo '<p>variables values</p>';
     echo '<span class="blueClass Gras" valInfo="t11">url = </span><span>' . $url . '</span><br>';
@@ -918,13 +928,13 @@ function displayAllHistos_2($histoArray, $clefs, $lineHisto1, $escaped_url, $pic
     echo '<br><br>';
 }
 
-function getNonEmptyKeysNumber($arr) {
+function getNonEmptyKeysNumber(array $arr) {
     $count = count(array_filter($arr, function($value) {
         return $value !== '';
     }));
     return $count;
 }
-function displayIsset($arr) { // display a list of isset variables set as a dictionnary
+function displayIsset(array $arr) { // display a list of isset variables set as a dictionnary
     $count = getNonEmptyKeysNumber($arr);
     if ($count > 0) {
         echo '<b><span class="redClass">Display ISSET variables : </span></b><br>';
