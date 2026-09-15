@@ -1,46 +1,17 @@
 <?php
 
-function extracFolder1(array $tab, string $chemin) : array {
+function extractAllPaths(array $tab) : array { // rien
     $t2 = [];  // chemins complets (sans .sys.)
 
-    foreach ($tab as $value)
-    {
-        $full = $chemin . '/' . $value;
-        if (is_dir($full))
-        {
-            if ( substr($value, 0, 5) !== '.sys.') {
-                $t2[] = $full;
+    foreach ($tab as $key0 => $value0) { // level 0
+        foreach ($value0 as $key1 => $value1) { // level 1
+            $path1 = $key0 . '/' . $key1;
+            foreach ($value1 as $value2) { // level 2
+                $t2[$key0][] = $path1 . '/' . $value2;
             }
         }
     }
     return array($t2);
-}
-
-function extractFilesFolders(array $tab, string $chemin) : array {
-    $t1 = [];  // noms de dossiers
-    $t2 = [];  // chemins complets (sans .sys.)
-    $t3 = [];  // noms de fichiers
-
-    foreach ($tab as $value)
-    {
-        $full = $chemin . '/' . $value;
-        if (is_dir($full))
-        {
-            $t1[] = $value;
-            if ( substr($value, 0, 5) !== '.sys.') {
-                $t2[] = $full;//
-            }
-        }
-        elseif (is_file($full))
-        {
-            $t3[] = $value;
-        }
-        else
-        {
-            simPrint("unknown type :", $value);
-        }
-    }
-    return array($t1, $t2, $t3);
 }
 
 function extractFolders4Accordion(array $tab) : array {

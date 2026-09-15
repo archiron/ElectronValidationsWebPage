@@ -208,6 +208,9 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 else { // construction of folders list web page
     echo '<div id="part1" class="parent blueBorder0 CtextAlign w-45pct fl-left">';
     $temp = substr($web_roots,6) . "/index.php";
+    $actionFrom = cleanInput_V2($_GET['actionFrom'] ?? '', true);
+    $filename   = cleanInput_V2($_GET['filename'] ?? '', true);
+
 
     if ( $actionFrom != '') {
         echo '<br>';
@@ -229,7 +232,8 @@ else { // construction of folders list web page
                 if ( stristr($filename, $choiceValue) != FALSE ) {
                     $new_path = $filename;
                     echo '<tr><td class="w-50pct">';
-                    echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
+                    //echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
+                    echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8') . '</a></b>' . "\n";
                     echo '</td><td>';
                     echo @date('F d, Y, H:i:s', filemtime($new_path));
                     echo '</td></tr>';
@@ -238,7 +242,8 @@ else { // construction of folders list web page
             else {
                 $new_path = $filename;
                 echo '<tr><td class="w-20pct">';
-                echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
+                //echo '<b><a href="' . dirname($_SERVER['PHP_SELF']) . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . getPathPiece($filename) . '</a></b>' . "\n";
+                echo '<b><a href="' . $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff">' . htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8') . '</a></b>' . "\n";
                 echo '</td><td>';
                 echo @date('F d, Y, H:i:s', filemtime($new_path));
                 echo '</td></tr>';
@@ -265,7 +270,7 @@ else { // construction of folders list web page
                 $firstChar = array_reverse(explode('/', $filename))[0][0];
                 if (is_numeric($firstChar)) {
                     if ( $i < 5 ) {
-                        $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
+                        $link1 = $_SERVER['PHP_SELF'] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
                         if ( $i == 0 ) {
                             echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
                             }

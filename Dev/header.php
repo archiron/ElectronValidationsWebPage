@@ -32,8 +32,6 @@
     //simPrintC('chemin', $chemin);
     $displayPaths = '';
     
-    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
-    //simPrintC('url avant ', $url);
     // 1. SÉCURISATION DE L'URL COURANTE (À placer ici)
     $raw_host = $_SERVER['HTTP_HOST'] ?? '';
     $raw_uri = $_SERVER['REQUEST_URI'] ?? '';
@@ -41,23 +39,17 @@
     // Suppression des caractères de contrôle (Header Injection)
     $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
     $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+    enforceCleanUri();
 
     // Reconstruction
-    $url = "//{$clean_host}{$clean_uri}"; 
+    $url = "//{$clean_host}{$clean_uri}";
 
     // 2. Préparez la version échappée pour le HTML si nécessaire
     $url_html = htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-    //$url =  "//{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}"; // url of the folder in order to use without index.php
-    //simPrintC('url ', $url);
-
     $url_graph = explode('&', $url)[0];
     $url_graph = str_replace('/index.php?actionFrom=/', '/', $url_graph);
-    //simPrintC('url graph', $url_graph);
     
-    //prePrint('url', parse_url($url));
-    //$url_from = $_SERVER['HTTP_REFERER'];
-    //simPrintC('url from', $url_from);
     // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
     $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
     $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
@@ -75,7 +67,6 @@
         $url_from_safe = ''; 
         // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/index.php';
     }
-    //simPrintC('url from', $url_from_safe);
 
     $url_tmp = explode('?', $url_from_safe)[0];
     $url_tmp = end(explode('/', $url_tmp));
@@ -100,6 +91,7 @@
     $_SESSION['fileForHistos_eos'] = $_SESSION['localFileForHistos_eos'];
     $classical_path = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
     $classical_path = str_replace("/index.php?actionFrom=/", "/", $classical_path);
+    //echo '======= ' . $url . ' =======' . $_fDL;
     $previous_url = dirname($url);
     $displayPaths .= '<span class="blueClass Gras" >classical_path = </span><span>' . $classical_path . '</span><br>';
     
@@ -135,14 +127,15 @@
         $cchoice = "diff";
     }
 
+    simPrintC("url : ", $url);
     $url_http = 'https:' . $url;
     $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
     $escaped_url = str_replace("/index.php?actionFrom=/", "/", $escaped_url);
-    //simPrintC("escap : ", $escaped_url);
+    simPrintC("escap : ", $escaped_url);
     $escaped_url = str_replace("&amp;cchoice=diff", "", $escaped_url);
     $escaped_url = str_replace("&amp;cchoice=pValue", "", $escaped_url);
     $escaped_url = explode('&', $escaped_url)[0];
-    //simPrintC('escaped_url', $escaped_url);
+    simPrintC('escaped_url', $escaped_url);
     $displayPaths .= '<span class="blueClass Gras" >escaped_url = </span><span>' . $escaped_url . '</span><br>';
 
     $_SESSION['url'] = $url_http;
@@ -580,9 +573,7 @@
     echo '<td class="LtextAlign MtextAlign color1Border0">';
     echo '<span valInfo="t13"></span>';
     echo '</td>';
-    echo '<td class="LtextAlign MtextAlign">';
-    echo '<a href="https:'.str_replace("index.php", "index2.php", $url).'">New form</a>';
-    echo '</td></tr>';
+    echo '</tr>';
 
     echo '</table>';
 

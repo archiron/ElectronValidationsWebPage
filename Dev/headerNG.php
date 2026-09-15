@@ -15,7 +15,7 @@
     echo '<td class="RtextAlign MtextAlign">';
     if ( $actionFrom !== '' ) // histos web page construction
     {    
-        echo '<a href="$web_roots/indexNG.php">Back to roots</a>';
+        echo '<a href="' . $web_roots . '/indexNG.php">Back to roots</a>';
     }
     if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     {
@@ -205,7 +205,7 @@
         $diffMaxTag = True;
     }
     if ($l_actionFrom >= 4) {
-        $pict_name1 = 'https://cms-egamma.web.cern.ch/validation/Electrons/Releases/15_0_0_pre1_2025_DQM_std/FullvsFull_CMSSW_14_2_0_pre4/RECO-RECO_ZEE_14/pngs/comparison_KS_values_total_cum_1000.png';
+        //$pict_name1 = 'https://cms-egamma.web.cern.ch/validation/Electrons/Releases/15_0_0_pre1_2025_DQM_std/FullvsFull_CMSSW_14_2_0_pre4/RECO-RECO_ZEE_14/pngs/comparison_KS_values_total_cum_1000.png';
         $chemin_KS_eos = str_replace($racine_html, $racine_eos, 'https:' . $url_graph);
         $pict_name1 = 'https:' . $url_graph . '/pngs/maxDiff_comparison_values_1.png';
         $pict_name2 = 'https:' . $url_graph . '/pngs/maxDiff_comparison_values_2.png';
