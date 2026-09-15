@@ -535,13 +535,16 @@ span.ex2 {
     color: #1a5276;  /* bleu foncé */
     background: #d6eaf8;
 }
+.cAccordion.lv1 > h3 {
+    margin: 3px 0;
+}
 
 /* Niveau 2 */
 .cAccordion.lv2 > span.ex2 {
     color: #1e8449;  /* vert */
     background: #d5f5e3;
     display: block;
-    width: 100%;
+    padding: 2px 12px;
 }
 
 /* Niveau 3 */
@@ -570,7 +573,9 @@ span.ex2 {
 .cAccordion h3 + div.open { display: block; }
 #accordion h3 + div.open { display: block; }
 
-#accordion > h3,
+#accordion > h3 {
+  font-size: 1.5em;
+}
 .cAccordion.lv1 > h3,
 .cAccordion.lv2 > span.ex2,
 .cAccordion.lv3 > span.ex2 {
@@ -588,13 +593,13 @@ span.ex2 {
 .cAccordion > span.ex2.active {
     font-weight: bold;
 }
+.cAccordion.lv1 {
+    padding: 0px 0;
+}
 .cAccordion.lv2 {
-    padding: 6px 0;
+    padding: 2px 0;
 }
 .cAccordion.lv3 {
     padding: 5px 0;
-}
-.cAccordion.lv2 > span.ex2 {
-    padding: 10px 12px;
 }
 

@@ -282,12 +282,12 @@ function pageFooter($image_up, $previous_url, $text1, $text2) {
     echo '<td class="LtextAlign">' . $text1 . '</td>';
 
     echo '<td class="LtextAlign">';
-    echo $previous_url;
+    echo htmlspecialchars($previous_url, ENT_QUOTES, 'UTF-8');
     echo '</td>';
     
     echo'<td class="RtextAlign">' . $text2 . '</td>';
     echo '<td>';
-    echo '<a href="' . $previous_url . '"><img class="s18" src="' . $image_up . '" alt="Up"></a>';
+    echo '<a href="' . htmlspecialchars($previous_url, ENT_QUOTES, 'UTF-8') . '"><img class="s18" src="' . $image_up . '" alt="Up"></a>';
     echo '&nbsp; </td>';
     
     echo '<td></td>';
@@ -630,13 +630,12 @@ function displayReleaseDateTitle() {
 }
 
 function displayReleaseDate(string $item, string $chemin_eos) {
+    //echo '<span class="ex2"><b>' . htmlspecialchars($key2) . '</b> - ' . @date('F d, Y, H:i:s', filemtime($new_path)) .'</span>'; // level 2
     $new_path = $chemin_eos . '/' . $item;
-    echo '<span class="ex1">';
-    echo '<b>' . $item . '</b>' . "\n";
-    echo'</span>';
-    echo '<span class="ex1">';
+    echo '<span class="ex2">';
+    echo '<b>' . $item . '</b> - ';
     echo @date('F d, Y, H:i:s', filemtime($new_path));
-    echo'</span><br>';
+    echo'</span>';
 }
 
 function displayReleaseLinkDate(string $item, string $chemin_eos, string $web_roots, string $actionFrom) {

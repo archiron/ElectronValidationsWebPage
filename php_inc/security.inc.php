@@ -11,8 +11,8 @@
 // Pour une redirection PHP : header('Location: ' . $url); (le nettoyage étape 2 suffit)
 // Pour un affichage HTML : echo '<a href="' . $url_html_safe . '">Lien</a>';
 
-function cleanInput($data, $allowSlash = true) {
-    if ($allowSlash) {
+function cleanInput($data, $mode = 'strict') {
+    if ($mode === 'url') {
         // Pour les chemins comme actionFrom
         return preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $data);
     } else {
@@ -49,6 +49,28 @@ function cleanInput_V2($data, $allowSlash = false) {
         return preg_replace('/[^a-zA-Z0-9\/_\-\.]/', '', $data);
     } else {
         return preg_replace('/[^a-zA-Z0-9_\-]/', '', $data);
+    }
+}
+
+function enforceCleanUri() {
+    $uri    = $_SERVER['REQUEST_URI'];
+    $script = basename($_SERVER['SCRIPT_NAME']); // "index.php"
+
+    $pos = strpos($uri, $script);
+    if ($pos === false) return; // script pas trouvé, on laisse passer
+
+    $afterScript = substr($uri, $pos + strlen($script));
+
+    // S'il y a un "/" après le nom du script → format inattendu
+    if (str_starts_with($afterScript, '/')) {
+        // Récupérer la query string si elle existe
+        $qPos  = strpos($afterScript, '?');
+        $query = ($qPos !== false) ? substr($afterScript, $qPos) : '';
+
+        // Rediriger vers l'URI propre
+        $cleanUri = substr($uri, 0, $pos + strlen($script)) . $query;
+        header("Location: $cleanUri", true, 301);
+        exit;
     }
 }
 
@@ -91,6 +113,7 @@ function secureURL(): string {
     // Suppression des caractères de contrôle (Header Injection)
     $clean_host = preg_replace('/[\r\n\t\x00]/', '', $raw_host);
     $clean_uri = preg_replace('/[\r\n\t\x00]/', '', $raw_uri);
+    enforceCleanUri();
 
     // Reconstruction
     return "//{$clean_host}{$clean_uri}";
