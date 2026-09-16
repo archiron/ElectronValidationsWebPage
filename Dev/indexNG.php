@@ -26,6 +26,7 @@ header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 
 define('MAIN_INDEX_LOADED', true);
+
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
@@ -54,25 +55,15 @@ define('MAIN_INDEX_LOADED', true);
     require_once '../php_inc/init_vars.inc.php';
 
     // 1. Sanitization de l'URL avant toute utilisation
-    $actionFrom = cleanInput_V2($_REQUEST['actionFrom'] ?? '', true);  // true autorise les slashes
-    $cchoice    = cleanInput_V2($_REQUEST['cchoice'] ?? '', true);    // false bloque les slashes
-    $short_histo_name    = cleanInput_V2($_REQUEST['short_histo_name'] ?? '', false);    // false bloque les slashes
-
     $url_safe = cleanInput_V2($_GET['redirect'] ?? '', 'url');
     if (!empty($url_safe) && !preg_match('#^https?://#i', $url_safe)) {
         $url_safe = ''; // Fallback si jamais le protocole a été altéré
     }
 
     // Vérification CRITIQUE anti-traversal
-    if (strpos($actionFrom, '..') !== false) {
+    /*if (strpos($actionFrom, '..') !== false) {
         die("Chemin invalide : tentative de traversal détectée");
-    }
-
-    // Si votre header.php utilise $_REQUEST ou $_GET directement, mettez-les à jour :
-    $_REQUEST['actionFrom'] = $actionFrom;
-    $_REQUEST['cchoice'] = $cchoice;
-    $_REQUEST['short_histo_name'] = $short_histo_name;
-    $_REQUEST['redirect'] = $url_safe;
+    }*/
 
     $url = secureURL();
 
@@ -99,7 +90,7 @@ define('MAIN_INDEX_LOADED', true);
         $url_from_safe = ''; 
         // Ou redirigez vers une page par défaut sûre : $url_from_safe = '/indexNG.php';
     }
-
+ 
 // --- END SECURITY ---
 
 ?>
@@ -110,7 +101,8 @@ define('MAIN_INDEX_LOADED', true);
     $chemin = $web_roots;
 
     $url_tmp = explode('?', $url_from_safe)[0];
-    $url_tmp = end(explode('/', $url_tmp));
+    $tmp_1 = explode('/', $url_tmp);
+    $url_tmp = end($tmp_1);
  
     if ($url == '//cms-egamma.web.cern.ch/validation/Electrons/Releases/indexNG.php') {
         session_unset(); // back to beginning & free $_SESSION
@@ -119,9 +111,7 @@ define('MAIN_INDEX_LOADED', true);
     $fileName = $web_roots . "/" . $fileName_0;
     $fileName_eos = str_replace($racine_html, $racine_eos, $fileName);
     $classical_roots = htmlspecialchars( $web_roots, ENT_QUOTES, 'UTF-8' );
-    $classical_roots = str_replace("/indexNG.php?actionFrom=/", "/", $classical_roots);
     $classical_path = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
-    $classical_path = str_replace("/indexNG.php?actionFrom=/", "/", $classical_path);
     $previous_url = dirname($url);
     
     if ( !file_exists($fileName_eos) ) {
@@ -132,20 +122,25 @@ define('MAIN_INDEX_LOADED', true);
     $url_http = 'https:' . $url;
     $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
 
-    $_SESSION['url'] = $url_http;
-
-    $chemin = $chemin . '/' . $actionFrom;
+    //$chemin = $chemin . '/' . $actionFrom;
     $chemin_eos = str_replace($racine_html, $racine_eos, $chemin);
     
     $files = array_slice(scandir($chemin_eos), 2);
     // Fill arrays with dirs & files
-    $allList = extractAllFolders($files);
+    $allList = extractAllFolders($files); // folders / subfolders / subsub folders
     $allKeys = array_keys($allList);
-    $dirsList_date = array_map(fn($t) => $chemin_eos . $t, $allKeys);
+    $dirsList_date = array_map(fn($t) => $chemin_eos . '/' . $t, $allKeys);
+    $tab_General = extractFolders4Accordion($allList); // idem allLists mais avec les releases 10 / 11 .. 15 / 16
+    $tab_Keys = array_keys($tab_General);
+    $tabPaths1 = extractAllPaths($allList); // equivalent des actionFrom
+    $tabPaths2 = convertTabPaths($tabPaths1);
     //prePrint('dirsList_date', $dirsList_date); // TEMP
-    //prePrint('all folders', $allList);
+    //prePrint('all folders', $allList); // folders / subfolders / subsub folders
     //prePrint('all Keys', $allKeys);
-    
+    //prePrint('tab general', $tab_General);
+    //prePrint('tab paths 1', $tabPaths1); // equivalent des actionFrom
+    //prePrint('tab paths 2', $tabPaths2); // equivalent des actionFrom
+
     $l_actionFrom = count(explode('/', $actionFrom));
     simPrint('l actionFrom', $l_actionFrom);
     if ($l_actionFrom == 4){
@@ -223,7 +218,7 @@ define('MAIN_INDEX_LOADED', true);
     echo '</div>';
 
     // construction of folders list web page
-    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct">';
+    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct">'; // part1
 
     echo '<p>Here is the list of the 5 last releases candidates ';
     usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
@@ -234,91 +229,85 @@ define('MAIN_INDEX_LOADED', true);
     echo '<b>Last Release Candidates';
     echo '</td><td class="w-50pct">';
     echo '<b>Last Modified On ';
-    echo '</td></tr><tr>';
+    echo '</td></tr>';
 
     $i = 0;
-    echo '<td>' . "\n";
     foreach($dirsList_date as $filename)
     {
-        $firstChar = array_reverse(explode('/', $filename))[0][0];
-        if (is_numeric($firstChar)) {
-            if ( $i < 5 ) {
-                $link1 = $_SERVER["PHP_SELF"] . '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename) . '&cchoice=diff';
-                if ( $i == 0 ) {
-                    echo '<b><a href="' . $link1 . '"><span class="redClass">' . getPathPiece($filename) . '</span></a></b><br>';//
-                    }
-                elseif ( $i == 1 ) {
-                    echo '<b><a href="' . $link1 . '"><span class="blueClass">' . getPathPiece($filename) . '</span></a></b><br>';//
+        if ($i < 5) {
+            echo '<tr><td class="p-5px">' . "\n";
+            //$link1 = $_SERVER["PHP_SELF"] ; //. '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename);
+            $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
+            if ( $i == 0 ) {
+                //echo '<b><a href="' . $link1 . '"><span class="redClass">' . $tmp_2 . ' - ' . $tabPaths[getPathPiece($filename)] . '</span></a></b><br>';//
+                echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';
                 }
-                else {
-                    echo '<b><a href="' . $link1 . '">' . getPathPiece($filename) . '</a></b><br>';//
-                }
+            elseif ( $i == 1 ) {
+                //echo '<b><a href="' . $link1 . '"><span class="blueClass">' . $tmp_2 . ' - ' . $tabPaths[getPathPiece($filename)] . '</span></a></b><br>';//
+                echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';
             }
+            else {
+                //echo '<b><a href="' . $link1 . '">' . $tmp_2 . ' - ' . $tabPaths[$tmp2] . '</a></b><br>';//
+                echo '<b>' . $tmp_2 . '</b><br>';
+            }
+            echo '</td><td>';
+            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
+            echo '</td></tr>';
             $i++;
         }
     }
-    echo '</td><td>';
-    $i = 0;
-    foreach($dirsList_date as $filename)
-    {
-        if ( $i < 5 ) {
-            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
-        }
-        $i++;
-    }
-    echo '</td></tr></table>';
+    echo '</table>';
     echo ' <br>';
     echo ' <br>';
-echo '</div>'; // part1
+    echo '</div>'; // part1
 
-$tab_General = extractFolders4Accordion($allList);
-$tab_Keys = array_keys($tab_General);
+    echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-54pct">'; // part3
+        echo '<p>List of all releases <br>';
+        echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';
 
-echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-54pct">';
-    echo '<p>List of all releases <br>';
-    echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';
-
-    echo '<div id="accordion">';
-        if ( count($tab_Keys) > 0 ) {
-            echo '<h3> General case level 0</h3>';
-            echo '<div>';
-            foreach($tab_General as $key => $value)
-            {
-                echo '<div class="cAccordion lv1">';//
-                    echo '<h3><b> ' . htmlspecialchars($key) . '</b> - Last : <span class="greenClass">' . $tab_General[$key][0] . ' level 1</span></h3>';
-                    echo '<div>';
-                    //displayReleaseDateTitle();
-                    foreach($tab_General[$key] as $key2 => $value2) {
-                        echo '<div class="cAccordion lv2">';
-                            //displayReleaseDate($key2, $chemin_eos);
-                            echo '<span class="ex2"><b>' . htmlspecialchars($key2) . ' level 2</b></span>'; // 
-                            echo '<div>';
-                            echo '<div class="cAccordion lv3">';
-                                foreach ($tab_General[$key][$key2] as $key3 => $value3) {
-                                    echo '<span class="ex2"><b>' . htmlspecialchars($key3) . ' level 3</b></span>'; //
-                                    echo '<div>';
-                                        echo '<table class="greenBorder1 tab5">';
-                                        foreach ($tab_General[$key][$key2][$key3] as $key4 => $value4) {
-                                            echo '<tr><td class="blueBorder1 p-5px">';
-                                            echo '<span class="ex2">' . htmlspecialchars($value4) . '</span>';
-                                            echo '</td></tr>';
-                                        }
-                                        echo '</table>';
-                                    echo '</div>';
-                                }
+        echo '<div id="accordion">';
+            if ( count($tab_Keys) > 0 ) {
+                echo '<h3> General case </h3>'; // level 0
+                echo '<div>';
+                foreach($tab_General as $key => $value)
+                {
+                    echo '<div class="cAccordion lv1">';//
+                        echo '<h3><b> ' . htmlspecialchars($key) . '</b></h3>'; // level 1
+                        //displayReleaseDateTitle();
+                        echo '<div>';
+                        foreach($tab_General[$key] as $key2 => $value2) {
+                            echo '<div class="cAccordion lv2">';
+                                displayReleaseDate(htmlspecialchars($key2), $chemin_eos);
+                                echo '<div>';
+                                echo '<div class="cAccordion lv3">';
+                                    foreach ($tab_General[$key][$key2] as $key3 => $value3) {
+                                        echo '<span class="ex2"><b>' . htmlspecialchars($key3) . '</b></span>'; // level 3
+                                        echo '<div>';
+                                            echo '<table class="clickable greenBorder1 tab5">';
+                                            foreach ($tab_General[$key][$key2][$key3] as $key4 => $value4) { // level 4
+                                                $tag = htmlspecialchars($key2) . '/' . htmlspecialchars($key3) . '/' . htmlspecialchars($value4);
+                                                echo '<tr><td class="blueBorder1 p-5px" id="' . $tabPaths2[$tag] . '">';
+                                                echo '<span class="ex2">' . htmlspecialchars($value4) . ' - ' . $tabPaths2[$tag] . '</span>';
+                                                echo '</td></tr>';
+                                            }
+                                            echo '</table>';
+                                        echo '</div>';
+                                    }
+                                echo '</div>';
+                                echo '</div>';
                             echo '</div>';
-                            echo '</div>';
+                            }
                         echo '</div>';
-                        }
                     echo '</div>';
+                }
                 echo '</div>';
             }
-            echo '</div>';
-        }
-    echo '</div>';
-echo '</div>'; // fint div part3
+        echo '</div>';
+    echo '</div>'; // fin div part3
 
 echo '<br><br><br>'. "\n";
+    echo ' <br>';
+    echo ' <br>';
 
 $action_tmp = substr($actionFrom,1);
 $action_list = explode("/", $action_tmp);
@@ -331,7 +320,7 @@ if (!(strpos($url, 'index') !== false)) {
 }
 if ( count($action_list) == 2) {
     echo '<b>Up to release folder : </b>' . $_fDL;
-    echo '<b> ' . '<a href="' . $web_roots.'/indexNG.php?actionFrom=/' . $action_list[0] . '&cchoice=diff">' . $action_list[0] . '</a></b>' . '<br>';
+    echo '<b> ' . '<a href="' . $web_roots.'/indexNG.php?actionFrom=/' . $action_list[0] . '">' . $action_list[0] . '</a></b>' . '<br>';
 }
 
 /*echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">';
@@ -654,6 +643,8 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 <script nonce="<?php echo $nonce; ?>"> // accordéon
 // --- Niveau 0 : ferme tout avant de se fermer ---
 const h0 = document.querySelector('#accordion > h3');
+h0.style.cursor = 'pointer';
+
 if (h0) {
     h0.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1037,6 +1028,16 @@ document.querySelectorAll('.cAccordion span.ex2, .cAccordion h3').forEach(el => 
                 console.log('ERROR from url4 !');
         });
         $(location).attr('href', web_roots_KS);
+    }
+</script>
+
+<script nonce="<?php echo $nonce; ?>"> // folder click
+    $(document).ready(function(){
+        $('table.clickable td').on('click', checkFolder );
+    });
+    function checkFolder(obj) {
+        var id = $(this).attr('id');
+        console.log('id = ' + id);
     }
 </script>
 
