@@ -12,7 +12,7 @@
     echo '<td class="CtextAlign w-25pct MtextAlign" >';
     writeHeaderLinks($base_dir, $url);
     echo '</td>';
-    echo '<td class="RtextAlign MtextAlign">';
+    /*echo '<td class="RtextAlign MtextAlign">';
     if ( $actionFrom !== '' ) // histos web page construction
     {    
         echo '<a href="' . $web_roots . '/indexNG.php">Back to roots</a>';
@@ -22,7 +22,7 @@
         echo '&nbsp; - &nbsp;';
         echo '<a href="' . $web_roots . '/basket.php?url=' . $url . '&basket=work&site=Releases' . '">Basket</a>' . "\n";
     }
-    echo '</td>';
+    echo '</td>';*/
     echo '</tr>';
     echo '</table>';
 

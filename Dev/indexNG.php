@@ -22,17 +22,10 @@ if (!isset($nonce)) {
 
 <body>
 <?php
-<<<<<<< HEAD
     header("X-Frame-Options: DENY");
     header("X-Content-Type-Options: nosniff");
 
     define('MAIN_INDEX_LOADED', true);
-=======
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
-
-define('MAIN_INDEX_LOADED', true);
->>>>>>> origin/main
 
     session_set_cookie_params([
         'lifetime' => 0,
@@ -67,30 +60,12 @@ define('MAIN_INDEX_LOADED', true);
         $url_safe = ''; // Fallback si jamais le protocole a été altéré
     }
 
-<<<<<<< HEAD
-=======
-    // Vérification CRITIQUE anti-traversal
-    /*if (strpos($actionFrom, '..') !== false) {
-        die("Chemin invalide : tentative de traversal détectée");
-    }*/
-
->>>>>>> origin/main
     $url = secureURL();
 
     // 2. Préparez la version échappée pour le HTML si nécessaire
     $url_html = htmlspecialchars($url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
     // 1. Récupération et nettoyage de base (suppression des caractères de contrôle)
-<<<<<<< HEAD
-=======
-    /*
-        $raw_referer = $_SERVER['HTTP_REFERER'] ?? '';
-        $clean_referer = preg_replace('/[\r\n\t\x00]/', '', $raw_referer);
-
-        // 2. Validation stricte via votre fonction cleanInput (mode 'url' ajouté précédemment)
-        $url_from_safe = cleanInput($clean_referer, 'url');
-    */
->>>>>>> origin/main
     $url_safe = cleanReferer();
     simPrintC('referer', $url_safe);
 
@@ -138,13 +113,8 @@ define('MAIN_INDEX_LOADED', true);
     //$chemin = $chemin . '/' . $actionFrom;
     $chemin_eos = str_replace($racine_html, $racine_eos, $chemin);
     
-<<<<<<< HEAD
     // Fill arrays with dirs & files
     $files = array_slice(scandir($chemin_eos), 2);
-=======
-    $files = array_slice(scandir($chemin_eos), 2);
-    // Fill arrays with dirs & files
->>>>>>> origin/main
     $allList = extractAllFolders($files); // folders / subfolders / subsub folders
     $allKeys = array_keys($allList);
     $dirsList_date = array_map(fn($t) => $chemin_eos . '/' . $t, $allKeys);
@@ -243,61 +213,46 @@ define('MAIN_INDEX_LOADED', true);
     echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) .'</span> and <span class="blueClass">' . htmlspecialchars($dirsList_date[1]) .'</span></b> folders).</p>';//
 
     echo '<table class="tab5 clickable folders">';
-<<<<<<< HEAD
     echo '<tr><td class="w-50pct text-20px">';
     echo '<b>Last Release Candidates';
-    echo '</td><td class="w-50pct text-20px">';
-=======
-    echo '<tr><td class="w-50pct">';
-    echo '<b>Last Release Candidates';
-    echo '</td><td class="w-50pct">';
->>>>>>> origin/main
+    echo '</td><td class="w-50pct text-20px">';//
     echo '<b>Last Modified On ';
     echo '</td></tr>';
 
     $i = 0;
+    echo '<tr>';
+    echo '<td class="p-5px text-16px">' . "\n";
     foreach($dirsList_date as $filename)
     {
         if ($i < 5) {
-            echo '<tr><td class="p-5px">' . "\n";
-<<<<<<< HEAD
             $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
             if ( $i == 0 ) {
-                echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';
+                echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';//
                 }
             elseif ( $i == 1 ) {
-                echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';
+                echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';//
             }
             else {
-=======
-            //$link1 = $_SERVER["PHP_SELF"] ; //. '?actionFrom=' . $actionFrom . '/' . getPathPiece($filename);
-            $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
-            if ( $i == 0 ) {
-                //echo '<b><a href="' . $link1 . '"><span class="redClass">' . $tmp_2 . ' - ' . $tabPaths[getPathPiece($filename)] . '</span></a></b><br>';//
-                echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';
-                }
-            elseif ( $i == 1 ) {
-                //echo '<b><a href="' . $link1 . '"><span class="blueClass">' . $tmp_2 . ' - ' . $tabPaths[getPathPiece($filename)] . '</span></a></b><br>';//
-                echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';
+                echo '<b>' . $tmp_2 . '</b><br>';//
             }
-            else {
-                //echo '<b><a href="' . $link1 . '">' . $tmp_2 . ' - ' . $tabPaths[$tmp2] . '</a></b><br>';//
->>>>>>> origin/main
-                echo '<b>' . $tmp_2 . '</b><br>';
-            }
-            echo '</td><td>';
-            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
-            echo '</td></tr>';
             $i++;
         }
     }
+    echo '</td><td text-16px>';
+    $i = 0;
+    foreach($dirsList_date as $filename)
+    {
+        if ($i < 5) {
+            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
+            $i++;
+        }
+    }
+    echo '</td>'; 
+    echo '</tr>';
     echo '</table>';
     echo ' <br>';
     echo ' <br>';
-<<<<<<< HEAD
     echo '<p id="displayFolderInfos"></p>';
-=======
->>>>>>> origin/main
     echo '</div>'; // part1
 
     echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-54pct">'; // part3
@@ -326,7 +281,7 @@ define('MAIN_INDEX_LOADED', true);
                                             foreach ($tab_General[$key][$key2][$key3] as $key4 => $value4) { // level 4
                                                 $tag = htmlspecialchars($key2) . '/' . htmlspecialchars($key3) . '/' . htmlspecialchars($value4);
                                                 echo '<tr><td class="blueBorder1 p-5px" id="' . $tabPaths2[$tag] . '">';
-                                                echo '<span class="ex2">' . htmlspecialchars($value4) . ' - ' . $tabPaths2[$tag] . '</span>';
+                                                echo '<span class="ex2">' . htmlspecialchars($value4) . $_tiret . $tabPaths2[$tag] . '</span>';
                                                 echo '</td></tr>';
                                             }
                                             echo '</table>';
@@ -681,64 +636,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var tabPaths1 = <?php echo json_encode($tabPaths1);  ?>;
 </script>
 
-<<<<<<< HEAD
 <!-- script nonce="<?php echo $nonce; ?>"> // addLink
-=======
-<script nonce="<?php echo $nonce; ?>"> // accordéon
-// --- Niveau 0 : ferme tout avant de se fermer ---
-const h0 = document.querySelector('#accordion > h3');
-h0.style.cursor = 'pointer';
-
-if (h0) {
-    h0.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const content = h0.nextElementSibling;
-        const isOpen = content.classList.contains('open');
-
-        if (isOpen) {
-            content.querySelectorAll('div.open').forEach(c => {
-                c.classList.remove('open');
-                c.previousElementSibling.classList.remove('active');
-            });
-        }
-
-        content.classList.toggle('open');
-        h0.classList.toggle('active');
-    });
-}
-
-// --- Niveaux 1-3 : toggle + fermeture des frères ---
-document.querySelectorAll('.cAccordion span.ex2, .cAccordion h3').forEach(el => {
-    // Skip le niveau 0 (géré séparément)
-    if (el.parentElement && el.parentElement.id === 'accordion') return;
-
-    const content = el.nextElementSibling;
-    if (!content || content.tagName !== 'DIV') return;
-
-    el.style.cursor = 'pointer';
-
-    el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isOpen = content.classList.contains('open');
-        const cAccordion = el.closest('.cAccordion');
-        const container = cAccordion.parentElement;
-
-        container.querySelectorAll(':scope > .cAccordion > span.ex2 + div.open, :scope > .cAccordion > h3 + div.open')
-            .forEach(c => {
-                c.classList.remove('open');
-                c.previousElementSibling.classList.remove('active');
-            });
-
-        if (!isOpen) {
-            content.classList.add('open');
-            el.classList.add('active');
-        }
-    });
-});
-</script>
-
-<script nonce="<?php echo $nonce; ?>"> // addLink
->>>>>>> origin/main
     $(document).ready(function(){
         // la class clickable est appliquée à tous les table qui auront des "boutons"
         $('table.clickable td').on('click', checkAddLink );
@@ -1144,16 +1042,6 @@ document.querySelectorAll('.cAccordion span.ex2, .cAccordion h3').forEach(el => 
         infoText += '<b><span class="redClass">release : </span></b>' + tmp[0] + '<br>';
         infoText += '<b><span class="blueClass">reference : </span></b>' + tmp[1] + '<br>';
         $('#displayFolderInfos').html(infoText);
-    }
-</script>
-
-<script nonce="<?php echo $nonce; ?>"> // folder click
-    $(document).ready(function(){
-        $('table.clickable td').on('click', checkFolder );
-    });
-    function checkFolder(obj) {
-        var id = $(this).attr('id');
-        console.log('id = ' + id);
     }
 </script>
 

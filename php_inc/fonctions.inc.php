@@ -305,7 +305,7 @@ function pageFooter_V2($image_up, $previous_url, $l_aF=4) {
     echo '<td class="LtextAlign">' . $text[0] . '</td>';
 
     echo '<td class="LtextAlign">';
-    echo $previous_url ;#. ' - ' . $l_aF;
+    echo $previous_url ;#. $_tiret . $l_aF;
     echo '</td>';
     
     if ($l_aF >= 2) {
@@ -1100,7 +1100,7 @@ function extractRelease($v, $r, $o, $d) {
 function extractRECO($t){
     $u = [];
     foreach($t as $k => $v) {
-        //echo $k . ' - ' . $v . "<br>\n";
+        //echo $k . $_tiret . $v . "<br>\n";
         if (substr($v, -5) == '0.txt') {
             $u[] = $v;
         }
@@ -1111,7 +1111,7 @@ function extractRECO($t){
 function extractMiniAOD($t){
     $u = [];
     foreach($t as $k => $v) {
-        //echo $k . ' - ' . $v . "<br>\n";
+        //echo $k . $_tiret . $v . "<br>\n";
         if (substr($v, -5) == '1.txt') {
             $u[] = $v;
         }

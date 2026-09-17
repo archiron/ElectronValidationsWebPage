@@ -86,11 +86,7 @@
         [4] => /eos/project/c/cmsweb/www/egamma/validation/Electrons/Dev/10_6_1_patch1_2024_14TeV_DQM_std
     )
     
-<<<<<<< HEAD
     tab paths : Array
-=======
-        tab paths : Array
->>>>>>> origin/main
     (
         [0] => Array
             (

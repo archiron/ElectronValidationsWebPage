@@ -1,6 +1,7 @@
 <?php
 
 $_fDL = '<br>' . "\n"; // fin de ligne
+$_tiret = ' - ';
 $baba = 'coucou';
 
 function prePrint($text1, $text2) {
