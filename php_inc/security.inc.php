@@ -34,14 +34,22 @@ function cleanInput_V2($data, $allowSlash = false) {
         }
 
         // 2. Vérification du protocole (Liste blanche)
-        $scheme = strtolower(parse_url($data, PHP_URL_SCHEME));
+        $parsed = parse_url($data);
+        $scheme = strtolower($parsed['scheme'] ?? '');
         if (!in_array($scheme, ['http', 'https'])) {
             return ''; // Rejet si javascript:, data:, file:, etc.
         }
 
         // 3. Nettoyage final des caractères superflus (optionnel mais recommandé)
         // On garde une URL propre
-        return filter_var($data, FILTER_SANITIZE_URL); 
+        $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhoist'];
+        $host = $parsed['host'] ?? '';
+        if (!in_array($host, $allowed_hosts)) {
+            return ''; 
+        }
+
+        // 4. Whitelist des caractères (REMPLACE FILTER_SANITIZE_URL)
+        return preg_replace('/[^a-zA-Z0-9\/_\-\.?=&%:]/', '', $data);
     }
 
     // Comportement existant pour les autres données
