@@ -1,16 +1,37 @@
 <?php
 
-function extractAllPaths(array $tab) : array {
+function extractAllPaths(array $tab, string $chemin) : array {
     $t2 = [];  // chemins complets (sans .sys.)
-
+    
     foreach ($tab as $key0 => $value0) { // level 0
         foreach ($value0 as $key1 => $value1) { // level 1
             $path1 = $key0 . '/' . $key1;
             foreach ($value1 as $value2) { // level 2
-                //$t2[$key0][] = $path1 . '/' . $value2;
-                $t2[] = $path1 . '/' . $value2;
+                $folderPath = $path1 . '/' . $value2;
+                $t2[] = [$folderPath, array_slice(scandir($chemin . '/' . $folderPath), 2)];
             }
         }
+
+    }
+    return $t2;
+}
+
+function extractAllHistos(array $tab, string $chemin) : array{
+    $t2 = [];  // chemins complets (sans .sys.)
+    foreach ($tab as $value0) { // level 0
+        $tmp = $chemin . '/' . $value0[0] . '/config_target.txt';
+        $lines = file($tmp, FILE_IGNORE_NEW_LINES);
+        $t2[] = $lines;
+    }
+    return $t2;
+}
+
+function extractAllConfigs(array $tab, string $chemin) : array{
+    $t2 = [];  // chemins complets (sans .sys.)
+    foreach ($tab as $value0) { // level 0
+        $tmp = $chemin . '/' . $value0[0] . '/definitions.txt';
+        $lines = file($tmp, FILE_IGNORE_NEW_LINES);
+        $t2[] = $lines;
     }
     return $t2;
 }
@@ -18,7 +39,7 @@ function extractAllPaths(array $tab) : array {
 function convertTabPaths(array $tab) : array {
     $tmp = [];
     foreach ($tab as $key0 => $value0) {
-        $tmp[$value0] = $key0;
+        $tmp[$value0[0]] = $key0;
     }
     return $tmp;
 }
@@ -49,6 +70,7 @@ function extractAllFolders(array $tab) {
             foreach($tmp_files as $value1) {
                 $tmp_files1 = array_slice(scandir($value . '/' . $value1), 2);
                 $t2[$value1] = $tmp_files1;
+                //$log .= $value . '/' . $value1 . "\n";
             }
             $t1[$tmp] = $t2;
         }

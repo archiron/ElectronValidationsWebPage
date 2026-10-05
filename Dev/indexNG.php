@@ -84,6 +84,10 @@ if (!isset($nonce)) {
 ?>
 <main>
 <?php
+    // Désactiver le buffering (indispensable !)
+    //while (ob_get_level()) ob_end_flush();
+    //ob_implicit_flush(true);
+
     $base_dir = __DIR__;
     $web_roots = getRootPath($base_dir);
     $chemin = $web_roots;
@@ -112,7 +116,15 @@ if (!isset($nonce)) {
 
     //$chemin = $chemin . '/' . $actionFrom;
     $chemin_eos = str_replace($racine_html, $racine_eos, $chemin);
+    simPrintC("chemin eos", $chemin_eos);
     
+    // --- Ouvrir la fenêtre de progression ---
+    /*echo "<script>
+        var w = window.open('', '_blank', 'width=500,height=400');
+        w.document.write('<html><body style=\"font-family:monospace;font-size:12px\">'
+            + '<pre id=\"log\"></pre></body></html>');
+        w.document.close();
+    </script>\n";*/
     // Fill arrays with dirs & files
     $files = array_slice(scandir($chemin_eos), 2);
     $allList = extractAllFolders($files); // folders / subfolders / subsub folders
@@ -120,34 +132,30 @@ if (!isset($nonce)) {
     $dirsList_date = array_map(fn($t) => $chemin_eos . '/' . $t, $allKeys);
     $tab_General = extractFolders4Accordion($allList); // idem allLists mais avec les releases 10 / 11 .. 15 / 16
     $tab_Keys = array_keys($tab_General);
-    $tabPaths1 = extractAllPaths($allList); // equivalent des actionFrom
+    $tabPaths1 = extractAllPaths($allList, $chemin_eos); // equivalent des actionFrom
     $tabPaths2 = convertTabPaths($tabPaths1);
+    $tabHistos = extractAllHistos($tabPaths1, $chemin_eos);
+    $tabConfigs = extractAllConfigs($tabPaths1, $chemin_eos);
     //prePrint('dirsList_date', $dirsList_date); // TEMP
     //prePrint('all folders', $allList); // folders / subfolders / subsub folders
     //prePrint('all Keys', $allKeys);
     //prePrint('tab general', $tab_General);
     //prePrint('tab paths 1', $tabPaths1); // equivalent des actionFrom
     //prePrint('tab paths 2', $tabPaths2); // equivalent des actionFrom
+    //prePrint('tab histos', $tabHistos);
+    //prePrint('tab configs', $tabConfigs);
+    // --- Fermer la popup ---
+    /*echo "<script>w.close();</script>\n";*/
 
     $l_actionFrom = count(explode('/', $actionFrom));
     simPrint('l actionFrom', $l_actionFrom);
     if ($l_actionFrom == 4){
         foreach ($dirsList as $key => $value)
         {
-            if ( $value == "gifs" )
-            {
-                $pictsDir = True;
-                $pictsValue="gifs";
-                $pictsExt=".gif";
-                $allFormat+=1;
-            }
-            elseif ( $value == "pngs" ) // pbm : si le dernier repertoire est un png, ça zappe les gifs
-            {
-                $pictsDir = True;
-                $pictsValue="pngs";
-                $pictsExt=".png";
-                $allFormat+=1;
-            }
+            $pictsDir = True;
+            $pictsValue="pngs";
+            $pictsExt=".png";
+            $allFormat+=1;
         }
     }
     $allFormat = count($dirsList);
@@ -206,57 +214,61 @@ if (!isset($nonce)) {
     echo '</div>';
 
     // construction of folders list web page
-    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct">'; // part1
+    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct hidden">'; // part1
 
-    echo '<p>Here is the list of the 5 last releases candidates ';
-    usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-    echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) .'</span> and <span class="blueClass">' . htmlspecialchars($dirsList_date[1]) .'</span></b> folders).</p>';//
+        echo '<p>Autre tableau à faire.</p>';//
 
-    echo '<table class="tab5 clickable folders">';
-    echo '<tr><td class="w-50pct text-20px">';
-    echo '<b>Last Release Candidates';
-    echo '</td><td class="w-50pct text-20px">';//
-    echo '<b>Last Modified On ';
-    echo '</td></tr>';
+        echo '</div>'; // part1
 
-    $i = 0;
-    echo '<tr>';
-    echo '<td class="p-5px text-16px">' . "\n";
-    foreach($dirsList_date as $filename)
-    {
-        if ($i < 5) {
-            $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
-            if ( $i == 0 ) {
-                echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';//
+        echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-45pct">'; // part3 accordéon
+
+        echo '<p>Here is the list of the 5 last releases candidates ';
+        usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
+        echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) .'</span> and <span class="blueClass">' . htmlspecialchars($dirsList_date[1]) .'</span></b> folders).</p>';//
+
+        echo '<table class="tab5 clickable folders">';
+        echo '<tr><td class="w-50pct text-20px">';
+        echo '<b>Last Release Candidates';
+        echo '</td><td class="w-50pct text-20px">';//
+        echo '<b>Last Modified On ';
+        echo '</td></tr>';
+
+        $i = 0;
+        echo '<tr>';
+        echo '<td class="p-5px text-16px">' . "\n";
+        foreach($dirsList_date as $filename)
+        {
+            if ($i < 5) {
+                $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
+                if ( $i == 0 ) {
+                    echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';//
+                    }
+                elseif ( $i == 1 ) {
+                    echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';//
                 }
-            elseif ( $i == 1 ) {
-                echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';//
+                else {
+                    echo '<b>' . $tmp_2 . '</b><br>';//
+                }
+                $i++;
             }
-            else {
-                echo '<b>' . $tmp_2 . '</b><br>';//
+        }
+        echo '</td><td text-16px>';
+        $i = 0;
+        foreach($dirsList_date as $filename)
+        {
+            if ($i < 5) {
+                echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
+                $i++;
             }
-            $i++;
         }
-    }
-    echo '</td><td text-16px>';
-    $i = 0;
-    foreach($dirsList_date as $filename)
-    {
-        if ($i < 5) {
-            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
-            $i++;
-        }
-    }
-    echo '</td>'; 
-    echo '</tr>';
-    echo '</table>';
-    echo ' <br>';
-    echo ' <br>';
-    echo '<p id="displayFolderInfos"></p>';
-    echo '</div>'; // part1
+        echo '</td>'; 
+        echo '</tr>';
+        echo '</table>';
+        echo ' <br>';
+        echo ' <br>';
+        echo '<p id="displayFolderInfos" class="LtextAlign"></p>';
 
-    echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-54pct">'; // part3
-        echo '<p>List of all releases <br>';
+        echo '<p>List of all releases<br>';
         echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';
 
         echo '<div id="accordion">';
@@ -317,59 +329,8 @@ if ( count($action_list) == 2) {
     echo '<b> ' . '<a href="' . $web_roots.'/indexNG.php?actionFrom=/' . $action_list[0] . '">' . $action_list[0] . '</a></b>' . '<br>';
 }
 
-/*echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">';
-if ($l_actionFrom == 1){
-    echo '<p>List of all releases <br>';
-    echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';//
-}
-if ( $actionFrom == '') {
-    //prePrint('others', $tab_Others); // TEMP
-    //prePrint('CMSSW', $tab_CMSSW); // TEMP
-    //prePrint('general', $tab_General); // TEMP
-
-    echo '<div id="accordion">';
-        if ( count($tab_Keys) > 0 ) {
-            echo '<h3> General case</h3>';
-            echo '<div>';
-            foreach($tab_General as $key => $value)
-            {
-                echo '<div class="cAccordion">';//
-                echo '<h3><b> ' . $key . '</b> - Last : <span class="greenClass">' . $tab_General[$key][0] . '</span></h3>';
-                echo '<div>';
-                displayReleaseDateTitle();
-                foreach($tab_General[$key] as $key2 => $value2) {
-                    displayReleaseLinkDate($value2, $chemin_eos, $web_roots, $actionFrom);
-                    }
-                echo '</div>';
-                echo '</div>';
-            }
-            echo '</div>';
-        }
-
-        if ( count($tab_CMSSW) > 0 ) {
-            echo '<h3> CMSSW case</h3>';
-            echo '<div>';
-            displayReleaseDateTitle();
-            foreach($tab_CMSSW as $item)
-            {
-                displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
-            }
-            echo '</div>';
-        }
-        
-        if ( count($tab_Others) > 0 ) {
-            echo '<h3> Others cases</h3>';
-            echo '<div>';
-            displayReleaseDateTitle();
-            foreach($tab_Others as $item)
-            {
-                displayReleaseLinkDate($item, $chemin_eos, $web_roots, $actionFrom);
-            }
-            echo '</div>';
-        }
-    echo '</div>';
-}
-echo '</div>'; // part2*/
+echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">';
+echo '</div>'; // part2
 
 // end of folders list web page construction
 
@@ -634,6 +595,8 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var Transf = <?php echo json_encode($Transf); ?>;
 
     var tabPaths1 = <?php echo json_encode($tabPaths1);  ?>;
+    var tabHistos = <?php echo json_encode($tabHistos);  ?>;
+    var tabConfigs = <?php echo json_encode($tabConfigs);  ?>;
 </script>
 
 <!-- script nonce="<?php echo $nonce; ?>"> // addLink
@@ -992,6 +955,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                     c.previousElementSibling.classList.remove('active');
                 });
             }
+            document.querySelector("#part1").classList.add("hidden");
 
             content.classList.toggle('open');
             h0.classList.toggle('active');
@@ -1036,12 +1000,33 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     function checkFolder(obj) {
         var id = $(this).attr('id');
         console.log('id = ' + id);
-        console.log('id = ' + tabPaths1[id]);
-        var tmp = tabPaths1[id].split('/');
+        console.log('id = ' + tabPaths1[id][0]);
+        var tmp = tabPaths1[id][0].split('/');
         var infoText = '<b>' + tmp[2] + '</b><br><br>';
-        infoText += '<b><span class="redClass">release : </span></b>' + tmp[0] + '<br>';
-        infoText += '<b><span class="blueClass">reference : </span></b>' + tmp[1] + '<br>';
+        infoText += '<b><span class="redClass">' + tabConfigs[id][1] + '&nbsp;' + tabConfigs[id][2] + '</span></b>';
+        t1 = tabConfigs[id][3].split("__");
+        t2 = t1[2].split("-");
+        p1 = '&nbsp;' + t1[0] + '__<b><span class="greenClass"> ' + t1[1] + "</span></b>__";
+        if ( t1.length == 3) {
+            p1 += t2[0] + "-" + '<b><span class="redClass">' + t2[1] + "-" + t2[2] + "</span></b>__" + t1[3];
+        }
+        else {
+            p1 += t2[0] + "-" + '<b><span class="redClass">' + t2[1] + "</span></b>__" + t1[3];
+        }
+        infoText += p1 + '<br>'
+        infoText += '<b><span class="blueClass">' + tabConfigs[id][4] + '&nbsp;' + tabConfigs[id][5] + '</span></b>';
+        t1 = tabConfigs[id][6].split("__");
+        t2 = t1[2].split("-");
+        p2 = '&nbsp;' + t1[0] + '__<b><span class="greenClass"> ' + t1[1] + "</span></b>__";
+        if ( t1.length == 3) {
+            p2 += t2[0] + "-" + '<b><span class="BlueClass">' + t2[1] + "-" + t2[2] + "</span></b>__" + t1[3];
+        }
+        else {
+            p2 += t2[0] + "-" + '<b><span class="blueClass">' + t2[1] + "</span></b>__" + t1[3];
+        }
+        infoText += p2 + '<br>'
         $('#displayFolderInfos').html(infoText);
+        $('#part1').removeClass("hidden");
     }
 </script>
 

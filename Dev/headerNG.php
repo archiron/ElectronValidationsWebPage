@@ -134,64 +134,6 @@
             
             fclose($handle_0);
         }
-        elseif (file_exists($chemin_eos . "/index.html")) // keep the "old" way for the display with the index.html file
-        {
-            $handle_1 = fopen($chemin_eos . "/index.html", "r");
-            $t1 = preg_split("/\//", $actionFrom);
-            $t1 = str_replace('CMSSW_', '', $t1[1]);
-            $t3 = $t1[0];
-            
-            for ($i = 0; $i <= 5; $i++) { // write ROOT name file from definitions.txt file
-                $lineRead = fgets($handle_1);
-            }
-            
-            if (! ($t3 > 1)) { // write ROOT name file from indexNG.php
-                $lineRead7 = fgets($handle_1); // line 7
-                echo '<table class="tab0">';
-                echo '<tr><td>';
-                $lineRead8 = fgets($handle_1); // line 8
-                $tmp_01 = explode("__", $lineRead8);
-                $tmp_02 = explode("-", $tmp_01[2]);
-                $lineRead8_4 = $tmp_01[0] . '__<b><span class="greenClass"> ' . $tmp_01[1] . '</span></b>__';
-                if (count($tmp_02) == 3) {
-                    $lineRead8_4 .= $tmp_02[0] . "-" . '<b><span class="blueClass">' . $tmp_02[1] . "-" . $tmp_02[2] . '</span></b>__' . $tmp_01[3];
-                }
-                else {
-                    $lineRead8_4 .= $tmp_02[0] . "-" . '<b><span class="redClass">' . $tmp_02[1] . '</span></b>__' . $tmp_01[3];
-                }
-                echo $lineRead8_4;
-                $lineRead9 = fgets($handle_1); // line 9
-                $tmp_01 = explode("__", $lineRead9);
-                $tmp_02 = explode("-", $tmp_01[2]);
-                $lineRead9_4 = $tmp_01[0] . '__<b><span class="greenClass"> ' . $tmp_01[1] . '</span></b>__';
-                if (count($tmp_02) == 3) {
-                    $lineRead9_4 .= $tmp_02[0] . "-" . '<b><span class="blueClass">' . $tmp_02[1] . "-" . $tmp_02[2] . '</span></b>__' . $tmp_01[3];
-                }
-                else {
-                    $lineRead9_4 .= $tmp_02[0] . "-" . '<b><span class="blueClass">' . $tmp_02[1] . '</span></b>__' . $tmp_01[3];
-                }
-                echo $lineRead9_4;
-                echo '</td>';
-                echo '</tr>';
-                echo '</table>';
-                $lineRead10 = fgets($handle_1); // line 10
-                $lineRead = str_replace('<a href="gifs/">', '<a href="' . $escaped_url . "/". $pictsValue ."/'>", $lineRead10);
-                $lineRead = str_replace('<a href="electronCompare.C">', "<a href='" . $escaped_url . "/electronCompare.C'>", $lineRead);
-                $lineRead = str_replace('<a href="config_target.txt">', "<a href='" . $escaped_url . "/config_target.txt'>", $lineRead);
-                $lineRead = str_replace('<a href="ElectronMcSignalHistos.txt">', "<a href='" . $escaped_url . "/ElectronMcSignalHistos.txt'>", $lineRead);
-                echo '<table class="tab0">';
-                echo '<tr><td>';
-                $newLine7 = '<a ID="TOP"></a><a href="' . $previous_url . '"><img width="22" height="22" src="' . $image_up . '" alt="Up"/></a>&nbsp; ' ." \n";
-                echo $newLine7;
-                echo '</td><td>';
-                echo $lineRead;
-                echo '</td>';
-                echo '</tr>';
-                echo '</table>';
-            }
-    
-            fclose($handle_1);
-        }
         else {
             // error opening the file.
             echo "error while trying to open the definitions.txt file";
