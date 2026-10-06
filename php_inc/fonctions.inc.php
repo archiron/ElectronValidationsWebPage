@@ -852,7 +852,7 @@ function displayAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $picts
     echo '<br><br>';
 }
 
-function displayAllHistos_2($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsValue, $pictsExt, $histoSize, $code, $site) {
+function displayAllHistos_2(array $histoArray, array $clefs, array $lineHisto1, string $escaped_url, string $pictsValue, string $pictsExt, int $histoSize, int $code, string $site) {
     include '../php_inc/defaults.inc.php';
     for ($i = 0; $i < count($clefs); $i++) {
         $partialHistoArray = $histoArray[$clefs[$i]];
@@ -925,6 +925,47 @@ function displayAllHistos_2($histoArray, $clefs, $lineHisto1, $escaped_url, $pic
         } // i_line
     } // loop i
     echo '<br><br>';
+}
+
+function display5LastHistos(array $tab) {
+    echo '<table class="tab5">'; //  clickable folders
+    echo '<tr><td class="w-50pct text-20px">';
+    echo '<b>Last Release Candidates';
+    echo '</td><td class="w-50pct text-20px">';//
+    echo '<b>Last Modified On ';
+    echo '</td></tr>';
+
+    echo '<tr>';
+    echo '<td class="p-5px text-16px">' . "\n";
+    $i = 0;
+    foreach($tab as $filename)
+    {
+        if ($i < 5) {
+            $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
+            if ( $i == 0 ) {
+                echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';//
+            }
+            elseif ( $i == 1 ) {
+                echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';//
+            }
+            else {
+                echo '<b>' . $tmp_2 . '</b><br>';//
+            }
+            $i++;
+        }
+    }
+    echo '</td><td text-16px>';
+    $i = 0;
+    foreach($tab as $filename)
+    {
+        if ($i < 5) {
+            echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
+            $i++;
+        }
+    }
+    echo '</td>'; 
+    echo '</tr>';
+    echo '</table>';
 }
 
 function getNonEmptyKeysNumber(array $arr) {

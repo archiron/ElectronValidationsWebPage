@@ -224,8 +224,12 @@ if (!isset($nonce)) {
 
         echo '<p>Here is the list of the 5 last releases candidates ';
         usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
-        echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) .'</span> and <span class="blueClass">' . htmlspecialchars($dirsList_date[1]) .'</span></b> folders).</p>';//
+        echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) . '</span> and <span class="blueClass">';
+        echo htmlspecialchars($dirsList_date[1]) . '</span></b> folders).</p>';
 
+        display5LastHistos($dirsList_date);/*
+        echo ' <br>';
+        echo ' <br>';
         echo '<table class="tab5 clickable folders">';
         echo '<tr><td class="w-50pct text-20px">';
         echo '<b>Last Release Candidates';
@@ -233,9 +237,9 @@ if (!isset($nonce)) {
         echo '<b>Last Modified On ';
         echo '</td></tr>';
 
-        $i = 0;
         echo '<tr>';
         echo '<td class="p-5px text-16px">' . "\n";
+        $i = 0;
         foreach($dirsList_date as $filename)
         {
             if ($i < 5) {
@@ -263,7 +267,7 @@ if (!isset($nonce)) {
         }
         echo '</td>'; 
         echo '</tr>';
-        echo '</table>';
+        echo '</table>';*/
         echo ' <br>';
         echo ' <br>';
         echo '<p id="displayFolderInfos" class="LtextAlign"></p>';
