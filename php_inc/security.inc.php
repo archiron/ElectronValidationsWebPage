@@ -42,7 +42,7 @@ function cleanInput_V2($data, $allowSlash = false) {
 
         // 3. Nettoyage final des caractères superflus (optionnel mais recommandé)
         // On garde une URL propre
-        $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhoist'];
+        $allowed_hosts = ['cms-egamma.web.cern.ch', 'localhost'];
         $host = $parsed['host'] ?? '';
         if (!in_array($host, $allowed_hosts)) {
             return ''; 
@@ -85,7 +85,7 @@ function enforceCleanUri() {
 /**
  * Nettoie et valide un nom de fichier pour empêcher le Path Traversal et les scripts PHP.
  */
-function validate_safe_filename($input_filename, $allowed_extensions = ['txt', 'json', 'csv']) {
+function validate_safe_filename(string $input_filename, $allowed_extensions = ['txt', 'json', 'csv']) {
     $filename = basename($input_filename); // Bloque le "Téléversement/Traversée de répertoire" (../)
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
     

@@ -968,6 +968,47 @@ function display5LastHistos(array $tab) {
     echo '</table>';
 }
 
+function displayReleasesAccordion(array $tab, array $tab2, int $nb_Keys, string $chemin_eos) {
+    echo '<div id="accordion">';
+        if ( $nb_Keys > 0 ) {
+            echo '<h3> General case </h3>'; // level 0
+            echo '<div>';
+            foreach($tab as $key => $value)
+            {
+                echo '<div class="cAccordion lv1">';//
+                    echo '<h3><b> ' . htmlspecialchars($key) . '</b></h3>'; // level 1
+                    //displayReleaseDateTitle();
+                    echo '<div>';
+                    foreach($tab[$key] as $key2 => $value2) {
+                        echo '<div class="cAccordion lv2">';
+                            displayReleaseDate(htmlspecialchars($key2), $chemin_eos);
+                            echo '<div>';
+                            echo '<div class="cAccordion lv3">';
+                                foreach ($tab[$key][$key2] as $key3 => $value3) {
+                                    echo '<span class="ex2"><b>' . htmlspecialchars($key3) . '</b></span>'; // level 3
+                                    echo '<div>';
+                                        echo '<table class="clickable greenBorder1 tab5">';
+                                        foreach ($tab[$key][$key2][$key3] as $key4 => $value4) { // level 4
+                                            $tag = htmlspecialchars($key2) . '/' . htmlspecialchars($key3) . '/' . htmlspecialchars($value4);
+                                            echo '<tr><td class="blueBorder1 p-5px" id="' . $tab2[$tag] . '">';
+                                            echo '<span class="ex2">' . htmlspecialchars($value4) . "$_tiret" . $tab2[$tag] . '</span>';
+                                            echo '</td></tr>';
+                                        }
+                                        echo '</table>';
+                                    echo '</div>';
+                                }/**/
+                            echo '</div>';
+                            echo '</div>';
+                        echo '</div>';
+                        }
+                    echo '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+    echo '</div>';
+}
+
 function getNonEmptyKeysNumber(array $arr) {
     $count = count(array_filter($arr, function($value) {
         return $value !== '';

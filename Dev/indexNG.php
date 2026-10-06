@@ -519,7 +519,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var url2 = <?php echo json_encode($url_2); ?>;
     var url4 = <?php echo json_encode($url_4); ?>;
     var web_roots_KS = <?php echo json_encode($web_roots_KS . '/main_display_KS.php'); ?>;
-    var viewSelectedPath = <?php echo json_encode($viewSelectedPath); ?>;
     var img_add = <?php echo json_encode($image_add); ?>;
     var img_remove = <?php echo json_encode($image_remove); ?>;
     var web_path = <?php echo json_encode($web_roots . '/basket.php?'); ?>;
@@ -710,9 +709,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 }
 
             }
-        }
-        else if (typeof ff !== "undefined") {
-            $(location).attr('href',viewSelectedPath);
         }
     }
     function clearArray(tab) {
