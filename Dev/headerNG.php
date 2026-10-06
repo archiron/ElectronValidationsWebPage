@@ -55,11 +55,11 @@
     echo '</tr>';
     echo '</table>'; // filter tab
 
-    echo '<table class="w-100pct blackBorder1">';
+    echo '<table class="w-100pct blueBorder1">';
     echo '<tr>';
     echo '<td>';
 
-    echo '<table class="tab0">';
+    echo '<table class="tab0">'; // affichage lignes de la comparaison choisie
     echo '<tr><td id="line1">';
     echo '</td></tr>';
     echo '<tr><td id="line2">';
@@ -70,28 +70,7 @@
     echo '</table>';
 
     echo '</td>';
-    echo '<td class="CtextAlign">';
-    if ($l_actionFrom >= 4) {
-        //$pict_name1 = 'https://cms-egamma.web.cern.ch/validation/Electrons/Releases/15_0_0_pre1_2025_DQM_std/FullvsFull_CMSSW_14_2_0_pre4/RECO-RECO_ZEE_14/pngs/comparison_KS_values_total_cum_1000.png';
-        $chemin_KS_eos = str_replace($racine_html, $racine_eos, 'https:' . $url_graph);
-        $pict_name1 = 'https:' . $url_graph . '/pngs/maxDiff_comparison_values_1.png';
-        $pict_name2 = 'https:' . $url_graph . '/pngs/maxDiff_comparison_values_2.png';
-        $pict_name3 = 'https:' . $url_graph . '/pngs/maxDiff_comparison_values_3.png';
-        if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_3.png')) {
-            echo '<a href="' . $pict_name3 . '">';
-            echo '<img class="image img blueBorder2 w-200px" src="' . $pict_name3 . '" alt="" ></a>';
-        }
-        else {
-            if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_1.png')) {
-                echo '<a href="' . $pict_name1 . '">';
-                echo '<img class="image img blueBorder2 w-150px" src="' . $pict_name1 . '" alt="" ></a>';
-            }
-            if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_2.png')) {
-                echo '<a href="' . $pict_name2 . '">';
-                echo '<img class="image img blueBorder2 w-150px" src="' . $pict_name2 . '" alt="" ></a>';
-            }
-        }
-    }
+    echo '<td class="CtextAlign" id="maxDiff">'; // affichage lignes de la comparaison choisie
     echo '</td>';
     if ($l_actionFrom >= 4) {
         if (file_exists($chemin_KS_eos . '/pngs/maxDiff_comparison_values_3.png')) {

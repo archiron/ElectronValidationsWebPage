@@ -138,6 +138,7 @@ if (!isset($nonce)) {
     $tabPaths2 = convertTabPaths($tabPaths1);
     $tabHistos = extractAllHistos($tabPaths1, $chemin_eos);
     $tabConfigs = extractAllConfigs($tabPaths1, $chemin_eos);
+    $tabMaxDiffPictures = extractAllMaxDiffPictures($tabPaths1, $chemin_eos);
     //prePrint('dirsList_date', $dirsList_date); // TEMP
     //prePrint('all folders', $allList); // folders / subfolders / subsub folders
     //prePrint('all Keys', $allKeys);
@@ -146,6 +147,7 @@ if (!isset($nonce)) {
     //prePrint('tab paths 2', $tabPaths2); // equivalent des actionFrom
     //prePrint('tab histos', $tabHistos);
     //prePrint('tab configs', $tabConfigs);
+    //prePrint('tab maxDiff pictures', $tabMaxDiffPictures);
     // --- Fermer la popup ---
     /*echo "<script>w.close();</script>\n";*/
 
@@ -216,7 +218,7 @@ if (!isset($nonce)) {
     echo '</div>';
 
     // construction of folders list web page
-    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct hidden">'; // part1
+    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct hidden">'; // part1 tableau histos
 
         echo '<p>Autre tableau à faire.</p>';//
 
@@ -252,13 +254,14 @@ if (!(strpos($url, 'index') !== false)) {
     echo ' <br><b><a href="'.$web_roots.'/indexNG.php">Roots</a></b>';
     echo ' <br><br>';
 }
-if ( count($action_list) == 2) {
-    echo '<b>Up to release folder : </b>' . $_fDL;
-    echo '<b> ' . '<a href="' . $web_roots.'/indexNG.php?actionFrom=/' . $action_list[0] . '">' . $action_list[0] . '</a></b>' . '<br>';
-}
 
-echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">';
+echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">'; // part2 tableau images
+echo 'tableau des histos';
 echo '</div>'; // part2
+
+echo '<div id="part4" class=" greenBorder1 fl-right CtextAlign w-54pct">'; // part4 basket
+echo 'basket';
+echo '</div>'; // part4
 
 // end of folders list web page construction
 
@@ -525,6 +528,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var tabHistos = <?php echo json_encode($tabHistos);  ?>;
     var tabConfigs = <?php echo json_encode($tabConfigs);  ?>;
     var chemin = <?php echo json_encode($chemin);  ?>;
+    var tabMaxDiffPictures = <?php echo json_encode($tabMaxDiffPictures);  ?>;
 </script>
 
 <!-- script nonce="<?php echo $nonce; ?>"> // addLink
@@ -866,6 +870,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             document.querySelector("#line1").innerHTML = "";
             document.querySelector("#line2").innerHTML = "";
             document.querySelector("#line3").innerHTML = "";
+            document.querySelector("#maxDiff").innerHTML = "";
 
             content.classList.toggle('open');
             h0.classList.toggle('active');
@@ -910,12 +915,27 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         var id = $(this).attr('id');
         console.log('id = ' + id);
         console.log('id = ' + tabPaths1[id][0]);
+        // === display folder config ===
         var tmp = tabPaths1[id][0].split('/');
         var infoText = '<b>' + tmp[2] + '</b><br><br>';
         infoText1 = fillLine1(id);
         infoText2 = fillLine2(id);
         infoText3 = fillLine3(id);
         infoText += infoText1 + infoText2 + infoText3;
+        // === display maxDiff pictures ===
+        nb_pict = tabMaxDiffPictures[id].length;
+        //console.log('max diff pictures : ' + nb_pict);
+        if ( nb_pict > 0 ) {
+            var ligne = "";
+            for (let i = 1; i <= 3; i++) {
+                var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
+                //console.log('image : '+pict_name);
+                ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
+                
+            }
+            $('#maxDiff').html(ligne)
+        }
+
         $('#line1').html(infoText1);
         $('#line2').html(infoText2);
         $('#line3').html(infoText3);
