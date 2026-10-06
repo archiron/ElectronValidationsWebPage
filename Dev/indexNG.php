@@ -912,6 +912,16 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         console.log('id = ' + tabPaths1[id][0]);
         var tmp = tabPaths1[id][0].split('/');
         var infoText = '<b>' + tmp[2] + '</b><br><br>';
+        infoText1 = fillLine1(id);
+        infoText2 = fillLine2(id);
+        infoText3 = fillLine3(id);
+        infoText += infoText1 + infoText2 + infoText3;
+        $('#line1').html(infoText1);
+        $('#line2').html(infoText2);
+        $('#line3').html(infoText3);
+        $('#part1').removeClass("hidden");
+    }
+    function fillLine1(id) {
         var infoText1 = '<b><span class="redClass">' + tabConfigs[id][1] + '&nbsp;' + tabConfigs[id][2] + '</span></b>';
         t1 = tabConfigs[id][3].split("__");
         t2 = t1[2].split("-");
@@ -922,7 +932,10 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         else {
             p1 += t2[0] + "-" + '<b><span class="redClass">' + t2[1] + "</span></b>__" + t1[3];
         }
-        infoText1 +=  " : " + p1 + '<br>'
+        infoText1 +=  " : " + p1 + '<br>';
+        return infoText1;
+    }
+    function fillLine2(id) {
         var infoText2 = '<b><span class="blueClass">' + tabConfigs[id][4] + '&nbsp;' + tabConfigs[id][5] + '</span></b>';
         t1 = tabConfigs[id][6].split("__");
         t2 = t1[2].split("-");
@@ -933,7 +946,10 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         else {
             p2 += t2[0] + "-" + '<b><span class="blueClass">' + t2[1] + "</span></b>__" + t1[3];
         }
-        infoText2 += " : " + p2 + '<br>'
+        infoText2 += " : " + p2 + '<br>';
+        return infoText2;
+    }
+    function fillLine3(id) {
         var newLine10 = "<p>In all plots below, ";
         newLine10 += 'the <b><span class="redClass"> ' + tabConfigs[id][7] + " " + tabConfigs[id][4] + " </span></b> histograms are in red";
         newLine10 += ', and the <b><span class="blueClass"> ' + tabConfigs[id][8] + " " + tabConfigs[id][4] + " </span></b> histograms are in blue.";
@@ -943,11 +959,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         newLine10 += ', <a href="' + chemin + "/" + tabPaths1[id][0] + '/config_target.txt">specification</a> of histograms';
         newLine10 += ', <a href="' + chemin + '/' + tabPaths1[id][0] + '/pngs/">images</a> of histograms.';
         newLine10 += '</p>';
-        infoText += infoText1 + infoText2 + newLine10;
-        $('#line1').html(infoText1);
-        $('#line2').html(infoText2);
-        $('#line3').html(newLine10);
-        $('#part1').removeClass("hidden");
+        return newLine10;
     }
 </script>
 
