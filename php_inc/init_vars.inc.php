@@ -88,18 +88,32 @@
         [4] => /eos/project/c/cmsweb/www/egamma/validation/Electrons/Dev/10_6_1_patch1_2024_14TeV_DQM_std
     )
     
-    tab paths : Array
+    tab paths 1 : Array
     (
         [0] => Array
             (
-                [0] => 10_2_0_pre6_DQM_std/FullvsFull_10_2_0_pre5/PU25-PU25_TTbar_13
-                [1] => 10_2_0_pre6_DQM_std/FullvsFull_10_2_0_pre5/PU25-PU25_ZEE_13
-                [2] => 10_2_0_pre6_jonastest_DQM_std/FullvsFull_10_2_0_pre5_jonastest/RECO-RECO_QCD_Pt_80_120_13
-                [3] => 10_2_0_pre6_jonastest_DQM_std/FullvsFull_10_2_0_pre5_jonastest/RECO-RECO_SingleElectronPt10
-                [4] => 10_2_0_pre6_jonastest_DQM_std/FullvsFull_10_2_0_pre5_jonastest/RECO-RECO_SingleElectronPt1000
-                [5] => 10_2_0_pre6_jonastest_DQM_std/FullvsFull_10_2_0_pre5_jonastest/RECO-RECO_SingleElectronPt35
-                [6] => 10_2_0_pre6_jonastest_DQM_std/FullvsFull_10_2_0_pre5_jonastest/RECO-RECO_TTbar_13
-    )
+                [0] => 12_0_0_pre1_2021_DQM_dev/FullvsFull_CMSSW_11_3_0_pre6/RECO-RECO_ZEE_14
+                [1] => Array
+                    (
+                        [0] => DBox
+                        [1] => config_reference.txt
+                        [2] => config_target.txt
+                        [3] => definitions.txt
+                        [4] => gifs.tar.gz
+                        [5] => index.html
+                        [6] => pngs
+                    )
+
+            )
+
+        [1] => Array
+            (..
+
+    tab paths 2 : Array
+    (
+        [12_0_0_pre1_2021_DQM_dev/FullvsFull_CMSSW_11_3_0_pre6/RECO-RECO_ZEE_14] => 0
+        [12_0_0_pre2_2021_DQM_dev/FullvsFull_CMSSW_12_0_0_pre1/RECO-RECO_ZEE_14] => 1
+        [12_0_0_pre2_2021_DQM_dev/FullvsFull_CMSSW_12_0_0_pre1_12_0_0_pre1/RECO-RECO_ZEE_14] => 2
 
     tab histos : Array
     (
@@ -131,7 +145,7 @@
                 [6] => DQM_V0001_R000000001__RelValZEE_14__CMSSW_11_3_0_pre6-113X_mcRun3_2021_realistic_v9-v1__DQMIO.root
                 [7] => CMSSW_12_0_0_pre1 
                 [8] => CMSSW_11_3_0_pre6 
-                [9] => 
+                [9] => something like : https://cms-talk.web.cern.ch/t/valdb-17-0-0-pre3-2026-campaign-notification/147342
                 [10] => config_target.txt
             )
 

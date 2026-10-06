@@ -55,97 +55,22 @@
     echo '</tr>';
     echo '</table>'; // filter tab
 
-    echo '<table class="w-100pct">';
+    echo '<table class="w-100pct blackBorder1">';
     echo '<tr>';
     echo '<td>';
 
-    if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
-    {    
-        if (file_exists($chemin_eos . "/definitions.txt"))
-        {
-            $handle_0 = fopen($chemin_eos . "/definitions.txt", "r");
-            $lineRead7 = fgets($handle_0); // line 7
-            echo '<table class="tab0">';
-            echo '<tr><td>';
-            
-            $lineRead8_1 = fgets($handle_0); // line 8 part 1
-            $lineRead8_2 = fgets($handle_0); // line 8 part 2
-            $lineRead8_3 = fgets($handle_0); // line 8 part 3
-            $tmp_01 = explode("__", $lineRead8_3);
-            $tmp_02 = explode("-", $tmp_01[2]);
-            $lineRead8_4 = $tmp_01[0] . '__<b><span class="greenClass"> ' . $tmp_01[1] . "</span></b>__";
-            if (count($tmp_02) == 3) {
-                $lineRead8_4 .= $tmp_02[0] . "-" . '<b><span class="redClass">' . $tmp_02[1] . "-" . $tmp_02[2] . "</span></b>__" . $tmp_01[3];
-            }
-            else {
-                $lineRead8_4 .= $tmp_02[0] . "-" . '<b><span class="redClass">' . $tmp_02[1] . "</span></b>__" . $tmp_01[3];
-            }
-            $newLine8 = '<b><span class="redClass"> ' . $lineRead8_1 . " " . $lineRead8_2 . " </span></b>" . " : " . $lineRead8_4 . " <br>\n";
-            echo $newLine8;
-    
-            $lineRead9_1 = fgets($handle_0); // line 9 part 1
-            $lineRead9_2 = fgets($handle_0); // line 9 part 2
-            $lineRead9_3 = fgets($handle_0); // line 9 part 3
-            $tmp_01 = explode("__", $lineRead9_3);
-            $tmp_02 = explode("-", $tmp_01[2]);
-            $lineRead9_4 = $tmp_01[0] . '__<b><span class="greenClass"> ' . $tmp_01[1] . "</span></b>__";
-            if (count($tmp_02) == 3) {
-                $lineRead9_4 .= $tmp_02[0] . "-" . '<b><span class="blueClass">' . $tmp_02[1] . "-" . $tmp_02[2] . "</span></b>__" . $tmp_01[3];
-            }
-            else {
-                $lineRead9_4 .= $tmp_02[0] . "-" . '<b><span class="redClass">' . $tmp_02[1] . "</span></b>__" . $tmp_01[3];
-            }
-            $newLine9 = "<b><span class='blueClass'> " . $lineRead9_1 . " " . $lineRead9_2 . " </span></b>" . " : " . $lineRead9_4 . " \n";//<br>
-            echo $newLine9;
-            echo '</td>';
-            echo '</tr>';
-            echo '</table>';
-    
-            $lineRead10_1 = fgets($handle_0); // line 10 part 1
-            $lineRead10_2 = fgets($handle_0); // line 10 part 2
-            $newLine10 = "<p>In all plots below, ";
-            if ( ($lineRead10_1 == $lineRead10_2) && ($lineRead8_1 == $lineRead9_1) ) {
-                $newLine10 .= "there was no reference histograms to compare with";
-                $newLine10 .= ", and the " . $lineRead10_1 . " histograms are in red.";
-            }
-            else {
-                $newLine10 .= 'the <b><span class="redClass"> ' . $lineRead10_1 . " " . $lineRead8_1 . " </span></b> histograms are in red";
-                $newLine10 .= ', and the <b><span class="blueClass"> ' . $lineRead10_2 . " " . $lineRead9_1 . " </span></b> histograms are in blue.";
-            }
-            $newLine10 .= "<br>Some more details";
-            $lineRead10_3 = fgets($handle_0); // line 10 part 3
-            $rest1 = substr($lineRead10_3, 0, 4);
-            if (strcmp($rest1, "none") !== 0) {
-                $newLine10 .= ', <a href="' . $lineRead10_3 . '">CMS Talk</a> references';
-            }
-            $lineRead10_4 = fgets($handle_0); // line 10 part 4
-            $newLine10 .= ', <a href="' . $escaped_url . "/" . $lineRead10_4 . '">specification</a> of histograms';
-            $newLine10 .= ', <a href="' . $escaped_url . '/' . $pictsValue . '/">images</a> of histograms.';
-            $newLine10 .= '</p>';
-            echo '<table class="tab0">';
-            echo '<tr><td>';
-            $newLine7 = '<a ID="TOP"></a><a href="' . $previous_url . '"><img width="22" height="22" src="' . $image_up . '" alt="Up"/></a>&nbsp; ' ." \n";
-            echo $newLine7;
-            echo '</td><td>';
-            echo $newLine10;
-            echo '</td>';
-            echo '</tr>';
-            echo '</table>';
-            
-            fclose($handle_0);
-        }
-        else {
-            // error opening the file.
-            echo "error while trying to open the definitions.txt file";
-        }
-        }
+    echo '<table class="tab0">';
+    echo '<tr><td id="line1">';
+    echo '</td></tr>';
+    echo '<tr><td id="line2">';
+    echo '</td>';
+    echo '</tr>';
+    echo '<tr><td id="line3">';
+    echo '</td></tr>';
+    echo '</table>';
 
     echo '</td>';
     echo '<td class="CtextAlign">';
-    $diffMaxTag = true;
-    if ((mb_substr($lineRead8_1, 0, -1) === 'RECO') && (mb_substr($lineRead9_1, 0, -1) === 'RECO')) {// && ($tmp_01[1] === 'RelValZEE_14')
-        $diffMaxTag = True;
-    }
     if ($l_actionFrom >= 4) {
         //$pict_name1 = 'https://cms-egamma.web.cern.ch/validation/Electrons/Releases/15_0_0_pre1_2025_DQM_std/FullvsFull_CMSSW_14_2_0_pre4/RECO-RECO_ZEE_14/pngs/comparison_KS_values_total_cum_1000.png';
         $chemin_KS_eos = str_replace($racine_html, $racine_eos, 'https:' . $url_graph);
@@ -178,63 +103,6 @@
             echo '</td>';
         }
     }
-    if ($l_actionFrom >= 4) {
-        echo '<td align="center" valign="middle" onclick="KS_Evclick()">';
-    $runText = '';
-    $dataSetText = substr($tmp_01[1], 6);
-    if (strpos($tmp_02[1], 'Run3') !== false)
-    {
-        $runText = "Run3";
-    }
-    else if (strpos($tmp_02[1], 'Run4') !== false)
-    {
-        $runText = "Run4";
-    }
-    if (str_replace("\n", "", $lineRead8_1) == 'PU') {
-        $operationText = 'PU';
-        $precisionText = 'RECO';
-    }
-    else {
-        $operationText = 'RECO';
-        $precisionText = 'RECO';
-    }
-    if (str_replace("\n", "", $lineRead9_1) == 'miniAOD') {
-        $precisionText = 'miniAOD';
-    }
-    if (strpos($tmp_02[1], 'PURecoOnly') !== false)
-    {
-        $operationText = 'PU';
-        $precisionText = 'RECO';
-    }
-    $Transf = [$runText, $operationText, $dataSetText, $precisionText];
-    //prePrint('transfert', $Transf);
-    echo '<b>go to<br>KS Evaluation</b>';
-    echo '</td>';
-}
-echo '<td>';
-    if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
-    {    
-        //simPrint('pictsDir', $pictsDir);
-        if ($allFormat >= 2) {
-            echo '<table class="clickable selectPictFormat">'; // select picture format table
-            echo '<tr>';
-            if ($boldFormat == 'g'){
-            echo '<td align="center" select-choice="Gif" class="w-30px" pictFormat="gif"><span class="blueClass"><b>gif</b></span></td>';
-            }
-            else {
-                echo '<td align="center" select-choice="Gif" class="w-30px" pictFormat="gif"><span class="blueClass">gif</span></td>';
-            }
-            if ($boldFormat == 'p'){
-                echo '<td align="center" select-choice="Png" class="w-30px" pictFormat="png"><span class="blueClass"><b>png</b></span></td>';
-            }
-            else {
-                echo '<td align="center" select-choice="Png" class="w-30px" pictFormat="png"><span class="blueClass">png</span></td>';
-            }
-            echo '</tr>';
-            echo '</table>'; // select picture format table
-        }
-    }
-    echo '</td>';
     echo '</tr>';
     echo '</table>';
 

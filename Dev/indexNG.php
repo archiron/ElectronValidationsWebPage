@@ -91,6 +91,7 @@ if (!isset($nonce)) {
     $base_dir = __DIR__;
     $web_roots = getRootPath($base_dir);
     $chemin = $web_roots;
+    simPrintC("chemin", $chemin);
 
     $url_tmp = explode('?', $url_from_safe)[0];
     $tmp_1 = explode('/', $url_tmp);
@@ -113,6 +114,7 @@ if (!isset($nonce)) {
 
     $url_http = 'https:' . $url;
     $escaped_url = htmlspecialchars( $url, ENT_QUOTES, 'UTF-8' );
+    //simPrintC("escaped_url", $escaped_url);
 
     //$chemin = $chemin . '/' . $actionFrom;
     $chemin_eos = str_replace($racine_html, $racine_eos, $chemin);
@@ -227,92 +229,14 @@ if (!isset($nonce)) {
         echo '( here <b><span class="redClass">' . htmlspecialchars($dirsList_date[0]) . '</span> and <span class="blueClass">';
         echo htmlspecialchars($dirsList_date[1]) . '</span></b> folders).</p>';
 
-        display5LastHistos($dirsList_date);/*
+        display5LastHistos($dirsList_date);
         echo ' <br>';
         echo ' <br>';
-        echo '<table class="tab5 clickable folders">';
-        echo '<tr><td class="w-50pct text-20px">';
-        echo '<b>Last Release Candidates';
-        echo '</td><td class="w-50pct text-20px">';//
-        echo '<b>Last Modified On ';
-        echo '</td></tr>';
-
-        echo '<tr>';
-        echo '<td class="p-5px text-16px">' . "\n";
-        $i = 0;
-        foreach($dirsList_date as $filename)
-        {
-            if ($i < 5) {
-                $tmp_2 = htmlspecialchars(getPathPiece($filename), ENT_QUOTES, 'UTF-8');
-                if ( $i == 0 ) {
-                    echo '<b><span class="redClass">' . $tmp_2 . '</span></b><br>';//
-                    }
-                elseif ( $i == 1 ) {
-                    echo '<b><span class="blueClass">' . $tmp_2 . '</span></b><br>';//
-                }
-                else {
-                    echo '<b>' . $tmp_2 . '</b><br>';//
-                }
-                $i++;
-            }
-        }
-        echo '</td><td text-16px>';
-        $i = 0;
-        foreach($dirsList_date as $filename)
-        {
-            if ($i < 5) {
-                echo @date('F d, Y, H:i:s', filemtime($filename)) . ' <br>';
-                $i++;
-            }
-        }
-        echo '</td>'; 
-        echo '</tr>';
-        echo '</table>';*/
-        echo ' <br>';
-        echo ' <br>';
-        echo '<p id="displayFolderInfos" class="LtextAlign"></p>';
 
         echo '<p>List of all releases<br>';
         echo 'here the <b>General case</b> release is a CMSSSW and <b>Others cases</b> not.</p>';
 
-        echo '<div id="accordion">';
-            if ( count($tab_Keys) > 0 ) {
-                echo '<h3> General case </h3>'; // level 0
-                echo '<div>';
-                foreach($tab_General as $key => $value)
-                {
-                    echo '<div class="cAccordion lv1">';//
-                        echo '<h3><b> ' . htmlspecialchars($key) . '</b></h3>'; // level 1
-                        //displayReleaseDateTitle();
-                        echo '<div>';
-                        foreach($tab_General[$key] as $key2 => $value2) {
-                            echo '<div class="cAccordion lv2">';
-                                displayReleaseDate(htmlspecialchars($key2), $chemin_eos);
-                                echo '<div>';
-                                echo '<div class="cAccordion lv3">';
-                                    foreach ($tab_General[$key][$key2] as $key3 => $value3) {
-                                        echo '<span class="ex2"><b>' . htmlspecialchars($key3) . '</b></span>'; // level 3
-                                        echo '<div>';
-                                            echo '<table class="clickable greenBorder1 tab5">';
-                                            foreach ($tab_General[$key][$key2][$key3] as $key4 => $value4) { // level 4
-                                                $tag = htmlspecialchars($key2) . '/' . htmlspecialchars($key3) . '/' . htmlspecialchars($value4);
-                                                echo '<tr><td class="blueBorder1 p-5px" id="' . $tabPaths2[$tag] . '">';
-                                                echo '<span class="ex2">' . htmlspecialchars($value4) . $_tiret . $tabPaths2[$tag] . '</span>';
-                                                echo '</td></tr>';
-                                            }
-                                            echo '</table>';
-                                        echo '</div>';
-                                    }
-                                echo '</div>';
-                                echo '</div>';
-                            echo '</div>';
-                            }
-                        echo '</div>';
-                    echo '</div>';
-                }
-                echo '</div>';
-            }
-        echo '</div>';
+        displayReleasesAccordion($tab_General, $tabPaths2, count($tab_Keys), $chemin_eos);
     echo '</div>'; // fin div part3
 
 echo '<br><br><br>'. "\n";
@@ -596,11 +520,11 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var img_add = <?php echo json_encode($image_add); ?>;
     var img_remove = <?php echo json_encode($image_remove); ?>;
     var web_path = <?php echo json_encode($web_roots . '/basket.php?'); ?>;
-    var Transf = <?php echo json_encode($Transf); ?>;
 
     var tabPaths1 = <?php echo json_encode($tabPaths1);  ?>;
     var tabHistos = <?php echo json_encode($tabHistos);  ?>;
     var tabConfigs = <?php echo json_encode($tabConfigs);  ?>;
+    var chemin = <?php echo json_encode($chemin);  ?>;
 </script>
 
 <!-- script nonce="<?php echo $nonce; ?>"> // addLink
@@ -919,26 +843,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         })
         $('#tableHistos').removeClass("hidden")
     }
-</script>
-
-<script nonce="<?php echo $nonce; ?>"> // KS click
-    function KS_Evclick() {
-        console.log(Transf)
-        var transfert = {run: Transf[0], operation: Transf[1], dataSet: Transf[2], precision: Transf[3], buttons: ''};
-        console.log(transfert)
-        Transfert = JSON.stringify(transfert);
-        $.post(
-            url4, 
-            {boldSelection: Transfert},
-            ).done(function(returnResult){
-            console.log('OK from url4 !');
-            console.log(returnResult);
-            }
-            ).fail(function(){
-                console.log('ERROR from url4 !');
-        });
-        $(location).attr('href', web_roots_KS);
-    }
 </script -->
 
 <script nonce="<?php echo $nonce; ?>"> // accordéon
@@ -948,7 +852,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 
     if (h0) {
         h0.addEventListener('click', (e) => {
-            $('#displayFolderInfos').html('');
             e.stopPropagation();
             const content = h0.nextElementSibling;
             const isOpen = content.classList.contains('open');
@@ -960,6 +863,9 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 });
             }
             document.querySelector("#part1").classList.add("hidden");
+            document.querySelector("#line1").innerHTML = "";
+            document.querySelector("#line2").innerHTML = "";
+            document.querySelector("#line3").innerHTML = "";
 
             content.classList.toggle('open');
             h0.classList.toggle('active');
@@ -977,7 +883,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         el.style.cursor = 'pointer';
 
         el.addEventListener('click', (e) => {
-            $('#displayFolderInfos').html('');
             e.stopPropagation();
             const isOpen = content.classList.contains('open');
             const cAccordion = el.closest('.cAccordion');
@@ -1007,7 +912,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         console.log('id = ' + tabPaths1[id][0]);
         var tmp = tabPaths1[id][0].split('/');
         var infoText = '<b>' + tmp[2] + '</b><br><br>';
-        infoText += '<b><span class="redClass">' + tabConfigs[id][1] + '&nbsp;' + tabConfigs[id][2] + '</span></b>';
+        var infoText1 = '<b><span class="redClass">' + tabConfigs[id][1] + '&nbsp;' + tabConfigs[id][2] + '</span></b>';
         t1 = tabConfigs[id][3].split("__");
         t2 = t1[2].split("-");
         p1 = '&nbsp;' + t1[0] + '__<b><span class="greenClass"> ' + t1[1] + "</span></b>__";
@@ -1017,8 +922,8 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         else {
             p1 += t2[0] + "-" + '<b><span class="redClass">' + t2[1] + "</span></b>__" + t1[3];
         }
-        infoText += p1 + '<br>'
-        infoText += '<b><span class="blueClass">' + tabConfigs[id][4] + '&nbsp;' + tabConfigs[id][5] + '</span></b>';
+        infoText1 +=  " : " + p1 + '<br>'
+        var infoText2 = '<b><span class="blueClass">' + tabConfigs[id][4] + '&nbsp;' + tabConfigs[id][5] + '</span></b>';
         t1 = tabConfigs[id][6].split("__");
         t2 = t1[2].split("-");
         p2 = '&nbsp;' + t1[0] + '__<b><span class="greenClass"> ' + t1[1] + "</span></b>__";
@@ -1028,8 +933,20 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         else {
             p2 += t2[0] + "-" + '<b><span class="blueClass">' + t2[1] + "</span></b>__" + t1[3];
         }
-        infoText += p2 + '<br>'
-        $('#displayFolderInfos').html(infoText);
+        infoText2 += " : " + p2 + '<br>'
+        var newLine10 = "<p>In all plots below, ";
+        newLine10 += 'the <b><span class="redClass"> ' + tabConfigs[id][7] + " " + tabConfigs[id][4] + " </span></b> histograms are in red";
+        newLine10 += ', and the <b><span class="blueClass"> ' + tabConfigs[id][8] + " " + tabConfigs[id][4] + " </span></b> histograms are in blue.";
+        if (tabConfigs[id][9] !== "") {
+            newLine10 += "<br>Some more details" + ', <a href="' + tabConfigs[id][9] + '">CMS Talk</a> references';
+        }
+        newLine10 += ', <a href="' + chemin + "/" + tabPaths1[id][0] + '/config_target.txt">specification</a> of histograms';
+        newLine10 += ', <a href="' + chemin + '/' + tabPaths1[id][0] + '/pngs/">images</a> of histograms.';
+        newLine10 += '</p>';
+        infoText += infoText1 + infoText2 + newLine10;
+        $('#line1').html(infoText1);
+        $('#line2').html(infoText2);
+        $('#line3').html(newLine10);
         $('#part1').removeClass("hidden");
     }
 </script>
