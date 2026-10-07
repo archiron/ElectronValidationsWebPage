@@ -920,17 +920,18 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         infoText += infoText1 + infoText2 + infoText3;
         // === display maxDiff pictures ===
         nb_pict = tabMaxDiffPictures[id].length;
-        //console.log('max diff pictures : ' + nb_pict);
+        console.log('max diff pictures : ' + nb_pict);
+        var ligne = "";
         if ( nb_pict > 0 ) {
-            var ligne = "";
+            /*var ligne = "";
             for (let i = 1; i <= 3; i++) {
                 var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
                 //console.log('image : '+pict_name);
                 ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
-                
-            }
-            $('#maxDiff').html(ligne)
+            }*/
+            ligne = displayMaxDiffPictures(id);
         }
+        $('#maxDiff').html(ligne)
 
         $('#line1').html(infoText1);
         $('#line2').html(infoText2);
@@ -976,6 +977,19 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         newLine10 += ', <a href="' + chemin + '/' + tabPaths1[id][0] + '/pngs/">images</a> of histograms.';
         newLine10 += '</p>';
         return newLine10;
+    }
+    function displayMaxDiffPictures(id) {
+        var ligne = "";
+        /*for (let i = 1; i <= 3; i++) {
+            var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
+            tl += " " + pict_name;
+            ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
+        }*/
+        tabMaxDiffPictures[id].forEach(i => {
+            var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
+            ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
+        });
+        return ligne;
     }
 </script>
 

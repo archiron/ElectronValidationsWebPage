@@ -991,7 +991,7 @@ function displayReleasesAccordion(array $tab, array $tab2, int $nb_Keys, string 
                                         foreach ($tab[$key][$key2][$key3] as $key4 => $value4) { // level 4
                                             $tag = htmlspecialchars($key2) . '/' . htmlspecialchars($key3) . '/' . htmlspecialchars($value4);
                                             echo '<tr><td class="blueBorder1 p-5px" id="' . $tab2[$tag] . '">';
-                                            echo '<span class="ex2">' . htmlspecialchars($value4) . "$_tiret" . $tab2[$tag] . '</span>';
+                                            echo '<span class="ex2">' . htmlspecialchars($value4) . " - " . $tab2[$tag] . '</span>';
                                             echo '</td></tr>';
                                         }
                                         echo '</table>';
