@@ -17,7 +17,7 @@ function extractAllPaths(array $tab, string $chemin) : array {
 }
 
 function extractAllHistos(array $tab, string $chemin) : array{
-    $t2 = [];  // chemins complets (sans .sys.)
+    $t2 = [];  // histos (sans .sys.)
     foreach ($tab as $value0) { // level 0
         $tmp = $chemin . '/' . $value0[0] . '/config_target.txt';
         $lines = file($tmp, FILE_IGNORE_NEW_LINES);
@@ -27,7 +27,7 @@ function extractAllHistos(array $tab, string $chemin) : array{
 }
 
 function extractAllConfigs(array $tab, string $chemin) : array{
-    $t2 = [];  // chemins complets (sans .sys.)
+    $t2 = [];  // lignes definition.txt (sans .sys.)
     foreach ($tab as $value0) { // level 0
         $tmp = $chemin . '/' . $value0[0] . '/definitions.txt';
         $lines = file($tmp, FILE_IGNORE_NEW_LINES);
@@ -50,6 +50,27 @@ function extractAllMaxDiffPictures(array $tab, string $chemin) : array{
         $t2[$key0] = $tt;
     }
     return $t2;
+}
+
+function extractAllNeeded(array $tab, string $chemin) : array{
+    $t1 = [];  // histos (sans .sys.)
+    $t2 = [];  // lignes definition.txt (sans .sys.)
+    $t3 = [];  // numeros des images maxFiff
+    foreach ($tab as $key0 => $value0) { // level 0
+        $tmp1 = $chemin . '/' . $value0[0] . '/config_target.txt';
+        $t1[$key0] = file($tmp1, FILE_IGNORE_NEW_LINES);
+        $tmp2 = $chemin . '/' . $value0[0] . '/definitions.txt';
+        $t2[$key0] = file($tmp2, FILE_IGNORE_NEW_LINES);
+        $tt = [];
+        for ($x = 1; $x <= 3; $x++) {
+            $tmp3 = $chemin . '/' . $value0[0] . '/pngs/maxDiff_comparison_values_' . $x . '.png';
+            if (file_exists($tmp3)) {
+                $tt[] = $x;
+            }
+        }
+        $t3[$key0] = $tt;
+    }
+    return [$t1, $t2, $t3];
 }
 
 function convertTabPaths(array $tab) : array {

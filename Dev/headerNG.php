@@ -26,13 +26,8 @@
         echo '<table border="1" class="clickable addLink w-200px">'; // Unselect All table
         echo '<tr>';
         echo '<td select-choice="remove ALL to basket" class="w-100px blueClass CtextAlign" soCol="bleu">Unselect All</td>';
-        //echo '</tr>';
-        //echo '<tr soCol="visio">';//
         echo '<td class="w-60px blueClass CtextAlign hidden" visio="goVisio">View selected histos</td>';
-        //echo '</tr>';
-        //echo '<tr>';
         echo '<td class="MtextAlign blueClass CtextAlign">';
-            //echo '<a href="' . $web_roots . '/basket.php?url=' . $url . '&basket=work&site=Releases' . '">Basket</a>' . "\n";
             echo 'Basket' . "\n";
         echo '</td>';
         echo '</tr>';

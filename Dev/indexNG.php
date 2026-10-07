@@ -84,9 +84,6 @@ if (!isset($nonce)) {
 ?>
 <main>
 <?php
-    // Désactiver le buffering (indispensable !)
-    //while (ob_get_level()) ob_end_flush();
-    //ob_implicit_flush(true);
 
     $base_dir = __DIR__;
     $web_roots = getRootPath($base_dir);
@@ -120,13 +117,6 @@ if (!isset($nonce)) {
     $chemin_eos = str_replace($racine_html, $racine_eos, $chemin);
     simPrintC("chemin eos", $chemin_eos);
     
-    // --- Ouvrir la fenêtre de progression ---
-    /*echo "<script>
-        var w = window.open('', '_blank', 'width=500,height=400');
-        w.document.write('<html><body style=\"font-family:monospace;font-size:12px\">'
-            + '<pre id=\"log\"></pre></body></html>');
-        w.document.close();
-    </script>\n";*/
     // Fill arrays with dirs & files
     $files = array_slice(scandir($chemin_eos), 2);
     $allList = extractAllFolders($files); // folders / subfolders / subsub folders
@@ -136,9 +126,10 @@ if (!isset($nonce)) {
     $tab_Keys = array_keys($tab_General);
     $tabPaths1 = extractAllPaths($allList, $chemin_eos); // equivalent des actionFrom
     $tabPaths2 = convertTabPaths($tabPaths1);
-    $tabHistos = extractAllHistos($tabPaths1, $chemin_eos);
+    /*$tabHistos = extractAllHistos($tabPaths1, $chemin_eos);
     $tabConfigs = extractAllConfigs($tabPaths1, $chemin_eos);
-    $tabMaxDiffPictures = extractAllMaxDiffPictures($tabPaths1, $chemin_eos);
+    $tabMaxDiffPictures = extractAllMaxDiffPictures($tabPaths1, $chemin_eos);*/
+    [$tabHistos, $tabConfigs, $tabMaxDiffPictures] = extractAllNeeded($tabPaths1, $chemin_eos);
     //prePrint('dirsList_date', $dirsList_date); // TEMP
     //prePrint('all folders', $allList); // folders / subfolders / subsub folders
     //prePrint('all Keys', $allKeys);
@@ -148,8 +139,6 @@ if (!isset($nonce)) {
     //prePrint('tab histos', $tabHistos);
     //prePrint('tab configs', $tabConfigs);
     //prePrint('tab maxDiff pictures', $tabMaxDiffPictures);
-    // --- Fermer la popup ---
-    /*echo "<script>w.close();</script>\n";*/
 
     $l_actionFrom = count(explode('/', $actionFrom));
     simPrint('l actionFrom', $l_actionFrom);
