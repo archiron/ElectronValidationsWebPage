@@ -207,13 +207,13 @@ if (!isset($nonce)) {
     echo '</div>';
 
     // construction of folders list web page
-    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-45pct hidden">'; // part1 tableau histos
+    echo '<div id="part1" class="parent blueBorder1 fl-left CtextAlign w-54pct hidden">'; // part1 tableau histos
 
-        echo '<p>Autre tableau à faire.</p>';//
+        echo '<p>part1 tableau histos</p>';//
 
-        echo '</div>'; // part1
+    echo '</div>'; // part1
 
-        echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-45pct">'; // part3 accordéon
+    echo '<div id="part3" class="parent blackBorder2 fl-right CtextAlign w-45pct">'; // part3 accordéon
 
         echo '<p>Here is the list of the 5 last releases candidates ';
         usort($dirsList_date, function($x, $y) { return filemtime($x) < filemtime($y); });
@@ -244,56 +244,19 @@ if (!(strpos($url, 'index') !== false)) {
     echo ' <br><br>';
 }
 
-echo '<div id="part2" class=" greenBorder1 fl-right CtextAlign w-54pct">'; // part2 tableau images
-echo 'tableau des histos';
+echo '<div id="part2" class=" greenBorder1 fl-left CtextAlign w-54pct hidden">'; // part2 tableau images
+echo 'part2 tableau images';
 echo '</div>'; // part2
 
-echo '<div id="part4" class=" greenBorder1 fl-right CtextAlign w-54pct">'; // part4 basket
-echo 'basket';
+echo '<div id="part4" class=" greenBorder1 fl-left CtextAlign w-54pct">'; // part4 basket
+echo 'part4 basket';
 echo '</div>'; // part4
 
 // end of folders list web page construction
 
-
-if (array_key_exists('fileForHistos_eos', $_SESSION)) {
-    $file = $_SESSION['fileForHistos_eos'];
-    //simPrint("fileForHistos_eos", $file); 
-    if ( file_exists($file) ) {
-        $handleBasket = fopen($file, "r");
-        if ($handleBasket)
-        {
-            while(!feof($handleBasket))
-            {
-                $tmp = fgets($handleBasket);
-                $tmp = str_replace(array("\r", "\n"), '', $tmp);
-                $lineHisto1[] = $tmp;
-            }
-            fclose($handleBasket);
-        }
-        else {
-            simPrint("can not open", $file);
-        }
-    }
-    else {
-        echo $file . " does not exist. Create it<br>\n";
-        fopen($file, "w");
-    }
-}
-
 if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
 {
-    $handle_2 = fopen($chemin_eos . "/" . $histosFileName, "r");
-    if ($handle_2)
-    {
-        while(!feof($handle_2))
-        {
-            $lineHisto[] = fgets($handle_2); // read the ElectronMC**Histos**.txt file
-        }
-        fclose($handle_2);
-    }
-
     $histoArray_0 = createHistoArray($lineHisto);
-
     $clefs_0 = array_keys($histoArray_0);
 
     ##### test with Title/Histo name choice
@@ -305,12 +268,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     }
 
     /* Write the table with all histos */
-    if ( $url_flag ) {
-        echo '<div id="tableHistos" class="parent blackBorder1 hidden">';
-    }
-    else {
-        echo '<div id="tableHistos" class="parent blackBorder1 d-block">';
-    }
     echo '<table class="tab6">';
     for ($ic = 0; $ic < count($clefs); $ic++) {
         $aaa = $ic % 5;
@@ -508,8 +465,6 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var url2 = <?php echo json_encode($url_2); ?>;
     var url4 = <?php echo json_encode($url_4); ?>;
     var web_roots_KS = <?php echo json_encode($web_roots_KS . '/main_display_KS.php'); ?>;
-    var img_add = <?php echo json_encode($image_add); ?>;
-    var img_remove = <?php echo json_encode($image_remove); ?>;
     var web_path = <?php echo json_encode($web_roots . '/basket.php?'); ?>;
 
     var tabPaths1 = <?php echo json_encode($tabPaths1);  ?>;
@@ -517,6 +472,9 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var tabConfigs = <?php echo json_encode($tabConfigs);  ?>;
     var chemin = <?php echo json_encode($chemin);  ?>;
     var tabMaxDiffPictures = <?php echo json_encode($tabMaxDiffPictures);  ?>;
+    var img_point = <?php echo json_encode($image_point); ?>;
+    var img_add = <?php echo json_encode($image_add); ?>;
+    var img_remove = <?php echo json_encode($image_remove); ?>;
 </script>
 
 <!-- script nonce="<?php echo $nonce; ?>"> // addLink
@@ -852,6 +810,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 });
             }
             document.querySelector("#part1").classList.add("hidden");
+            document.querySelector("#part2").classList.add("hidden");
             document.querySelector("#line1").innerHTML = "";
             document.querySelector("#line2").innerHTML = "";
             document.querySelector("#line3").innerHTML = "";
@@ -912,20 +871,28 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         console.log('max diff pictures : ' + nb_pict);
         var ligne = "";
         if ( nb_pict > 0 ) {
-            /*var ligne = "";
-            for (let i = 1; i <= 3; i++) {
-                var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
-                //console.log('image : '+pict_name);
-                ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
-            }*/
             ligne = displayMaxDiffPictures(id);
         }
         $('#maxDiff').html(ligne)
+        // === display tableau histos ===
+        lineHistos = tabHistos[id];
+        histoArray_0 = createHistoArray(lineHistos);
+        //const clefs_0 = Object.keys(histoArray_0); // ?
+        //const valeurs = Object.values(histoArray_0); // ?
+        //console.log(clefs_0);
+
+        // Itérer
+        /*for (const [key, value] of Object.entries(histoArray_0)) {
+            console.log(key, value);
+        }*/
+        tablo = displayHistosTable(histoArray_0);
 
         $('#line1').html(infoText1);
         $('#line2').html(infoText2);
         $('#line3').html(infoText3);
+        $('#part1').html(tablo);
         $('#part1').removeClass("hidden");
+        $('#part2').removeClass("hidden");
     }
     function fillLine1(id) {
         var infoText1 = '<b><span class="redClass">' + tabConfigs[id][1] + '&nbsp;' + tabConfigs[id][2] + '</span></b>';
@@ -969,16 +936,76 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     }
     function displayMaxDiffPictures(id) {
         var ligne = "";
-        /*for (let i = 1; i <= 3; i++) {
-            var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
-            tl += " " + pict_name;
-            ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
-        }*/
         tabMaxDiffPictures[id].forEach(i => {
             var pict_name = chemin + '/' + tabPaths1[id][0] + '/pngs/maxDiff_comparison_values_' + i + '.png';
             ligne += '<img class="image img blueBorder2 w-200px" src="' + pict_name + '" alt="" >';
         });
         return ligne;
+    }
+    function displayHistosTable(histoArray_0) {
+        const clefs_0 = Object.keys(histoArray_0);
+        const nbClefs = Object.keys(histoArray_0).length;
+        var tablo = '<table class="tab6">';
+        for (let ic = 0; ic < nbClefs; ic++) {
+            aaa = ic % 5;
+            if ( aaa == 0 ) {
+                tablo += '<tr>';
+            }
+            tablo += '<td class="b2"><b> ' + clefs_0[ic] + '</b>';
+            const titleShortName = getShortName(clefs_0[ic]);
+            //console.log(clefs_0[ic] + ' - ' + titleShortName);
+            tablo += '<img width="18" height="15" src=' + img_point + ' alt="Top">' + ' <br><br>';
+            console.log(histoArray_0[clefs_0[ic]]);
+            tablo += '</td>';
+            if ( aaa == 4 ) {
+                tablo += '</tr>';
+            }
+        }
+        tablo += '</table>';
+        return tablo;
+    }
+    function createHistoArray(lineHistos) {
+        const histoArray_0 = {};
+        let key = "";
+        let tmp = [];
+
+        for (const line of lineHistos) {
+            if (line.trim().length === 0) { // empty line
+                if (key.length !== 0 && tmp.length !== 0) {
+                    histoArray_0[key] = tmp;
+                    key = "";
+                    tmp = [];
+                }
+            } else {
+                if (key.length === 0) {
+                    key = line; // title
+                } else {
+                    tmp.push(line);
+                    const t1 = line.split("/");
+                    const short_positions = t1[1].split(/[\s,]+/);
+                    if (short_positions[3] === "1") {
+                        tmp.push("endLine");
+                    }
+                }
+            }
+        }
+
+        return histoArray_0;
+    }
+    function getShortName(elem) {
+        const titles = elem.split(" ");
+        let titleShortName;
+
+        if (titles.length === 1) {
+            titleShortName = titles[0];
+        } else {
+            titleShortName = titles[0] + "_" + titles[1];
+        }
+
+        //titleShortName = titleShortName.slice(0, -1);
+        titleShortName = titleShortName.replace(/\n/g, '');
+
+        return titleShortName;
     }
 </script>
 

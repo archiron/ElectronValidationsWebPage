@@ -512,7 +512,7 @@ function writeAllHistos($histoArray, $clefs, $lineHisto1, $escaped_url, $pictsVa
     return $tab_histo2Write;
 }
 
-function createHistoArray($lineHisto) {
+function createHistoArray(array $lineHisto) : array {
     $histoArray_0 = array();
     $key = "";
     $tmp = array();
