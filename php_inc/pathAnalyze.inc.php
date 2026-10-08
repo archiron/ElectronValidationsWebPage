@@ -114,4 +114,30 @@ function extractAllFolders(array $tab) {
     return $t1;
 }
 
+function deepReverse(array &$data): void {
+    $data = array_reverse($data, true);
+    foreach ($data as &$l1) {
+        $l1 = array_reverse($l1);
+        foreach ($l1 as &$l2) {
+            $l2 = array_reverse($l2);
+            foreach ($l2 as &$l3) {
+                $l3 = array_reverse($l3);
+            }
+        }
+    }
+}
+function deepReverse3(array &$arr): void {
+    $arr = array_reverse($arr, true);  // ← true = preserve keys
+    foreach ($arr as &$l1) {
+        if (is_array($l1)) {
+            $l1 = array_reverse($l1, true);
+            foreach ($l1 as &$l2) {
+                if (is_array($l2)) {
+                    $l2 = array_reverse($l2, true);
+                }
+            }
+        }
+    }
+}
+
 ?>

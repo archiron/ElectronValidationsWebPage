@@ -123,6 +123,7 @@ if (!isset($nonce)) {
     $allKeys = array_keys($allList);
     $dirsList_date = array_map(fn($t) => $chemin_eos . '/' . $t, $allKeys);
     $tab_General = extractFolders4Accordion($allList); // idem allLists mais avec les releases 10 / 11 .. 15 / 16
+    deepReverse($tab_General);
     $tab_Keys = array_keys($tab_General);
     $tabPaths1 = extractAllPaths($allList, $chemin_eos); // equivalent des actionFrom
     $tabPaths2 = convertTabPaths($tabPaths1);
@@ -443,6 +444,10 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     echo '</div>';
 
 } // end of web page construction of histos
+
+/*prePrint(' === tab general ===', $tab_General);
+deepReverse($tab_General);
+prePrint('<br> === tab general ===', $tab_General);*/
 
 ?>
 
@@ -956,7 +961,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             let jc = 0;
             let kc = 0;
             for (const [key, value] of Object.entries(histoArray_0[clefs_0[ic]])) {
-                console.log(key, value);
+                //console.log(key, value);
                 if (value != 'endLine') {
                     tablo += ic + '-' + jc + '-' + kc + '&nbsp;=&nbsp;';
                     kc += 1;
