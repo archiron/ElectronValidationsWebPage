@@ -230,27 +230,17 @@ if (!isset($nonce)) {
         displayReleasesAccordion($tab_General, $tabPaths2, count($tab_Keys), $chemin_eos);
     echo '</div>'; // fin div part3
 
-echo '<br><br><br>'. "\n";
-    echo ' <br>';
-    echo ' <br>';
-
-$action_tmp = substr($actionFrom,1);
-$action_list = explode("/", $action_tmp);
-if ( count($action_list) == 2) {
-    echo '<h2><center><b>' . $action_list[1] . '</b></center></h2><br>';
-}
-if (!(strpos($url, 'index') !== false)) {
-    echo ' <br><b><a href="'.$web_roots.'/indexNG.php">Roots</a></b>';
-    echo ' <br><br>';
-}
-
-echo '<div id="part2" class=" greenBorder1 fl-left CtextAlign w-54pct hidden">'; // part2 tableau images
+echo '<div id="part2" class=" greenBorder1 fl-left LtextAlign w-54pct hidden">'; // part2 tableau images
 echo 'part2 tableau images';
 echo '</div>'; // part2
 
 echo '<div id="part4" class=" greenBorder1 fl-left CtextAlign w-54pct">'; // part4 basket
 echo 'part4 basket';
 echo '</div>'; // part4
+
+echo '<br><br><br>'. "\n";
+    echo ' <br>';
+    echo ' <br>';
 
 // end of folders list web page construction
 
@@ -816,6 +806,8 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             document.querySelector("#line2").innerHTML = "";
             document.querySelector("#line3").innerHTML = "";
             document.querySelector("#maxDiff").innerHTML = "";
+            document.querySelector("#part1").innerHTML = "";
+            document.querySelector("#part2").innerHTML = "";
 
             content.classList.toggle('open');
             h0.classList.toggle('active');
@@ -960,7 +952,21 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             tablo += '<a href="#h_' + ic + '">';
             tablo += '<img width="18" height="15" src=' + img_point + ' alt="Top">' + ' <br><br>';
             tablo += '</a>';
-            console.log(histoArray_0[clefs_0[ic]]);
+            //console.log(histoArray_0[clefs_0[ic]]);
+            let jc = 0;
+            let kc = 0;
+            for (const [key, value] of Object.entries(histoArray_0[clefs_0[ic]])) {
+                console.log(key, value);
+                if (value != 'endLine') {
+                    tablo += ic + '-' + jc + '-' + kc + '&nbsp;=&nbsp;';
+                    kc += 1;
+                }
+                else { // endLine
+                    tablo += '<br>';
+                    kc = 0;
+                    jc += 1;
+                }
+            }
 
             tablo += '</td>';
             if ( aaa == 4 ) {
@@ -979,7 +985,25 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             histos += '<a href="#"><img class="s18" src=' + img_up + ' alt="Top"></a>';
             const titleShortName = getShortName(clefs_0[ic]);
             histos += '&nbsp;<b>' + clefs_0[ic] + ' - ' + ic + '</b>';
-            histos += '<br><br><br><br><br><br><br><br><br><br>'
+            //histos += '<br><br><br><br><br><br><br><br><br><br>'
+            histos += '</div>';
+            let jc = 0;
+            let kc = 0;
+            histos += '<div class="blueBorder1">';
+            for (const [key, value] of Object.entries(histoArray_0[clefs_0[ic]])) {
+                //console.log(key, value);
+                if (value != 'endLine') {
+                    histos += ic + '-' + jc + '-' + kc + '&nbsp;=&nbsp;';
+                    kc += 1;
+                }
+                else { // endLine
+                    histos += '<br>';
+                    kc = 0;
+                    jc += 1;
+                    histos += '</div>';
+                    histos += '<div class="blueBorder1">';
+                }
+            }
             histos += '</div>';
         }
         return histos;
