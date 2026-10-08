@@ -36,14 +36,13 @@ function extractAllConfigs(array $tab, string $chemin) : array{
     return $t2;
 }
 
-function extractAllMaxDiffPictures(array $tab, string $chemin) : array{
+function extractAllMaxDiffPictures(array $tab, string $chemin) : array{ // same as extractAllPaths + extractAllHistos + extractAllConfigs
     $t2 = [];  // numeros des images maxFiff
     foreach ($tab as $key0 => $value0) { // level 0
         $tt = [];
         for ($x = 1; $x <= 3; $x++) {
             $tmp = $chemin . '/' . $value0[0] . '/pngs/maxDiff_comparison_values_' . $x . '.png';
             if (file_exists($tmp)) {
-                //echo $tmp . "<br>\n";
                 $tt[] = $x;
             }
         }

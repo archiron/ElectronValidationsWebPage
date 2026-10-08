@@ -296,7 +296,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
                 $otherTextToWrite .= " <br>";
                 $jc += 1;
                 $kc = 0;
-        }
+            }
             elseif ( $histo_positions[3] == "0" ) {
                 if ($numLine == 0) {
                     $otherTextToWrite .= ' &nbsp;<a href="#' . $short_histo_name . '" class="' . $classColor . '" onclick="goToHisto(this.id)" id="' . $short_histo_name . '_2">' . $short_histo_name . '</a>' . " &nbsp;";
@@ -473,6 +473,7 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
     var chemin = <?php echo json_encode($chemin);  ?>;
     var tabMaxDiffPictures = <?php echo json_encode($tabMaxDiffPictures);  ?>;
     var img_point = <?php echo json_encode($image_point); ?>;
+    var img_up = <?php echo json_encode($image_up); ?>;
     var img_add = <?php echo json_encode($image_add); ?>;
     var img_remove = <?php echo json_encode($image_remove); ?>;
 </script>
@@ -886,13 +887,15 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             console.log(key, value);
         }*/
         tablo = displayHistosTable(histoArray_0);
+        images = displayHistosPictures(histoArray_0);
 
         $('#line1').html(infoText1);
         $('#line2').html(infoText2);
         $('#line3').html(infoText3);
-        $('#part1').html(tablo);
         $('#part1').removeClass("hidden");
         $('#part2').removeClass("hidden");
+        $('#part1').html(tablo);
+        $('#part2').html(images);
     }
     function fillLine1(id) {
         var infoText1 = '<b><span class="redClass">' + tabConfigs[id][1] + '&nbsp;' + tabConfigs[id][2] + '</span></b>';
@@ -954,8 +957,11 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
             tablo += '<td class="b2"><b> ' + clefs_0[ic] + '</b>';
             const titleShortName = getShortName(clefs_0[ic]);
             //console.log(clefs_0[ic] + ' - ' + titleShortName);
+            tablo += '<a href="#h_' + ic + '">';
             tablo += '<img width="18" height="15" src=' + img_point + ' alt="Top">' + ' <br><br>';
+            tablo += '</a>';
             console.log(histoArray_0[clefs_0[ic]]);
+
             tablo += '</td>';
             if ( aaa == 4 ) {
                 tablo += '</tr>';
@@ -963,6 +969,20 @@ if ( $pictsDir and $indexHtml and $histosFile ) // histos web page construction
         }
         tablo += '</table>';
         return tablo;
+    }
+    function displayHistosPictures(histoArray_0) {
+        const clefs_0 = Object.keys(histoArray_0);
+        const nbClefs = Object.keys(histoArray_0).length;
+        var histos = ''; 
+        for (let ic = 0; ic < nbClefs; ic++) {
+            histos += '<div id="h_' + ic + '">'; // class="line"
+            histos += '<a href="#"><img class="s18" src=' + img_up + ' alt="Top"></a>';
+            const titleShortName = getShortName(clefs_0[ic]);
+            histos += '&nbsp;<b>' + clefs_0[ic] + ' - ' + ic + '</b>';
+            histos += '<br><br><br><br><br><br><br><br><br><br>'
+            histos += '</div>';
+        }
+        return histos;
     }
     function createHistoArray(lineHistos) {
         const histoArray_0 = {};

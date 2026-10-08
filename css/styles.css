@@ -1,4 +1,7 @@
 /* LXPLUS */
+html {
+    scroll-behavior: smooth;
+}
 body {
   margin-top: 0px;
   padding-top: 0px;
@@ -253,7 +256,7 @@ table.tab4 {
 table.tab5 {
   padding: 5px;
   width: 100%;
-  border: 1px solid #008000;
+  border: 2px solid #008000;
   border-collapse: collapse;
 }
 table.tab6 {
@@ -280,6 +283,9 @@ table.tab6 {
 }
 .text-16px {
   font-size: 16px !important;
+}
+.text-20px {
+  font-size: 20px !important;
 }
 .text-30px {
   font-size: 30px !important;
